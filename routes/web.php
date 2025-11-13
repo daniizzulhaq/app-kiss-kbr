@@ -3,10 +3,11 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\BpdasDashboardController;
 use App\Http\Controllers\KelompokDashboardController;
+use App\Http\Controllers\PermasalahanKelompokController;
+use App\Http\Controllers\PermasalahanBpdasController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    // Arahkan langsung ke halaman login
     return redirect()->route('login');
 });
 
@@ -20,15 +21,29 @@ Route::middleware('auth')->group(function () {
     })->name('dashboard');
 
     // Dashboard BPDAS
-    Route::middleware(['role:bpdas'])->group(function () {
-        Route::get('/bpdas/dashboard', [BpdasDashboardController::class, 'index'])
-            ->name('bpdas.dashboard');
+    Route::middleware(['role:bpdas'])->prefix('bpdas')->name('bpdas.')->group(function () {
+        Route::get('/dashboard', [BpdasDashboardController::class, 'index'])->name('dashboard');
+        
+        // Routes Permasalahan BPDAS
+        Route::get('/permasalahan', [PermasalahanBpdasController::class, 'index'])->name('permasalahan.index');
+        Route::get('/permasalahan/{permasalahan}', [PermasalahanBpdasController::class, 'show'])->name('permasalahan.show');
+        Route::post('/permasalahan/{permasalahan}/terima', [PermasalahanBpdasController::class, 'terima'])->name('permasalahan.terima');
+        Route::put('/permasalahan/{permasalahan}/solusi', [PermasalahanBpdasController::class, 'updateSolusi'])->name('permasalahan.solusi');
     });
 
     // Dashboard Kelompok
-    Route::middleware(['role:kelompok'])->group(function () {
-        Route::get('/kelompok/dashboard', [KelompokDashboardController::class, 'index'])
-            ->name('kelompok.dashboard');
+    Route::middleware(['role:kelompok'])->prefix('kelompok')->name('kelompok.')->group(function () {
+        Route::get('/dashboard', [KelompokDashboardController::class, 'index'])->name('dashboard');
+        
+        // Routes Permasalahan Kelompok
+        Route::resource('permasalahan', PermasalahanKelompokController::class);
+         // Route tambahan untuk tanggapan
+    Route::get('/permasalahan/{permasalahan}/tanggapan', [PermasalahanKelompokController::class, 'tanggapan'])
+        ->name('permasalahan.tanggapan');
+    
+    Route::post('/permasalahan/{permasalahan}/tanggapan', [PermasalahanKelompokController::class, 'storeTanggapan'])
+        ->name('permasalahan.tanggapan.store');
+        
     });
 
     // Profile routes

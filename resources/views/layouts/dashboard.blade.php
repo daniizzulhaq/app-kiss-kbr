@@ -56,10 +56,13 @@
                 <span class="text-2xl">⚠️</span>
                 <span class="ml-3 font-medium">Terima Permasalahan</span>
             </a>
-            <a href="#" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300">
-                <span class="text-2xl">👷‍♂️</span>
-                <span class="ml-3 font-medium">Realisasi Tenaga</span>
-            </a>
+            <!-- Untuk User Kelompok -->
+<!-- Untuk BPDAS -->
+<a href="{{ route('bpdas.kelompok.index') }}" 
+   class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('bpdas.kelompok.*') ? 'bg-green-700' : '' }}">
+    <span class="text-2xl">👥</span>
+    <span class="ml-3 font-medium">Data Kelompok</span>
+</a>
            <a href="{{ route('bpdas.geotagging.index') }}" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('bpdas.geotagging.*') ? 'bg-green-700 shadow-lg' : '' }}">
     <span class="text-2xl">📍</span>
     <span class="ml-3 font-medium">Geotagging</span>
@@ -86,10 +89,13 @@
     <span class="text-2xl">📍</span>
     <span class="ml-3 font-medium">Calon Lokasi</span>
 </a>
-            <a href="#" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300">
-                <span class="text-2xl">👥</span>
-                <span class="ml-3 font-medium">Kelompok</span>
-            </a>
+            <!-- Untuk BPDAS -->
+<!-- Untuk User Kelompok -->
+<a href="{{ route('kelompok.data-kelompok.index') }}" 
+   class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('kelompok.data-kelompok.*') ? 'bg-green-700' : '' }}">
+    <span class="text-2xl">👷‍♂️</span>
+    <span class="ml-3 font-medium">Kelompok</span>
+</a>
             <a href="#" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300">
                 <span class="text-2xl">🌱</span>
                 <span class="ml-3 font-medium">Rencana Bibit</span>

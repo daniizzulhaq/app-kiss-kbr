@@ -7,6 +7,8 @@ use App\Http\Controllers\PermasalahanKelompokController;
 use App\Http\Controllers\PermasalahanBpdasController;
 use App\Http\Controllers\CalonLokasiKelompokController;
 use App\Http\Controllers\GeotaggingBpdasController;
+use App\Http\Controllers\KelompokController;// ← WAJIB ADA
+use App\Http\Controllers\KelompokBpdasController;//
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -14,6 +16,7 @@ Route::get('/', function () {
 });
 
 Route::middleware('auth')->group(function () {
+
     // Redirect berdasarkan role setelah login
     Route::get('/dashboard', function () {
         if (auth()->user()->isBpdas()) {
@@ -22,44 +25,67 @@ Route::middleware('auth')->group(function () {
         return redirect()->route('kelompok.dashboard');
     })->name('dashboard');
 
-    // Dashboard BPDAS
+    /*
+    |--------------------------------------------------------------------------
+    | ROUTE BPDAS
+    |--------------------------------------------------------------------------
+    */
     Route::middleware(['role:bpdas'])->prefix('bpdas')->name('bpdas.')->group(function () {
         Route::get('/dashboard', [BpdasDashboardController::class, 'index'])->name('dashboard');
-        
-        // Routes Permasalahan BPDAS
+
+        // Permasalahan BPDAS
         Route::get('/permasalahan', [PermasalahanBpdasController::class, 'index'])->name('permasalahan.index');
         Route::get('/permasalahan/{permasalahan}', [PermasalahanBpdasController::class, 'show'])->name('permasalahan.show');
         Route::post('/permasalahan/{permasalahan}/terima', [PermasalahanBpdasController::class, 'terima'])->name('permasalahan.terima');
         Route::put('/permasalahan/{permasalahan}/solusi', [PermasalahanBpdasController::class, 'updateSolusi'])->name('permasalahan.solusi');
-        
-        // Routes Geotagging BPDAS
+
+        // Geotagging
         Route::get('/geotagging', [GeotaggingBpdasController::class, 'index'])->name('geotagging.index');
         Route::get('/geotagging/{calonLokasi}', [GeotaggingBpdasController::class, 'show'])->name('geotagging.show');
         Route::put('/geotagging/{calonLokasi}/verifikasi', [GeotaggingBpdasController::class, 'verifikasi'])->name('geotagging.verifikasi');
+
+        Route::get('/kelompok', [KelompokBpdasController::class, 'index'])->name('kelompok.index'); 
+        Route::get('/kelompok/{kelompok}', [KelompokBpdasController::class, 'show'])->name('kelompok.show');
     });
 
-    // Dashboard Kelompok
+    /*
+    |--------------------------------------------------------------------------
+    | ROUTE KELOMPOK
+    |--------------------------------------------------------------------------
+    */
     Route::middleware(['role:kelompok'])->prefix('kelompok')->name('kelompok.')->group(function () {
         Route::get('/dashboard', [KelompokDashboardController::class, 'index'])->name('dashboard');
-        
-        // Routes Permasalahan Kelompok
+
+        // Permasalahan Kelompok
         Route::resource('permasalahan', PermasalahanKelompokController::class);
-        
-        // Route tambahan untuk tanggapan
+
+        // Tanggapan tambahan
         Route::get('/permasalahan/{permasalahan}/tanggapan', [PermasalahanKelompokController::class, 'tanggapan'])
             ->name('permasalahan.tanggapan');
-        
         Route::post('/permasalahan/{permasalahan}/tanggapan', [PermasalahanKelompokController::class, 'storeTanggapan'])
             ->name('permasalahan.tanggapan.store');
-        
-        // Routes Calon Lokasi Kelompok
+
+        // CRUD Data Kelompok
+        Route::get('/data-kelompok', [KelompokController::class, 'index'])->name('data-kelompok.index');
+        Route::get('/data-kelompok/create', [KelompokController::class, 'create'])->name('data-kelompok.create');
+        Route::post('/data-kelompok', [KelompokController::class, 'store'])->name('data-kelompok.store');
+        Route::get('/data-kelompok/{kelompok}/edit', [KelompokController::class, 'edit'])->name('data-kelompok.edit');
+        Route::put('/data-kelompok/{kelompok}', [KelompokController::class, 'update'])->name('data-kelompok.update');
+        Route::delete('/data-kelompok/{kelompok}', [KelompokController::class, 'destroy'])->name('data-kelompok.destroy');
+
+        // Calon Lokasi
         Route::resource('calon-lokasi', CalonLokasiKelompokController::class);
     });
 
-    // Profile routes
+    /*
+    |--------------------------------------------------------------------------
+    | PROFILE ROUTES
+    |--------------------------------------------------------------------------
+    */
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+// Authentication routes
 require __DIR__.'/auth.php';

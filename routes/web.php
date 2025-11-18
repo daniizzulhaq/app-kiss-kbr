@@ -9,6 +9,8 @@ use App\Http\Controllers\CalonLokasiKelompokController;
 use App\Http\Controllers\GeotaggingBpdasController;
 use App\Http\Controllers\KelompokController;// ← WAJIB ADA
 use App\Http\Controllers\KelompokBpdasController;//
+use App\Http\Controllers\RencanaBibitController;//
+use App\Http\Controllers\RencanaBibitBpdasController;//
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -46,6 +48,11 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/kelompok', [KelompokBpdasController::class, 'index'])->name('kelompok.index'); 
         Route::get('/kelompok/{kelompok}', [KelompokBpdasController::class, 'show'])->name('kelompok.show');
+
+         Route::get('/rencana-bibit', [RencanaBibitBpdasController::class, 'index'])->name('rencana-bibit.index');
+    Route::get('/rencana-bibit/statistik', [RencanaBibitBpdasController::class, 'statistik'])->name('rencana-bibit.statistik');
+    Route::get('/rencana-bibit/{rencanaBibit}', [RencanaBibitBpdasController::class, 'show'])->name('rencana-bibit.show');
+
     });
 
     /*
@@ -75,6 +82,8 @@ Route::middleware('auth')->group(function () {
 
         // Calon Lokasi
         Route::resource('calon-lokasi', CalonLokasiKelompokController::class);
+
+        Route::resource('rencana-bibit', RencanaBibitController::class);
     });
 
     /*

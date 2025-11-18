@@ -6,21 +6,47 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
         Schema::table('permasalahan', function (Blueprint $table) {
-            $table->enum('prioritas', ['rendah', 'sedang', 'tinggi'])->default('rendah')->after('permasalahan');
-            $table->enum('status', ['pending', 'diproses', 'selesai'])->default('pending')->after('prioritas');
-            $table->text('solusi')->nullable()->after('status');
-            $table->string('ditangani_oleh')->nullable()->after('solusi');
-            $table->timestamp('ditangani_pada')->nullable()->after('ditangani_oleh');
+
+            // Tambahkan kolom yang belum ada
+            if (!Schema::hasColumn('permasalahan', 'kategori')) {
+                $table->string('kategori')->nullable();
+            }
+
+            if (!Schema::hasColumn('permasalahan', 'tanggal')) {
+                $table->date('tanggal')->nullable();
+            }
+
+            if (!Schema::hasColumn('permasalahan', 'status')) {
+                $table->string('status')->nullable();
+            }
+
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
         Schema::table('permasalahan', function (Blueprint $table) {
-            $table->dropColumn(['prioritas', 'status', 'solusi', 'ditangani_oleh', 'ditangani_pada']);
+
+            // Remove only if exists
+            if (Schema::hasColumn('permasalahan', 'kategori')) {
+                $table->dropColumn('kategori');
+            }
+            if (Schema::hasColumn('permasalahan', 'tanggal')) {
+                $table->dropColumn('tanggal');
+            }
+            if (Schema::hasColumn('permasalahan', 'status')) {
+                $table->dropColumn('status');
+            }
+
         });
     }
 };

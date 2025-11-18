@@ -67,6 +67,11 @@
     <span class="text-2xl">📍</span>
     <span class="ml-3 font-medium">Geotagging</span>
 </a>
+            <a href="{{ route('bpdas.rencana-bibit.index') }}" 
+   class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300">
+    <span class="text-2xl">🌱</span>
+    <span class="ml-3 font-medium">Rencana Bibit Kelompok</span>
+</a>
             <a href="#" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300">
                 <span class="text-2xl">🧱</span>
                 <span class="ml-3 font-medium">Rencana Pembuatan</span>
@@ -89,17 +94,17 @@
     <span class="text-2xl">📍</span>
     <span class="ml-3 font-medium">Calon Lokasi</span>
 </a>
-            <!-- Untuk BPDAS -->
+        
 <!-- Untuk User Kelompok -->
-<a href="{{ route('kelompok.data-kelompok.index') }}" 
-   class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('kelompok.data-kelompok.*') ? 'bg-green-700' : '' }}">
-    <span class="text-2xl">👷‍♂️</span>
-    <span class="ml-3 font-medium">Kelompok</span>
-</a>
-            <a href="#" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300">
-                <span class="text-2xl">🌱</span>
-                <span class="ml-3 font-medium">Rencana Bibit</span>
+            <a href="{{ route('kelompok.data-kelompok.index') }}" 
+            class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('kelompok.data-kelompok.*') ? 'bg-green-700' : '' }}">
+                <span class="text-2xl">👷‍♂️</span>
+                <span class="ml-3 font-medium">Kelompok</span>
             </a>
+            <a href="{{ route('kelompok.rencana-bibit.index') }}" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300">
+    <span class="text-2xl">🌱</span>
+    <span class="ml-3 font-medium">Rencana Bibit</span>
+</a>
             <a href="#" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300">
                 <span class="text-2xl">🌳</span>
                 <span class="ml-3 font-medium">Realisasi Bibit</span>

@@ -6,23 +6,33 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
-{
-    Schema::table('permasalahan', function (Blueprint $table) {
-        $table->string('sarpras')->nullable();
-        $table->string('bibit')->nullable();
-        $table->string('lokasi_tanam')->nullable();
-    });
-}
+    {
+        Schema::table('permasalahan', function (Blueprint $table) {
+            if (!Schema::hasColumn('permasalahan', 'sarpras')) {
+                $table->string('sarpras')->nullable();
+            }
+            if (!Schema::hasColumn('permasalahan', 'bibit')) {
+                $table->string('bibit')->nullable();
+            }
+            if (!Schema::hasColumn('permasalahan', 'lokasi_tanam')) {
+                $table->string('lokasi_tanam')->nullable();
+            }
+        });
+    }
 
-public function down(): void
-{
-    Schema::table('permasalahan', function (Blueprint $table) {
-        $table->dropColumn(['sarpras', 'bibit', 'lokasi_tanam']);
-    });
-}
-
+    public function down(): void
+    {
+        Schema::table('permasalahan', function (Blueprint $table) {
+            if (Schema::hasColumn('permasalahan', 'sarpras')) {
+                $table->dropColumn('sarpras');
+            }
+            if (Schema::hasColumn('permasalahan', 'bibit')) {
+                $table->dropColumn('bibit');
+            }
+            if (Schema::hasColumn('permasalahan', 'lokasi_tanam')) {
+                $table->dropColumn('lokasi_tanam');
+            }
+        });
+    }
 };

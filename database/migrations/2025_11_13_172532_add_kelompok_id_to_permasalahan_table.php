@@ -7,18 +7,24 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     public function up(): void
-    {
-        Schema::table('permasalahan', function (Blueprint $table) {
-            // Tambahkan kolom kelompok_id setelah kolom id
-            $table->foreignId('kelompok_id')->after('id')->constrained('users')->onDelete('cascade');
-        });
-    }
+{
+    Schema::table('permasalahan', function (Blueprint $table) {
+        if (!Schema::hasColumn('permasalahan', 'kelompok_id')) {
+            $table->foreignId('kelompok_id')
+                ->constrained('kelompok', 'id_kelompok')
+                ->onDelete('cascade');
+        }
+    });
+}
 
-    public function down(): void
-    {
-        Schema::table('permasalahan', function (Blueprint $table) {
+public function down(): void
+{
+    Schema::table('permasalahan', function (Blueprint $table) {
+        if (Schema::hasColumn('permasalahan', 'kelompok_id')) {
             $table->dropForeign(['kelompok_id']);
             $table->dropColumn('kelompok_id');
-        });
-    }
+        }
+    });
+}
+
 };

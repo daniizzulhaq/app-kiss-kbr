@@ -68,18 +68,15 @@
     <span class="ml-3 font-medium">Geotagging</span>
 </a>
             <a href="{{ route('bpdas.rencana-bibit.index') }}" 
-   class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300">
-    <span class="text-2xl">🌱</span>
-    <span class="ml-3 font-medium">Rencana Bibit Kelompok</span>
-</a>
-            <a href="#" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300">
-                <span class="text-2xl">🧱</span>
-                <span class="ml-3 font-medium">Rencana Pembuatan</span>
-            </a>
-            <a href="#" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300">
+   <a href="#" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300">
                 <span class="text-2xl">🌳</span>
-                <span class="ml-3 font-medium">Rencana Pembelian Bibit</span>
+                <span class="ml-3 font-medium">Rencana Bibit Kelompok</span>
             </a>
+            
+            <a href="{{ route('bpdas.realisasi-bibit.index') }}" class="...">
+    <span class="text-2xl">🌳</span>
+    <span class="ml-3 font-medium">Realisasi Bibit Kelompok</span>
+</a>
         @else
             <!-- Menu Kelompok -->
             <a href="{{ route('kelompok.dashboard') }}" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('kelompok.dashboard') ? 'bg-green-700 shadow-lg' : '' }}">
@@ -91,9 +88,9 @@
                 <span class="ml-3 font-medium">Permasalahan</span>
             </a>
             <a href="{{ route('kelompok.calon-lokasi.index') }}" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('kelompok.calon-lokasi.*') ? 'bg-green-700 shadow-lg' : '' }}">
-    <span class="text-2xl">📍</span>
-    <span class="ml-3 font-medium">Calon Lokasi</span>
-</a>
+                <span class="text-2xl">📍</span>
+                <span class="ml-3 font-medium">Calon Lokasi</span>
+            </a>
         
 <!-- Untuk User Kelompok -->
             <a href="{{ route('kelompok.data-kelompok.index') }}" 
@@ -102,13 +99,13 @@
                 <span class="ml-3 font-medium">Kelompok</span>
             </a>
             <a href="{{ route('kelompok.rencana-bibit.index') }}" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300">
-    <span class="text-2xl">🌱</span>
-    <span class="ml-3 font-medium">Rencana Bibit</span>
-</a>
-            <a href="#" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300">
-                <span class="text-2xl">🌳</span>
-                <span class="ml-3 font-medium">Realisasi Bibit</span>
+                <span class="text-2xl">🌱</span>
+                <span class="ml-3 font-medium">Rencana Bibit</span>
             </a>
+        <a href="{{ route('kelompok.realisasi-bibit.index') }}" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300">
+            <span class="text-2xl">🌳</span>
+            <span class="ml-3 font-medium">Realisasi Bibit</span>
+         </a>
         @endif
     </nav>
 

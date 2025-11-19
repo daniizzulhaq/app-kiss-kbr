@@ -11,6 +11,8 @@ use App\Http\Controllers\KelompokController;// ← WAJIB ADA
 use App\Http\Controllers\KelompokBpdasController;//
 use App\Http\Controllers\RencanaBibitController;//
 use App\Http\Controllers\RencanaBibitBpdasController;//
+use App\Http\Controllers\RealisasiBibitController;
+use App\Http\Controllers\RealisasiBibitBpdasController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -53,6 +55,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/rencana-bibit/statistik', [RencanaBibitBpdasController::class, 'statistik'])->name('rencana-bibit.statistik');
     Route::get('/rencana-bibit/{rencanaBibit}', [RencanaBibitBpdasController::class, 'show'])->name('rencana-bibit.show');
 
+    Route::get('/realisasi-bibit', [RealisasiBibitBpdasController::class, 'index'])->name('realisasi-bibit.index');
+    Route::get('/realisasi-bibit/statistik', [RealisasiBibitBpdasController::class, 'statistik'])->name('realisasi-bibit.statistik');
+    Route::get('/realisasi-bibit/{realisasiBibit}', [RealisasiBibitBpdasController::class, 'show'])->name('realisasi-bibit.show');
+
     });
 
     /*
@@ -84,6 +90,8 @@ Route::middleware('auth')->group(function () {
         Route::resource('calon-lokasi', CalonLokasiKelompokController::class);
 
         Route::resource('rencana-bibit', RencanaBibitController::class);
+
+        Route::resource('realisasi-bibit', RealisasiBibitController::class);
     });
 
     /*

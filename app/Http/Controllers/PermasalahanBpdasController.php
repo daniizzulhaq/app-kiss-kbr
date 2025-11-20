@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Permasalahan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\PermasalahanExport;
 
 class PermasalahanBpdasController extends Controller
 {
@@ -30,7 +33,7 @@ class PermasalahanBpdasController extends Controller
         }
 
         $permasalahan->update([
-            'status' => 'diterima',
+            'status' => 'diproses',
             'ditangani_oleh' => Auth::id(),
             'ditangani_pada' => now(),
         ]);
@@ -43,7 +46,7 @@ class PermasalahanBpdasController extends Controller
     {
         $validated = $request->validate([
             'solusi' => 'required|string',
-            'status' => 'required|in:diterima,diproses,selesai,ditolak',
+            'status' => 'required|in:pending,diproses,selesai',
         ]);
 
         $permasalahan->update([
@@ -55,5 +58,53 @@ class PermasalahanBpdasController extends Controller
 
         return redirect()->route('bpdas.permasalahan.show', $permasalahan)
             ->with('success', 'Solusi berhasil disimpan!');
+    }
+
+    /**
+     * Export ke PDF
+     */
+    public function exportPdf(Request $request)
+    {
+        $query = Permasalahan::with('kelompokUser');
+
+        // Filter berdasarkan status jika ada
+        if ($request->has('status') && $request->status != '') {
+            $query->where('status', $request->status);
+        }
+
+        // Filter berdasarkan prioritas jika ada
+        if ($request->has('prioritas') && $request->prioritas != '') {
+            $query->where('prioritas', $request->prioritas);
+        }
+
+        // Filter berdasarkan tanggal
+        if ($request->has('tanggal_dari') && $request->tanggal_dari != '') {
+            $query->whereDate('created_at', '>=', $request->tanggal_dari);
+        }
+        if ($request->has('tanggal_sampai') && $request->tanggal_sampai != '') {
+            $query->whereDate('created_at', '<=', $request->tanggal_sampai);
+        }
+
+        $permasalahan = $query->latest()->get();
+
+        $pdf = Pdf::loadView('bpdas.permasalahan.pdf', [
+            'permasalahan' => $permasalahan,
+            'tanggal_export' => now()->format('d M Y H:i')
+        ]);
+
+        $pdf->setPaper('a4', 'landscape');
+
+        return $pdf->download('laporan-permasalahan-' . now()->format('Y-m-d') . '.pdf');
+    }
+
+    /**
+     * Export ke Excel
+     */
+    public function exportExcel(Request $request)
+    {
+        return Excel::download(
+            new PermasalahanExport($request->all()), 
+            'laporan-permasalahan-' . now()->format('Y-m-d') . '.xlsx'
+        );
     }
 }

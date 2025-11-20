@@ -9,8 +9,7 @@ class Kelompok extends Model
 {
     use HasFactory;
 
-    protected $table = 'kelompoks'; // Nama tabel
-    // Primary key otomatis 'id'
+    protected $table = 'kelompoks';
 
     protected $fillable = [
         'user_id',
@@ -24,37 +23,35 @@ class Kelompok extends Model
         'kontak',
         'spks',
         'rekening',
+        'dokumentasi', // Tambahkan ini
     ];
 
-    /**
-     * Relasi ke User
-     */
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
+    // Cast dokumentasi sebagai array
+    protected $casts = [
+        'dokumentasi' => 'array',
+    ];
 
-    /**
-     * Relasi ke Rencana Bibit
-     */
+    public function user()
+   {
+    return $this->belongsTo(User::class, 'user_id');
+}
     public function rencanaBibits()
     {
         return $this->hasMany(RencanaBibit::class, 'id_kelompok', 'id');
     }
 
-    /**
-     * Relasi ke Calon Lokasi
-     */
     public function calonLokasis()
     {
         return $this->hasMany(CalonLokasi::class, 'id_kelompok', 'id');
     }
 
-    /**
-     * Relasi ke Permasalahan
-     */
     public function permasalahans()
     {
         return $this->hasMany(Permasalahan::class, 'id_kelompok', 'id');
     }
+
+    public function realBibits()
+{
+    return $this->hasMany(RealBibit::class, 'id_kelompok');
+}
 }

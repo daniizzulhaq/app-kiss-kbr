@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Kelompok;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class KelompokController extends Controller
 {
@@ -15,7 +16,6 @@ class KelompokController extends Controller
 
     public function create()
     {
-        // Cek apakah user sudah memiliki data kelompok
         if (Kelompok::where('user_id', auth()->id())->exists()) {
             return redirect()->route('kelompok.data-kelompok.index')
                 ->with('error', 'Anda sudah memiliki data kelompok');
@@ -37,9 +37,22 @@ class KelompokController extends Controller
             'kontak' => 'nullable|string|max:255',
             'spks' => 'nullable|string|max:255',
             'rekening' => 'nullable|string',
+            'dokumentasi.*' => 'nullable|image|mimes:jpeg,jpg,png|max:2048', // Max 2MB per gambar
         ]);
 
         $validated['user_id'] = auth()->id();
+
+        // Handle upload dokumentasi
+        if ($request->hasFile('dokumentasi')) {
+            $dokumentasiPaths = [];
+            
+            foreach ($request->file('dokumentasi') as $file) {
+                $path = $file->store('dokumentasi-kelompok', 'public');
+                $dokumentasiPaths[] = $path;
+            }
+            
+            $validated['dokumentasi'] = $dokumentasiPaths;
+        }
 
         Kelompok::create($validated);
 
@@ -49,7 +62,6 @@ class KelompokController extends Controller
 
     public function edit(Kelompok $kelompok)
     {
-        // Pastikan user hanya bisa edit kelompoknya sendiri
         if ($kelompok->user_id !== auth()->id()) {
             abort(403);
         }
@@ -59,7 +71,6 @@ class KelompokController extends Controller
 
     public function update(Request $request, Kelompok $kelompok)
     {
-        // Pastikan user hanya bisa update kelompoknya sendiri
         if ($kelompok->user_id !== auth()->id()) {
             abort(403);
         }
@@ -75,7 +86,27 @@ class KelompokController extends Controller
             'kontak' => 'nullable|string|max:255',
             'spks' => 'nullable|string|max:255',
             'rekening' => 'nullable|string',
+            'dokumentasi.*' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
         ]);
+
+        // Handle upload dokumentasi baru
+        if ($request->hasFile('dokumentasi')) {
+            // Hapus dokumentasi lama
+            if ($kelompok->dokumentasi) {
+                foreach ($kelompok->dokumentasi as $oldPath) {
+                    Storage::disk('public')->delete($oldPath);
+                }
+            }
+
+            $dokumentasiPaths = [];
+            
+            foreach ($request->file('dokumentasi') as $file) {
+                $path = $file->store('dokumentasi-kelompok', 'public');
+                $dokumentasiPaths[] = $path;
+            }
+            
+            $validated['dokumentasi'] = $dokumentasiPaths;
+        }
 
         $kelompok->update($validated);
 
@@ -83,11 +114,53 @@ class KelompokController extends Controller
             ->with('success', 'Data kelompok berhasil diperbarui');
     }
 
+     public function deletePhoto(Request $request, Kelompok $kelompok)
+{
+    $request->validate([
+        'photo_path' => 'required|string',
+    ]);
+
+    $photoPath = $request->photo_path;
+
+    // Hapus file dari storage
+    if (Storage::exists($photoPath)) {
+        Storage::delete($photoPath);
+    }
+
+    // Update database: hapus path dari array dokumentasi
+    $dokumentasi = $kelompok->dokumentasi;
+
+    if (is_string($dokumentasi)) {
+        $dokumentasi = json_decode($dokumentasi, true);
+    }
+
+    if (is_array($dokumentasi)) {
+        $dokumentasi = array_filter($dokumentasi, function ($item) use ($photoPath) {
+            return $item !== $photoPath;
+        });
+        $kelompok->dokumentasi = array_values($dokumentasi); // reset index
+        $kelompok->save();
+    }
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Foto berhasil dihapus!'
+    ]);
+}
+
+
+
     public function destroy(Kelompok $kelompok)
     {
-        // Pastikan user hanya bisa hapus kelompoknya sendiri
         if ($kelompok->user_id !== auth()->id()) {
             abort(403);
+        }
+
+        // Hapus dokumentasi dari storage
+        if ($kelompok->dokumentasi) {
+            foreach ($kelompok->dokumentasi as $path) {
+                Storage::disk('public')->delete($path);
+            }
         }
 
         $kelompok->delete();

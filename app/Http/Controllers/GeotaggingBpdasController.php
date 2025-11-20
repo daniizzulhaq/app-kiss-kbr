@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\CalonLokasi;
+use App\Exports\GeotaggingExport;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class GeotaggingBpdasController extends Controller
 {
@@ -61,5 +64,45 @@ class GeotaggingBpdasController extends Controller
 
         return redirect()->route('bpdas.geotagging.index')
             ->with('success', "Lokasi berhasil {$status}!");
+    }
+
+    // Export Excel
+    public function exportExcel(Request $request)
+    {
+        $filters = [
+            'status' => $request->status,
+            'kabupaten' => $request->kabupaten,
+            'kecamatan' => $request->kecamatan,
+        ];
+
+        $filename = 'geotagging_' . date('Y-m-d_His') . '.xlsx';
+        
+        return Excel::download(new GeotaggingExport($filters), $filename);
+    }
+
+    // Export PDF
+    public function exportPdf(Request $request)
+    {
+        $query = CalonLokasi::with('user');
+
+        // Apply filters
+        if ($request->filled('status')) {
+            $query->where('status_verifikasi', $request->status);
+        }
+
+        if ($request->filled('kabupaten')) {
+            $query->where('kabupaten', 'like', '%' . $request->kabupaten . '%');
+        }
+
+        if ($request->filled('kecamatan')) {
+            $query->where('kecamatan', 'like', '%' . $request->kecamatan . '%');
+        }
+
+        $data = $query->latest()->get();
+
+        $pdf = Pdf::loadView('bpdas.geotagging.pdf', compact('data'))
+            ->setPaper('a4', 'landscape');
+
+        return $pdf->download('geotagging_' . date('Y-m-d_His') . '.pdf');
     }
 }

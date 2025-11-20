@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Dashboard Kelompok - Sistem KBR')</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -73,7 +74,7 @@
                 <span class="ml-3 font-medium">Rencana Bibit Kelompok</span>
             </a>
             
-            <a href="{{ route('bpdas.realisasi-bibit.index') }}" class="...">
+            <a href="{{ route('bpdas.realisasi-bibit.index') }}" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300">
     <span class="text-2xl">🌳</span>
     <span class="ml-3 font-medium">Realisasi Bibit Kelompok</span>
 </a>

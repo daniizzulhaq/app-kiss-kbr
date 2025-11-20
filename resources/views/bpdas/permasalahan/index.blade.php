@@ -22,6 +22,87 @@
             </div>
         @endif
 
+        <!-- Filter & Export Section -->
+        <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+            <div class="flex flex-wrap items-end gap-4">
+                <!-- Filter Form -->
+                <form method="GET" action="{{ route('bpdas.permasalahan.index') }}" class="flex-1 grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <!-- Filter Status -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                        <select name="status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                            <option value="">Semua Status</option>
+                            <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
+                            <option value="diproses" {{ request('status') == 'diproses' ? 'selected' : '' }}>Diproses</option>
+                            <option value="selesai" {{ request('status') == 'selesai' ? 'selected' : '' }}>Selesai</option>
+                        </select>
+                    </div>
+
+                    <!-- Filter Prioritas -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Prioritas</label>
+                        <select name="prioritas" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                            <option value="">Semua Prioritas</option>
+                            <option value="tinggi" {{ request('prioritas') == 'tinggi' ? 'selected' : '' }}>Tinggi</option>
+                            <option value="sedang" {{ request('prioritas') == 'sedang' ? 'selected' : '' }}>Sedang</option>
+                            <option value="rendah" {{ request('prioritas') == 'rendah' ? 'selected' : '' }}>Rendah</option>
+                        </select>
+                    </div>
+
+                    <!-- Filter Tanggal Dari -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Dari Tanggal</label>
+                        <input type="date" name="tanggal_dari" value="{{ request('tanggal_dari') }}" 
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                    </div>
+
+                    <!-- Filter Tanggal Sampai -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Sampai Tanggal</label>
+                        <input type="date" name="tanggal_sampai" value="{{ request('tanggal_sampai') }}" 
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                    </div>
+
+                    <!-- Tombol Filter -->
+                    <div class="md:col-span-4 flex gap-3">
+                        <button type="submit" 
+                                class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-all flex items-center gap-2">
+                            <span>🔍</span> Filter
+                        </button>
+                        <a href="{{ route('bpdas.permasalahan.index') }}" 
+                           class="px-6 py-2 bg-gray-300 hover:bg-gray-400 text-gray-700 rounded-lg font-medium transition-all">
+                            Reset
+                        </a>
+                    </div>
+                </form>
+
+                <!-- Export Buttons -->
+                <div class="flex gap-3">
+                    <form action="{{ route('bpdas.permasalahan.export.pdf') }}" method="GET" class="inline">
+                        <input type="hidden" name="status" value="{{ request('status') }}">
+                        <input type="hidden" name="prioritas" value="{{ request('prioritas') }}">
+                        <input type="hidden" name="tanggal_dari" value="{{ request('tanggal_dari') }}">
+                        <input type="hidden" name="tanggal_sampai" value="{{ request('tanggal_sampai') }}">
+                        <button type="submit" 
+                                class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-all shadow-lg hover:shadow-xl flex items-center gap-2">
+                            <span>📄</span> Export PDF
+                        </button>
+                    </form>
+
+                    <form action="{{ route('bpdas.permasalahan.export.excel') }}" method="GET" class="inline">
+                        <input type="hidden" name="status" value="{{ request('status') }}">
+                        <input type="hidden" name="prioritas" value="{{ request('prioritas') }}">
+                        <input type="hidden" name="tanggal_dari" value="{{ request('tanggal_dari') }}">
+                        <input type="hidden" name="tanggal_sampai" value="{{ request('tanggal_sampai') }}">
+                        <button type="submit" 
+                                class="px-6 py-3 bg-green-700 hover:bg-green-800 text-white rounded-lg font-medium transition-all shadow-lg hover:shadow-xl flex items-center gap-2">
+                            <span>📊</span> Export Excel
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
         <!-- Tabel Permasalahan -->
         <div class="bg-white rounded-xl shadow-md overflow-hidden">
             <div class="overflow-x-auto">

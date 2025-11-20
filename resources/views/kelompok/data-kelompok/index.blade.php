@@ -108,6 +108,28 @@
 
             </div>
 
+            <!-- Dokumentasi Foto -->
+            @if($kelompok->dokumentasi && count($kelompok->dokumentasi) > 0)
+            <div class="mt-6 pt-6 border-t border-gray-200">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">📸 Dokumentasi</h3>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    @foreach($kelompok->dokumentasi as $index => $foto)
+                    <div class="relative group cursor-pointer" onclick="openImageModal('{{ asset('storage/' . $foto) }}', {{ $index + 1 }})">
+                        <img src="{{ asset('storage/' . $foto) }}" 
+                             alt="Dokumentasi {{ $index + 1 }}"
+                             class="w-full h-32 object-cover rounded-lg border-2 border-gray-200 hover:border-green-500 transition-all duration-300 hover:shadow-lg">
+                        <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-300 rounded-lg flex items-center justify-center">
+                            <span class="text-white opacity-0 group-hover:opacity-100 text-sm font-semibold">🔍 Lihat</span>
+                        </div>
+                        <div class="absolute top-2 right-2 bg-green-600 text-white text-xs px-2 py-1 rounded">
+                            Foto {{ $index + 1 }}
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+            @endif
+
             <!-- Button Delete -->
             <div class="mt-8 pt-6 border-t border-gray-200">
                 <form action="{{ route('kelompok.data-kelompok.destroy', $kelompok) }}" 
@@ -202,6 +224,17 @@
     @endif
 </div>
 
+<!-- Image Modal -->
+<div id="imageModal" class="fixed inset-0 bg-black bg-opacity-75 z-50 hidden flex items-center justify-center p-4" onclick="closeImageModal()">
+    <div class="relative max-w-4xl w-full" onclick="event.stopPropagation()">
+        <button onclick="closeImageModal()" class="absolute -top-10 right-0 text-white hover:text-gray-300 text-2xl font-bold">
+            ✕
+        </button>
+        <img id="modalImage" src="" alt="Preview" class="w-full h-auto rounded-lg shadow-2xl">
+        <p id="modalCaption" class="text-white text-center mt-4 font-semibold"></p>
+    </div>
+</div>
+
 @if($kelompok && $kelompok->koordinat)
 <!-- Leaflet CSS & JS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
@@ -236,7 +269,7 @@ document.addEventListener('DOMContentLoaded', function() {
         maxZoom: 19
     }).addTo(map);
 
-    // Custom icon (opsional - bisa pakai default atau custom)
+    // Custom icon
     const customIcon = L.divIcon({
         className: 'custom-marker',
         html: '<div style="background-color: #16a34a; width: 30px; height: 30px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; font-size: 16px;">📍</div>',
@@ -269,18 +302,38 @@ document.addEventListener('DOMContentLoaded', function() {
 
     marker.bindPopup(popupContent).openPopup();
 
-    // Add circle radius (opsional - untuk menunjukkan area)
+    // Add circle radius
     L.circle([lat, lng], {
         color: '#16a34a',
         fillColor: '#22c55e',
         fillOpacity: 0.1,
-        radius: 500 // 500 meter radius
+        radius: 500
     }).addTo(map);
 
     // Fix map rendering
     setTimeout(function() {
         map.invalidateSize();
     }, 100);
+});
+
+// Modal functions
+function openImageModal(src, index) {
+    document.getElementById('imageModal').classList.remove('hidden');
+    document.getElementById('modalImage').src = src;
+    document.getElementById('modalCaption').textContent = `Dokumentasi Foto ${index}`;
+    document.body.style.overflow = 'hidden';
+}
+
+function closeImageModal() {
+    document.getElementById('imageModal').classList.add('hidden');
+    document.body.style.overflow = 'auto';
+}
+
+// Close modal dengan ESC key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeImageModal();
+    }
 });
 </script>
 @endif

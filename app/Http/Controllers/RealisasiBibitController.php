@@ -23,12 +23,18 @@ class RealisasiBibitController extends Controller
                 ->with('error', 'Anda belum memiliki data kelompok. Silakan buat data kelompok terlebih dahulu.');
         }
         
-        $realBibits = RealBibit::with('kelompok')
-            ->where('id_kelompok', $kelompok->id)
+        // Ambil semua kelompok dengan nama yang sama
+        $kelompokIds = Kelompok::where('nama_kelompok', $kelompok->nama_kelompok)
+            ->pluck('id')
+            ->toArray();
+        
+        // Ambil realisasi bibit dari semua kelompok dengan nama yang sama
+        $realBibits = RealBibit::with('kelompok.user')
+            ->whereIn('id_kelompok', $kelompokIds)
             ->latest()
             ->paginate(10);
 
-        return view('kelompok.realisasi-bibit.index', compact('realBibits'));
+        return view('kelompok.realisasi-bibit.index', compact('realBibits', 'kelompok'));
     }
 
     /**
@@ -96,7 +102,14 @@ class RealisasiBibitController extends Controller
         $user = auth()->user();
         $kelompok = Kelompok::where('user_id', $user->id)->first();
         
-        if (!$kelompok || $realisasiBibit->id_kelompok !== $kelompok->id) {
+        if (!$kelompok) {
+            abort(403, 'Anda belum memiliki kelompok.');
+        }
+        
+        // Cek apakah bibit ini dari kelompok dengan nama yang sama
+        $kelompokBibit = Kelompok::find($realisasiBibit->id_kelompok);
+        
+        if (!$kelompokBibit || $kelompokBibit->nama_kelompok !== $kelompok->nama_kelompok) {
             abort(403, 'Unauthorized access.');
         }
 
@@ -111,8 +124,9 @@ class RealisasiBibitController extends Controller
         $user = auth()->user();
         $kelompok = Kelompok::where('user_id', $user->id)->first();
         
+        // Hanya bisa edit data milik sendiri
         if (!$kelompok || $realisasiBibit->id_kelompok !== $kelompok->id) {
-            abort(403, 'Unauthorized access.');
+            abort(403, 'Anda hanya dapat mengedit data milik Anda sendiri.');
         }
 
         return view('kelompok.realisasi-bibit.edit', compact('realisasiBibit'));
@@ -126,8 +140,9 @@ class RealisasiBibitController extends Controller
         $user = auth()->user();
         $kelompok = Kelompok::where('user_id', $user->id)->first();
         
+        // Hanya bisa update data milik sendiri
         if (!$kelompok || $realisasiBibit->id_kelompok !== $kelompok->id) {
-            abort(403, 'Unauthorized access.');
+            abort(403, 'Anda hanya dapat mengupdate data milik Anda sendiri.');
         }
 
         $validated = $request->validate([
@@ -153,8 +168,9 @@ class RealisasiBibitController extends Controller
         $user = auth()->user();
         $kelompok = Kelompok::where('user_id', $user->id)->first();
         
+        // Hanya bisa delete data milik sendiri
         if (!$kelompok || $realisasiBibit->id_kelompok !== $kelompok->id) {
-            abort(403, 'Unauthorized access.');
+            abort(403, 'Anda hanya dapat menghapus data milik Anda sendiri.');
         }
 
         $realisasiBibit->delete();

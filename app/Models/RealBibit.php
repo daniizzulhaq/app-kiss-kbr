@@ -29,8 +29,11 @@ class RealBibit extends Model
     /**
      * Relasi ke Kelompok
      */
+    
     public function kelompok()
     {
         return $this->belongsTo(Kelompok::class, 'id_kelompok', 'id');
     }
+
+    
 }

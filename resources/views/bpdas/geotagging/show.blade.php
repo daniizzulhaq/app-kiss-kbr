@@ -4,14 +4,23 @@
 
 @section('content')
 @php
-    // Pastikan polygonCoordinates berupa array
+    // Polygon
     $polygonCoordinates = is_array($calonLokasi->polygon_coordinates)
         ? $calonLokasi->polygon_coordinates
         : json_decode($calonLokasi->polygon_coordinates, true) ?? [];
 
-    // Tentukan koordinat pusat
+    // Koordinat pusat
     $centerLat = $calonLokasi->latitude ?? $calonLokasi->center_latitude ?? -6.2088;
     $centerLng = $calonLokasi->longitude ?? $calonLokasi->center_longitude ?? 106.8456;
+
+    // Ambil PDF sesuai field index
+    $pdfFiles = [];
+    for($i = 1; $i <= 5; $i++){
+        $fieldName = "pdf_dokumen_{$i}";
+        if($calonLokasi->$fieldName){
+            $pdfFiles[] = $calonLokasi->$fieldName;
+        }
+    }
 @endphp
 
 <div class="max-w-5xl mx-auto">
@@ -63,6 +72,25 @@
                             🗺️ Lihat di Google Maps →
                         </a>
                     </div>
+
+                    <!-- PDF Dokumen -->
+                 <div class="border-b border-gray-200 pb-4 mt-4">
+    <label class="text-sm font-semibold text-gray-600">📄 Dokumen PDF</label>
+    <div class="mt-2 space-y-2">
+        @if(count($pdfFiles) > 0)
+            @foreach($pdfFiles as $index => $file)
+                <a href="{{ asset('storage/' . $file) }}" target="_blank"
+                   class="inline-flex items-center px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors font-medium">
+                   📑 Dokumen {{ $index + 1 }}
+                </a>
+            @endforeach
+        @else
+            <p class="text-gray-500">PDF belum di-upload oleh kelompok.</p>
+        @endif
+    </div>
+</div>
+
+
 
                     @if($calonLokasi->deskripsi)
                     <div class="border-b border-gray-200 pb-4">
@@ -151,16 +179,31 @@ if(polygonCoords.length > 0){
     const latlngs = polygonCoords.map(c => [c[0], c[1]]);
     const polygon = L.polygon(latlngs, { color:'#10b981', fillColor:'#10b981', fillOpacity:0.3, weight:3 }).addTo(map);
 
-    // Marker di centroid/pusat
+    // Marker di pusat
     const center = [{{ $centerLat }}, {{ $centerLng }}];
+
+    let popupContent = `<b>{{ $calonLokasi->nama_kelompok_desa }}</b><br>
+                        Jumlah Titik: ${latlngs.length}<br>
+                        Luas Area: {{ $calonLokasi->formatted_area ?? '-' }}<br>`;
+
+    // Tambahkan PDF di popup
+    const pdfFiles = @json($pdfFiles);
+    if(pdfFiles.length > 0){
+        pdfFiles.forEach(file => {
+            popupContent += `<a href="{{ asset('storage') }}/${file}" target="_blank">📑 Lihat PDF</a><br>`;
+        });
+    } else {
+        popupContent += 'PDF belum di-upload';
+    }
+
     L.marker(center).addTo(map)
-        .bindPopup(`<b>{{ $calonLokasi->nama_kelompok_desa }}</b><br>Jumlah Titik: ${latlngs.length}<br>Luas Area: {{ $calonLokasi->formatted_area ?? '-' }}`)
+        .bindPopup(popupContent)
         .openPopup();
 
     map.fitBounds(polygon.getBounds());
 } else {
     L.marker([{{ $centerLat }}, {{ $centerLng }}]).addTo(map)
-        .bindPopup('<b>{{ $calonLokasi->nama_kelompok_desa }}</b><br>Tidak ada polygon')
+        .bindPopup('<b>{{ $calonLokasi->nama_kelompok_desa }}</b><br>Tidak ada polygon<br>PDF belum di-upload')
         .openPopup();
 }
 </script>

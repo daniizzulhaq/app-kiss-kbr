@@ -16,7 +16,7 @@
             
             <!-- Form Section -->
             <div class="bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
-                <form action="{{ route('kelompok.data-kelompok.store') }}" method="POST" id="kelompokForm">
+                <form action="{{ route('kelompok.data-kelompok.store') }}" method="POST" enctype="multipart/form-data" id="kelompokForm">
                     @csrf
 
                     <!-- Nama Kelompok -->
@@ -116,6 +116,34 @@
                         <textarea name="rekening" rows="3"
                             class="w-full px-4 py-3 rounded-xl border-gray-300 shadow-sm focus:border-green-600 focus:ring-green-600">{{ old('rekening') }}</textarea>
                         @error('rekening') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                    </div>
+
+                    <!-- Dokumentasi Foto -->
+                    <div class="mb-6">
+                        <label class="block text-sm text-gray-700 font-semibold mb-2">
+                            📸 Dokumentasi Kelompok (Maksimal 5 Foto)
+                        </label>
+                        <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-3 rounded-lg">
+                            <p class="text-sm text-blue-800 flex items-start">
+                                <span class="mr-2">💡</span>
+                                <span>Upload foto dokumentasi kelompok seperti foto anggota, kegiatan, atau lokasi. Format: JPG, PNG. Maksimal 2MB per foto.</span>
+                            </p>
+                        </div>
+                        
+                        <input type="file" 
+                               name="dokumentasi[]" 
+                               id="dokumentasi" 
+                               multiple 
+                               accept="image/jpeg,image/jpg,image/png"
+                               class="w-full px-4 py-3 rounded-xl border-gray-300 shadow-sm focus:border-green-600 focus:ring-green-600"
+                               onchange="previewImages(event)">
+                        
+                        @error('dokumentasi.*')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                        
+                        <!-- Preview Container -->
+                        <div id="imagePreviewContainer" class="mt-4 grid grid-cols-2 md:grid-cols-3 gap-3"></div>
                     </div>
 
                     <!-- Buttons -->
@@ -297,6 +325,46 @@ document.getElementById('searchBox').addEventListener('keypress', function(e) {
             });
     }
 });
+
+// Preview images before upload
+function previewImages(event) {
+    const container = document.getElementById('imagePreviewContainer');
+    container.innerHTML = '';
+    
+    const files = event.target.files;
+    
+    if (files.length > 5) {
+        alert('⚠️ Maksimal 5 foto yang dapat diupload!');
+        event.target.value = '';
+        return;
+    }
+    
+    Array.from(files).forEach((file, index) => {
+        // Check file size (2MB = 2 * 1024 * 1024 bytes)
+        if (file.size > 2 * 1024 * 1024) {
+            alert(`⚠️ File ${file.name} melebihi ukuran maksimal 2MB!`);
+            return;
+        }
+        
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            const div = document.createElement('div');
+            div.className = 'relative group';
+            div.innerHTML = `
+                <img src="${e.target.result}" 
+                     class="w-full h-32 object-cover rounded-lg border-2 border-gray-300"
+                     alt="Preview ${index + 1}">
+                <div class="absolute top-2 right-2 bg-green-600 text-white text-xs px-2 py-1 rounded">
+                    Foto ${index + 1}
+                </div>
+            `;
+            container.appendChild(div);
+        };
+        
+        reader.readAsDataURL(file);
+    });
+}
 
 // Form validation
 document.getElementById('kelompokForm').addEventListener('submit', function(e) {

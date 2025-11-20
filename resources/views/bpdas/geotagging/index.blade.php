@@ -9,7 +9,30 @@
         <h1 class="text-4xl font-bold text-gray-800 mb-2">🗺️ Geotagging Data Lokasi</h1>
         <p class="text-gray-600">Kelola dan verifikasi data lokasi dari kelompok tani</p>
     </div>
-
+<!-- Export Buttons -->
+<div class="bg-white rounded-2xl shadow-lg p-4 mb-6">
+    <div class="flex items-center justify-between">
+        <h3 class="text-lg font-semibold text-gray-800">📥 Export Data</h3>
+        <div class="flex space-x-3">
+            <a href="{{ route('bpdas.geotagging.export.excel', request()->query()) }}" 
+               class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium inline-flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                Export Excel
+            </a>
+            
+            <a href="{{ route('bpdas.geotagging.export.pdf', request()->query()) }}" 
+               class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium inline-flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                </svg>
+                Export PDF
+            </a>
+        </div>
+    </div>
+    <p class="text-sm text-gray-600 mt-2">Export data sesuai filter yang aktif</p>
+</div>
     @if(session('success'))
     <div class="mb-6 bg-green-50 border-l-4 border-green-500 p-4 rounded-lg slide-in">
         <div class="flex items-center">
@@ -123,6 +146,7 @@
                         <th class="px-6 py-4 text-left text-sm font-semibold">Koordinat</th>
                         <th class="px-6 py-4 text-left text-sm font-semibold">Pengusul</th>
                         <th class="px-6 py-4 text-left text-sm font-semibold">Status</th>
+                        <th class="px-6 py-4 text-left text-sm font-semibold">Dokumen</th>
                         <th class="px-6 py-4 text-center text-sm font-semibold">Aksi</th>
                     </tr>
                 </thead>
@@ -147,6 +171,21 @@
                         <td class="px-6 py-4 text-gray-700">{{ $lokasi->user->name ?? '-' }}</td>
                         <td class="px-6 py-4">{!! $lokasi->status_badge !!}</td>
                         <td class="px-6 py-4">
+                            @php $hasPdf = false; @endphp
+                            @for($i = 1; $i <= 5; $i++)
+                                @php $fieldName = "pdf_dokumen_{$i}"; @endphp
+                                @if($lokasi->$fieldName)
+                                    @php $hasPdf = true; @endphp
+                                    <a href="{{ asset('storage/' . $lokasi->$fieldName) }}" target="_blank" class="text-blue-600 hover:underline text-xs">
+                                        Dokumen {{ $i }}
+                                    </a><br>
+                                @endif
+                            @endfor
+                            @if(!$hasPdf)
+                                <span class="text-gray-500 text-xs">Tidak ada</span>
+                            @endif
+                        </td>
+                        <td class="px-6 py-4">
                             <div class="flex items-center justify-center space-x-2">
                                 <a href="{{ route('bpdas.geotagging.show', $lokasi) }}" 
                                    class="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-sm font-medium">
@@ -157,7 +196,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7" class="px-6 py-12 text-center">
+                        <td colspan="8" class="px-6 py-12 text-center">
                             <div class="flex flex-col items-center justify-center">
                                 <span class="text-6xl mb-4">📍</span>
                                 <p class="text-gray-500 font-medium">Belum ada data lokasi</p>
@@ -204,7 +243,6 @@ locations.forEach(loc => {
 
     let popupContent = `<b>${loc.nama_kelompok_desa}</b><br>Status: ${loc.status_verifikasi}`;
 
-    // Tambahkan info polygon jika ada
     if(loc.polygon_coordinates && loc.polygon_coordinates.length > 0){
         const points = loc.polygon_coordinates.length;
         popupContent += `<br>Jumlah titik polygon: ${points}`;

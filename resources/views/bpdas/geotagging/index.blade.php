@@ -130,17 +130,15 @@
                     @forelse($calonLokasis as $index => $lokasi)
                     <tr class="hover:bg-green-50 transition-colors duration-200">
                         <td class="px-6 py-4 text-gray-700">{{ $calonLokasis->firstItem() + $index }}</td>
-                        <td class="px-6 py-4">
-                            <div class="font-semibold text-gray-800">{{ $lokasi->nama_kelompok_desa }}</div>
-                        </td>
+                        <td class="px-6 py-4 font-semibold text-gray-800">{{ $lokasi->nama_kelompok_desa }}</td>
                         <td class="px-6 py-4">
                             <div class="text-sm text-gray-700">{{ $lokasi->kecamatan }}</div>
                             <div class="text-xs text-gray-500">{{ $lokasi->kabupaten }}</div>
                         </td>
                         <td class="px-6 py-4">
-                            @if($lokasi->latitude && $lokasi->longitude)
+                            @if($lokasi->center_latitude && $lokasi->center_longitude)
                                 <span class="text-xs text-green-700 font-mono bg-green-50 px-2 py-1 rounded">
-                                    {{ number_format($lokasi->latitude, 6) }}, {{ number_format($lokasi->longitude, 6) }}
+                                    {{ number_format($lokasi->center_latitude, 6) }}, {{ number_format($lokasi->center_longitude, 6) }}
                                 </span>
                             @else
                                 <span class="text-xs text-gray-500">Tidak ada koordinat</span>
@@ -197,19 +195,27 @@ const locations = @json($lokasiMap);
 locations.forEach(loc => {
     const color = loc.status_verifikasi === 'diverifikasi' ? 'green' : 
                   loc.status_verifikasi === 'ditolak' ? 'red' : 'orange';
-    
+
     const icon = L.divIcon({
         html: `<div style="background-color: ${color}; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>`,
         className: '',
         iconSize: [20, 20]
     });
-    
+
+    let popupContent = `<b>${loc.nama_kelompok_desa}</b><br>Status: ${loc.status_verifikasi}`;
+
+    // Tambahkan info polygon jika ada
+    if(loc.polygon_coordinates && loc.polygon_coordinates.length > 0){
+        const points = loc.polygon_coordinates.length;
+        popupContent += `<br>Jumlah titik polygon: ${points}`;
+    }
+
     L.marker([loc.latitude, loc.longitude], { icon: icon })
-        .bindPopup(`<b>${loc.nama_kelompok_desa}</b><br>Status: ${loc.status_verifikasi}`)
+        .bindPopup(popupContent)
         .addTo(map);
 });
 
-// Fit bounds if there are markers
+// Fit bounds jika ada marker
 if (locations.length > 0) {
     const bounds = L.latLngBounds(locations.map(loc => [loc.latitude, loc.longitude]));
     map.fitBounds(bounds, { padding: [50, 50] });

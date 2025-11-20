@@ -49,8 +49,7 @@
                         <option value="">-- Pilih Golongan --</option>
                         <option value="MPTS" {{ old('golongan') == 'MPTS' ? 'selected' : '' }}>🌳 MPTS (Multi Purpose Tree Species)</option>
                         <option value="Kayu" {{ old('golongan') == 'Kayu' ? 'selected' : '' }}>🪵 Kayu</option>
-                        <option value="Buah" {{ old('golongan') == 'Buah' ? 'selected' : '' }}>🍎 Buah</option>
-                        <option value="Bambu" {{ old('golongan') == 'Bambu' ? 'selected' : '' }}>🎋 Bambu</option>
+                       
                     </select>
                     @error('golongan')
                         <p class="mt-2 text-sm text-red-600">{{ $message }}</p>

@@ -6,246 +6,236 @@
 <div class="py-12">
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <!-- Header -->
-        <div class="mb-6">
-            <a href="{{ route('kelompok.calon-lokasi.index') }}" 
-               class="text-green-600 hover:text-green-700 font-medium mb-4 inline-block">
-                ← Kembali ke Daftar
-            </a>
-            <h2 class="text-3xl font-bold text-gray-800">📍 Detail Calon Lokasi</h2>
-            <p class="text-gray-600 mt-1">Informasi detail calon lokasi yang telah Anda ajukan</p>
+        <div class="mb-6 flex items-center justify-between">
+            <div>
+                <a href="{{ route('kelompok.calon-lokasi.index') }}" 
+                   class="text-green-600 hover:text-green-700 font-medium mb-4 inline-block">
+                    ← Kembali
+                </a>
+                <h2 class="text-3xl font-bold text-gray-800">📍 Detail Calon Lokasi</h2>
+                <p class="text-gray-600 mt-1">Informasi lengkap calon lokasi kegiatan</p>
+            </div>
+            <div>
+                {!! $calonLokasi->status_badge !!}
+            </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Main Content -->
+            <!-- Info Section -->
             <div class="lg:col-span-2 space-y-6">
-                <!-- Info Lokasi -->
+                <!-- Data Umum -->
                 <div class="bg-white rounded-xl shadow-lg p-8">
-                    <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-200">
-                        <h3 class="text-2xl font-bold text-gray-800">📋 Informasi Lokasi</h3>
-                        <span class="px-3 py-1 text-xs font-semibold rounded-full 
-                            @if($calonLokasi->status_verifikasi == 'pending') bg-yellow-100 text-yellow-800
-                            @elseif($calonLokasi->status_verifikasi == 'diverifikasi') bg-green-100 text-green-800
-                            @elseif($calonLokasi->status_verifikasi == 'ditolak') bg-red-100 text-red-800
-                            @else bg-gray-100 text-gray-800 @endif">
-                            @if($calonLokasi->status_verifikasi == 'pending') ⏳ Menunggu
-                            @elseif($calonLokasi->status_verifikasi == 'diverifikasi') ✅ Diverifikasi
-                            @elseif($calonLokasi->status_verifikasi == 'ditolak') ❌ Ditolak
-                            @else - @endif
-                        </span>
-                    </div>
-
+                    <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+                        <span>📋</span>
+                        <span>Data Umum</span>
+                    </h3>
+                    
                     <div class="space-y-4">
-                        <div class="border-b border-gray-200 pb-4">
-                            <label class="text-sm font-semibold text-gray-600">Nama Kelompok Desa</label>
-                            <p class="text-lg text-gray-800 mt-1 font-semibold">{{ $calonLokasi->nama_kelompok_desa }}</p>
+                        <div class="border-b border-gray-200 pb-3">
+                            <p class="text-sm text-gray-600 mb-1">Nama Kelompok Desa</p>
+                            <p class="text-lg font-semibold text-gray-800">{{ $calonLokasi->nama_kelompok_desa }}</p>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-4 border-b border-gray-200 pb-4">
+                        <div class="grid grid-cols-2 gap-4 border-b border-gray-200 pb-3">
                             <div>
-                                <label class="text-sm font-semibold text-gray-600">Kecamatan</label>
-                                <p class="text-gray-800 mt-1">{{ $calonLokasi->kecamatan }}</p>
+                                <p class="text-sm text-gray-600 mb-1">Kecamatan</p>
+                                <p class="font-semibold text-gray-800">{{ $calonLokasi->kecamatan }}</p>
                             </div>
                             <div>
-                                <label class="text-sm font-semibold text-gray-600">Kabupaten</label>
-                                <p class="text-gray-800 mt-1">{{ $calonLokasi->kabupaten }}</p>
+                                <p class="text-sm text-gray-600 mb-1">Kabupaten</p>
+                                <p class="font-semibold text-gray-800">{{ $calonLokasi->kabupaten }}</p>
                             </div>
                         </div>
 
-                        <div class="border-b border-gray-200 pb-4">
-                            <label class="text-sm font-semibold text-gray-600">📍 Koordinat GPS</label>
-                            @if($calonLokasi->latitude && $calonLokasi->longitude)
-                                <p class="text-gray-800 mt-1 font-mono text-lg">
-                                    {{ number_format($calonLokasi->latitude, 6) }}, {{ number_format($calonLokasi->longitude, 6) }}
-                                </p>
-                                <a href="https://www.google.com/maps?q={{ $calonLokasi->latitude }},{{ $calonLokasi->longitude }}" 
-                                   target="_blank"
-                                   class="inline-flex items-center mt-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-sm font-medium">
-                                    🗺️ Buka di Google Maps
-                                </a>
-                            @else
-                                <p class="text-gray-500 mt-1 text-sm">Koordinat tidak tersedia</p>
-                            @endif
+                        <div class="border-b border-gray-200 pb-3">
+                            <p class="text-sm text-gray-600 mb-1">Koordinat Pusat Area</p>
+                            <p class="font-mono text-sm text-gray-800">
+                                {{ $calonLokasi->center_latitude }}, {{ $calonLokasi->center_longitude }}
+                            </p>
                         </div>
-
-                        @if($calonLokasi->koordinat_pdf_lokasi)
-                        <div class="border-b border-gray-200 pb-4">
-                            <label class="text-sm font-semibold text-gray-600">📄 Dokumen PDF Koordinat</label>
-                            <div class="mt-2">
-                                <a href="{{ asset('storage/' . $calonLokasi->koordinat_pdf_lokasi) }}" 
-                                   target="_blank"
-                                   class="inline-flex items-center px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors font-medium">
-                                    📄 Lihat PDF Koordinat
-                                </a>
-                            </div>
-                        </div>
-                        @endif
 
                         @if($calonLokasi->deskripsi)
-                        <div class="border-b border-gray-200 pb-4">
-                            <label class="text-sm font-semibold text-gray-600">📝 Deskripsi Lokasi</label>
-                            <p class="text-gray-700 mt-2 leading-relaxed">{{ $calonLokasi->deskripsi }}</p>
-                        </div>
-                        @endif
-
-                        <div class="border-b border-gray-200 pb-4">
-                            <label class="text-sm font-semibold text-gray-600">📅 Tanggal Pengajuan</label>
-                            <p class="text-gray-800 mt-1">{{ $calonLokasi->created_at->format('d M Y, H:i') }} WIB</p>
-                        </div>
-
-                        @if($calonLokasi->catatan_bpdas)
-                        <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg">
-                            <label class="text-sm font-semibold text-blue-800">💬 Tanggapan dari BPDAS</label>
-                            <p class="text-blue-700 mt-2 leading-relaxed">{{ $calonLokasi->catatan_bpdas }}</p>
-                            <p class="text-xs text-blue-600 mt-2">{{ $calonLokasi->updated_at->format('d M Y, H:i') }} WIB</p>
+                        <div>
+                            <p class="text-sm text-gray-600 mb-1">Deskripsi</p>
+                            <p class="text-gray-800">{{ $calonLokasi->deskripsi }}</p>
                         </div>
                         @endif
                     </div>
                 </div>
 
-                <!-- Peta -->
-                @if($calonLokasi->latitude && $calonLokasi->longitude)
-                <div class="bg-white rounded-xl shadow-lg p-6">
-                    <h3 class="text-xl font-bold text-gray-800 mb-4">🗺️ Lokasi di Peta</h3>
-                    <div id="detailMap" class="w-full h-96 rounded-lg border-2 border-gray-200"></div>
+                <!-- Dokumen PDF -->
+                <div class="bg-white rounded-xl shadow-lg p-8">
+                    <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+                        <span>📄</span>
+                        <span>Dokumen PDF</span>
+                    </h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        @php $hasPdf = false; @endphp
+                        @for($i = 1; $i <= 5; $i++)
+                            @php $fieldName = "pdf_dokumen_{$i}"; @endphp
+                            @if($calonLokasi->$fieldName)
+                                @php $hasPdf = true; @endphp
+                                <a href="{{ asset('storage/' . $calonLokasi->$fieldName) }}" 
+                                   target="_blank"
+                                   class="flex items-center gap-3 p-4 border-2 border-gray-300 rounded-lg hover:border-green-500 hover:bg-green-50 transition-all group">
+                                    <div class="text-3xl">📑</div>
+                                    <div class="flex-1">
+                                        <p class="font-semibold text-gray-800 group-hover:text-green-700">Dokumen {{ $i }}</p>
+                                        <p class="text-xs text-gray-500">Klik untuk membuka</p>
+                                    </div>
+                                    <div class="text-green-600">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                        </svg>
+                                    </div>
+                                </a>
+                            @endif
+                        @endfor
+
+                        @if(!$hasPdf)
+                            <div class="col-span-2 text-center py-8 bg-gray-50 rounded-lg">
+                                <p class="text-gray-500">Tidak ada dokumen PDF yang diupload</p>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
+                @if($calonLokasi->catatan_bpdas)
+                <div class="bg-blue-50 border-l-4 border-blue-400 p-6 rounded-lg">
+                    <h4 class="font-bold text-blue-900 mb-2 flex items-center gap-2">
+                        <span>💬</span>
+                        <span>Catatan dari BPDAS</span>
+                    </h4>
+                    <p class="text-blue-800">{{ $calonLokasi->catatan_bpdas }}</p>
+                </div>
+                @endif
+
+                @if($calonLokasi->status_verifikasi === 'pending')
+                <div class="flex gap-3">
+                    <a href="{{ route('kelompok.calon-lokasi.edit', $calonLokasi) }}" 
+                       class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-all text-center">
+                        ✏️ Edit Data
+                    </a>
+                    <form action="{{ route('kelompok.calon-lokasi.destroy', $calonLokasi) }}" 
+                          method="POST" 
+                          class="flex-1"
+                          onsubmit="return confirm('Yakin ingin menghapus data ini?')">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" 
+                                class="w-full bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-all">
+                            🗑️ Hapus
+                        </button>
+                    </form>
                 </div>
                 @endif
             </div>
 
-            <!-- Sidebar -->
-            <div class="space-y-6">
-                <!-- Status Card -->
-                <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl shadow-lg p-6 border-2 border-green-200">
-                    <h3 class="text-lg font-bold text-gray-800 mb-3">ℹ️ Status Pengajuan</h3>
-                    <div class="space-y-3 text-sm">
-                        <div>
-                            <p class="text-gray-600 font-semibold mb-1">Status Saat Ini:</p>
-                            <span class="px-3 py-1 text-xs font-semibold rounded-full inline-block
-                                @if($calonLokasi->status_verifikasi == 'pending') bg-yellow-100 text-yellow-800
-                                @elseif($calonLokasi->status_verifikasi == 'diverifikasi') bg-green-100 text-green-800
-                                @elseif($calonLokasi->status_verifikasi == 'ditolak') bg-red-100 text-red-800
-                                @else bg-gray-100 text-gray-800 @endif">
-                                @if($calonLokasi->status_verifikasi == 'pending') ⏳ Menunggu Verifikasi
-                                @elseif($calonLokasi->status_verifikasi == 'diverifikasi') ✅ Sudah Diverifikasi
-                                @elseif($calonLokasi->status_verifikasi == 'ditolak') ❌ Ditolak
-                                @else - @endif
-                            </span>
-                        </div>
-                        
-                        <div class="pt-3 border-t border-green-200">
-                            <p class="text-gray-600 font-semibold mb-1">Tanggal Pengajuan:</p>
-                            <p class="text-gray-700">{{ $calonLokasi->created_at->format('d M Y, H:i') }} WIB</p>
-                        </div>
+            <!-- Map Section -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-xl shadow-lg p-6 sticky top-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                        <span>🗺️</span>
+                        <span>Peta Lokasi</span>
+                    </h3>
 
-                        @if($calonLokasi->status_verifikasi !== 'pending')
-                        <div class="pt-3 border-t border-green-200">
-                            <p class="text-gray-600 font-semibold mb-1">Tanggal Diproses:</p>
-                            <p class="text-gray-700">{{ $calonLokasi->updated_at->format('d M Y, H:i') }} WIB</p>
+                    <div id="map" class="w-full h-96 rounded-lg border-2 border-gray-300 shadow-inner mb-4"></div>
+
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <p class="text-sm font-semibold text-green-800 mb-2">📐 Informasi Area</p>
+                        <div class="space-y-1">
+                            @php
+                                $polygonCoordinates = is_array($calonLokasi->polygon_coordinates) 
+                                    ? $calonLokasi->polygon_coordinates 
+                                    : json_decode($calonLokasi->polygon_coordinates, true) ?? [];
+                            @endphp
+                            <p class="text-xs text-green-700">
+                                <span class="font-semibold">Luas:</span> 
+                                <span id="areaSize">
+                                    @if($calonLokasi->polygon_area)
+                                        {{ $calonLokasi->formatted_area }}
+                                    @else
+                                        Tidak ada data
+                                    @endif
+                                </span>
+                            </p>
+                            <p class="text-xs text-green-700">
+                                <span class="font-semibold">Titik Polygon:</span> 
+                                <span id="pointCount">
+                                    @if(is_array($polygonCoordinates) && count($polygonCoordinates) > 0)
+                                        {{ count($polygonCoordinates) }} titik
+                                    @else
+                                        -
+                                    @endif
+                                </span>
+                            </p>
                         </div>
-                        @endif
                     </div>
-                </div>
-
-                <!-- Action Buttons -->
-                @if($calonLokasi->status_verifikasi === 'pending')
-                <div class="bg-white rounded-xl shadow-lg p-6">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">⚙️ Aksi</h3>
-                    <div class="space-y-3">
-                        <a href="{{ route('kelompok.calon-lokasi.edit', $calonLokasi) }}" 
-                           class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors font-medium">
-                            <span>✏️</span>
-                            <span>Edit Lokasi</span>
-                        </a>
-                        
-                        <form action="{{ route('kelompok.calon-lokasi.destroy', $calonLokasi) }}" 
-                              method="POST" 
-                              onsubmit="return confirm('⚠️ Yakin ingin menghapus lokasi ini?')">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" 
-                                    class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium">
-                                <span>🗑️</span>
-                                <span>Hapus Lokasi</span>
-                            </button>
-                        </form>
-                    </div>
-                </div>
-                @endif
-
-                <!-- Info Help -->
-                <div class="bg-blue-50 border-2 border-blue-200 rounded-xl p-6">
-                    <h3 class="text-lg font-bold text-gray-800 mb-3">💡 Informasi</h3>
-                    <ul class="space-y-2 text-sm text-gray-700">
-                        @if($calonLokasi->status_verifikasi === 'pending')
-                        <li class="flex items-start">
-                            <span class="mr-2">•</span>
-                            <span>Lokasi Anda sedang menunggu verifikasi dari BPDAS</span>
-                        </li>
-                        <li class="flex items-start">
-                            <span class="mr-2">•</span>
-                            <span>Anda masih bisa mengedit atau menghapus lokasi ini</span>
-                        </li>
-                        @elseif($calonLokasi->status_verifikasi === 'diverifikasi')
-                        <li class="flex items-start">
-                            <span class="mr-2">✅</span>
-                            <span>Lokasi Anda telah diverifikasi oleh BPDAS</span>
-                        </li>
-                        <li class="flex items-start">
-                            <span class="mr-2">•</span>
-                            <span>Data tidak dapat diubah setelah diverifikasi</span>
-                        </li>
-                        @elseif($calonLokasi->status_verifikasi === 'ditolak')
-                        <li class="flex items-start">
-                            <span class="mr-2">❌</span>
-                            <span>Lokasi Anda ditolak. Lihat catatan dari BPDAS</span>
-                        </li>
-                        <li class="flex items-start">
-                            <span class="mr-2">•</span>
-                            <span>Anda dapat mengajukan lokasi baru</span>
-                        </li>
-                        @endif
-                    </ul>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Leaflet JS -->
-@if($calonLokasi->latitude && $calonLokasi->longitude)
+<!-- Leaflet CSS & JS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
-const detailMap = L.map('detailMap').setView([{{ $calonLokasi->latitude }}, {{ $calonLokasi->longitude }}], 15);
+const polygonCoordinates = @json($polygonCoordinates);
+const centerLat = {{ $calonLokasi->center_latitude ?? -6.2088 }};
+const centerLng = {{ $calonLokasi->center_longitude ?? 106.8456 }};
+
+const map = L.map('map').setView([centerLat, centerLng], 15);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap contributors',
     maxZoom: 19
-}).addTo(detailMap);
+}).addTo(map);
 
-// Add marker
-const marker = L.marker([{{ $calonLokasi->latitude }}, {{ $calonLokasi->longitude }}])
-    .bindPopup(`
-        <div style="text-align: center;">
-            <strong style="font-size: 14px;">{{ $calonLokasi->nama_kelompok_desa }}</strong><br>
-            <span style="font-size: 12px; color: #666;">{{ $calonLokasi->kecamatan }}, {{ $calonLokasi->kabupaten }}</span><br>
-            <a href="https://www.google.com/maps?q={{ $calonLokasi->latitude }},{{ $calonLokasi->longitude }}" 
-               target="_blank" 
-               style="color: #2563eb; font-size: 11px; text-decoration: underline;">
-                Lihat di Google Maps
-            </a>
-        </div>
-    `)
-    .addTo(detailMap)
-    .openPopup();
+// Fungsi hitung luas geodesic
+L.GeometryUtil = {
+    geodesicArea: function(latlngs) {
+        const EARTH_RADIUS = 6378137;
+        const toRad = function(num) { return num * Math.PI / 180; };
+        let area = 0;
+        if (latlngs.length > 2) {
+            for (let i = 0; i < latlngs.length; i++) {
+                const j = (i + 1) % latlngs.length;
+                const xi = latlngs[i].lng;
+                const yi = latlngs[i].lat;
+                const xj = latlngs[j].lng;
+                const yj = latlngs[j].lat;
+                area += toRad(xj - xi) * (2 + Math.sin(toRad(yi)) + Math.sin(toRad(yj)));
+            }
+            area = area * EARTH_RADIUS * EARTH_RADIUS / 2.0;
+        }
+        return Math.abs(area);
+    }
+};
 
-// Add circle radius (optional - visual aid)
-L.circle([{{ $calonLokasi->latitude }}, {{ $calonLokasi->longitude }}], {
-    color: 'green',
-    fillColor: '#22c55e',
-    fillOpacity: 0.1,
-    radius: 500
-}).addTo(detailMap);
+if (polygonCoordinates && polygonCoordinates.length > 0) {
+    const latlngs = polygonCoordinates.map(coord => L.latLng(coord[0], coord[1]));
+    const polygon = L.polygon(latlngs, { color:'#10b981', fillColor:'#10b981', fillOpacity:0.3, weight:3 }).addTo(map);
+    const area = L.GeometryUtil.geodesicArea(latlngs);
+    const areaInHectares = (area / 10000).toFixed(2);
+    const areaInSquareMeters = area.toFixed(0);
+
+    const areaSizeEl = document.getElementById('areaSize');
+    const pointCountEl = document.getElementById('pointCount');
+
+    if(areaSizeEl) areaSizeEl.textContent = `${areaInHectares} ha (${areaInSquareMeters} m²)`;
+    if(pointCountEl) pointCountEl.textContent = `${latlngs.length} titik`;
+
+    polygon.bindPopup(`<div class="text-center"><b class="text-lg">{{ $calonLokasi->nama_kelompok_desa }}</b><br><span class="text-sm text-gray-600">Luas: ${areaInHectares} hektar</span></div>`).openPopup();
+    map.fitBounds(polygon.getBounds());
+    latlngs.forEach((latlng,index)=>{
+        L.circleMarker(latlng,{radius:6,fillColor:'#059669',color:'#fff',weight:2,fillOpacity:1}).addTo(map).bindPopup(`Titik ${index+1}`);
+    });
+} else {
+    L.marker([centerLat, centerLng]).addTo(map).bindPopup('<b>{{ $calonLokasi->nama_kelompok_desa }}</b>').openPopup();
+    document.getElementById('areaSize').textContent = 'Tidak ada data polygon';
+}
 </script>
-@endif
 @endsection

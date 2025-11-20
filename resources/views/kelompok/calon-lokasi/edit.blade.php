@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="py-12">
-    <div class="max-w-6xl mx-auto sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <!-- Header -->
         <div class="mb-6">
             <a href="{{ route('kelompok.calon-lokasi.index') }}" 
@@ -69,74 +69,76 @@
                         </div>
                     </div>
 
-                    <!-- Koordinat -->
+                    <!-- Area Polygon Info -->
                     <div class="mb-6">
                         <label class="block text-gray-700 font-semibold mb-3">
-                            📍 Koordinat Lokasi <span class="text-red-500">*</span>
+                            📍 Area Lokasi (Polygon) <span class="text-red-500">*</span>
                         </label>
                         <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-3 rounded-lg">
                             <p class="text-sm text-blue-800 flex items-start">
                                 <span class="mr-2">💡</span>
-                                <span>Klik peta atau geser marker untuk mengubah lokasi</span>
+                                <span><strong>Cara edit:</strong> Klik tombol "Edit Area" untuk mengubah polygon, atau klik "Gambar Ulang" untuk membuat polygon baru.</span>
                             </p>
                         </div>
                         
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm text-gray-600 mb-1">Latitude</label>
-                                <input type="number" 
-                                       step="0.000001"
-                                       name="latitude" 
-                                       id="latitude"
-                                       value="{{ old('latitude', $calonLokasi->latitude) }}"
-                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 bg-gray-50 @error('latitude') border-red-500 @enderror"
-                                       readonly>
-                                @error('latitude')
-                                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                                @enderror
-                            </div>
-
-                            <div>
-                                <label class="block text-sm text-gray-600 mb-1">Longitude</label>
-                                <input type="number" 
-                                       step="0.000001"
-                                       name="longitude" 
-                                       id="longitude"
-                                       value="{{ old('longitude', $calonLokasi->longitude) }}"
-                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 bg-gray-50 @error('longitude') border-red-500 @enderror"
-                                       readonly>
-                                @error('longitude')
-                                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                                @enderror
-                            </div>
+                        <!-- Hidden inputs -->
+                        <input type="hidden" name="polygon_coordinates" id="polygon_coordinates" required>
+                        <input type="hidden" name="center_latitude" id="center_latitude" required>
+                        <input type="hidden" name="center_longitude" id="center_longitude" required>
+                        
+                        <div id="polygonInfo" class="p-4 bg-gray-50 border border-gray-300 rounded-lg">
+                            <p class="text-sm text-gray-600">
+                                <span class="font-semibold">Status:</span> 
+                                <span id="polygonStatus" class="text-green-600">✅ Area tersimpan</span>
+                            </p>
+                            <p class="text-sm text-gray-600 mt-1">
+                                <span class="font-semibold">Luas Area:</span> 
+                                <span id="polygonArea">Menghitung...</span>
+                            </p>
                         </div>
                     </div>
 
-                    <!-- Upload PDF -->
+                    <!-- Upload 5 PDF -->
                     <div class="mb-6">
-                        <label class="block text-gray-700 font-semibold mb-2">
-                            📄 Upload PDF Koordinat (Opsional)
+                        <label class="block text-gray-700 font-semibold mb-3">
+                            📄 Upload Dokumen PDF (Max 5 File)
                         </label>
                         
-                        @if($calonLokasi->koordinat_pdf_lokasi)
-                        <div class="mb-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
-                            <p class="text-sm text-gray-700 mb-2">File saat ini:</p>
-                            <a href="{{ asset('storage/' . $calonLokasi->koordinat_pdf_lokasi) }}" 
-                               target="_blank"
-                               class="text-blue-600 hover:text-blue-700 text-sm font-medium">
-                                📄 Lihat PDF
-                            </a>
+                        <div class="space-y-3">
+                            @for($i = 1; $i <= 5; $i++)
+                                @php $fieldName = "pdf_dokumen_{$i}"; @endphp
+                                <div class="border border-gray-300 rounded-lg p-4">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        Dokumen {{ $i }} (Opsional)
+                                    </label>
+                                    
+                                    @if($calonLokasi->$fieldName)
+                                    <div class="mb-2 p-2 bg-green-50 rounded border border-green-200 flex items-center justify-between">
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-green-700">📄</span>
+                                            <a href="{{ asset('storage/' . $calonLokasi->$fieldName) }}" 
+                                               target="_blank"
+                                               class="text-xs text-green-700 hover:text-green-900 font-medium">
+                                                File tersedia - Klik untuk lihat
+                                            </a>
+                                        </div>
+                                        <span class="text-xs text-green-600">✅</span>
+                                    </div>
+                                    @endif
+                                    
+                                    <input type="file" 
+                                           name="{{ $fieldName }}" 
+                                           accept=".pdf"
+                                           class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100">
+                                    <p class="text-xs text-gray-500 mt-1">
+                                        @if($calonLokasi->$fieldName)
+                                            Upload file baru untuk mengganti. 
+                                        @endif
+                                        Format: PDF, Max 5MB
+                                    </p>
+                                </div>
+                            @endfor
                         </div>
-                        @endif
-                        
-                        <input type="file" 
-                               name="koordinat_pdf_lokasi" 
-                               accept=".pdf"
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 @error('koordinat_pdf_lokasi') border-red-500 @enderror">
-                        @error('koordinat_pdf_lokasi')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
-                        <p class="text-xs text-gray-500 mt-2">Upload file baru untuk mengganti. Format: PDF, Max 5MB</p>
                     </div>
 
                     <!-- Deskripsi -->
@@ -171,8 +173,8 @@
             <!-- Map Section -->
             <div class="bg-white rounded-xl shadow-lg p-6 sticky top-6">
                 <div class="mb-4">
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">🗺️ Pilih Lokasi di Peta</h3>
-                    <p class="text-sm text-gray-600">Klik atau geser marker untuk mengubah lokasi</p>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">🗺️ Edit Area di Peta</h3>
+                    <p class="text-sm text-gray-600">Edit polygon atau gambar ulang area lokasi</p>
                 </div>
 
                 <!-- Search Box -->
@@ -183,14 +185,32 @@
                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
                 </div>
 
-                <!-- Map Container -->
-                <div id="map" class="w-full h-96 rounded-lg border-2 border-gray-300"></div>
-
-                <!-- Selected Coordinates -->
-                <div id="selectedCoords" class="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-                    <p class="text-sm font-semibold text-green-800 mb-1">✅ Lokasi Terpilih:</p>
-                    <p class="text-xs text-green-700 font-mono" id="coordsDisplay">{{ $calonLokasi->latitude }}, {{ $calonLokasi->longitude }}</p>
+                <!-- Drawing Controls -->
+                <div class="mb-4 flex gap-2">
+                    <button type="button" 
+                            id="editPolygon"
+                            class="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2">
+                        <span>✏️</span>
+                        <span>Edit Area</span>
+                    </button>
+                    <button type="button" 
+                            id="redrawPolygon"
+                            class="flex-1 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium flex items-center justify-center gap-2">
+                        <span>🔄</span>
+                        <span>Gambar Ulang</span>
+                    </button>
                 </div>
+
+                <!-- Map Container -->
+                <div id="map" class="w-full h-96 rounded-lg border-2 border-gray-300 shadow-inner"></div>
+
+                <!-- Current Location Button -->
+                <button type="button" 
+                        id="getCurrentLocation"
+                        class="mt-4 w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2">
+                    <span>📍</span>
+                    <span>Gunakan Lokasi Saya Saat Ini</span>
+                </button>
             </div>
         </div>
     </div>
@@ -198,48 +218,196 @@
 
 <!-- Leaflet CSS & JS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
 
 <script>
-// Initialize map with existing location
-const existingLat = {{ $calonLokasi->latitude ?? -6.2088 }};
-const existingLng = {{ $calonLokasi->longitude ?? 106.8456 }};
+// Get existing polygon data
+const existingPolygon = @json($calonLokasi->polygon_coordinates);
+const centerLat = {{ $calonLokasi->center_latitude ?? -6.2088 }};
+const centerLng = {{ $calonLokasi->center_longitude ?? 106.8456 }};
 
-const map = L.map('map').setView([existingLat, existingLng], 15);
+// Initialize map
+const map = L.map('map').setView([centerLat, centerLng], 15);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap contributors',
     maxZoom: 19
 }).addTo(map);
 
-// Add existing marker
-let marker = L.marker([existingLat, existingLng], {
-    draggable: true
-}).addTo(map);
+// Feature group for drawn items
+const drawnItems = new L.FeatureGroup();
+map.addLayer(drawnItems);
 
-marker.bindPopup('<b>Lokasi Saat Ini</b><br>Geser untuk mengubah').openPopup();
+let currentPolygon = null;
 
-// Function to update location
-function updateLocation(lat, lng) {
-    marker.setLatLng([lat, lng]);
-    map.setView([lat, lng], map.getZoom());
-    
-    document.getElementById('latitude').value = lat.toFixed(6);
-    document.getElementById('longitude').value = lng.toFixed(6);
-    document.getElementById('coordsDisplay').textContent = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
-    
-    marker.bindPopup(`<b>Lokasi Baru</b><br>Lat: ${lat.toFixed(6)}<br>Lng: ${lng.toFixed(6)}`).openPopup();
+// Geometry utility for area calculation
+L.GeometryUtil = {
+    geodesicArea: function(latlngs) {
+        const EARTH_RADIUS = 6378137;
+        const toRad = function(num) {
+            return num * Math.PI / 180;
+        };
+        
+        let area = 0;
+        if (latlngs.length > 2) {
+            for (let i = 0; i < latlngs.length; i++) {
+                const j = (i + 1) % latlngs.length;
+                const xi = latlngs[i].lng;
+                const yi = latlngs[i].lat;
+                const xj = latlngs[j].lng;
+                const yj = latlngs[j].lat;
+                area += toRad(xj - xi) * (2 + Math.sin(toRad(yi)) + Math.sin(toRad(yj)));
+            }
+            area = area * EARTH_RADIUS * EARTH_RADIUS / 2.0;
+        }
+        return Math.abs(area);
+    }
+};
+
+// Calculate area in hectares
+function calculateArea(latlngs) {
+    let area = L.GeometryUtil.geodesicArea(latlngs);
+    let areaInHectares = (area / 10000).toFixed(2);
+    return areaInHectares;
 }
 
-// Update on marker drag
-marker.on('dragend', function(e) {
-    const position = e.target.getLatLng();
-    updateLocation(position.lat, position.lng);
+// Update form with polygon data
+function updatePolygonData(layer) {
+    const latlngs = layer.getLatLngs()[0];
+    const coordinates = latlngs.map(latlng => [latlng.lat, latlng.lng]);
+    const bounds = layer.getBounds();
+    const center = bounds.getCenter();
+    
+    document.getElementById('polygon_coordinates').value = JSON.stringify(coordinates);
+    document.getElementById('center_latitude').value = center.lat.toFixed(6);
+    document.getElementById('center_longitude').value = center.lng.toFixed(6);
+    
+    const area = calculateArea(latlngs);
+    document.getElementById('polygonStatus').textContent = '✅ Area telah diupdate';
+    document.getElementById('polygonStatus').classList.remove('text-red-600');
+    document.getElementById('polygonStatus').classList.add('text-green-600');
+    document.getElementById('polygonArea').textContent = `${area} hektar (${(area * 10000).toFixed(0)} m²)`;
+}
+
+// Load existing polygon
+if (existingPolygon && existingPolygon.length > 0) {
+    const latlngs = existingPolygon.map(coord => L.latLng(coord[0], coord[1]));
+    
+    currentPolygon = L.polygon(latlngs, {
+        color: '#10b981',
+        fillColor: '#10b981',
+        fillOpacity: 0.3,
+        weight: 3
+    }).addTo(drawnItems);
+    
+    // Set initial form values
+    document.getElementById('polygon_coordinates').value = JSON.stringify(existingPolygon);
+    document.getElementById('center_latitude').value = centerLat.toFixed(6);
+    document.getElementById('center_longitude').value = centerLng.toFixed(6);
+    
+    const area = calculateArea(latlngs);
+    document.getElementById('polygonArea').textContent = `${area} hektar (${(area * 10000).toFixed(0)} m²)`;
+    
+    currentPolygon.bindPopup(`<b>Area Saat Ini</b><br>Luas: ${area} hektar`);
+    map.fitBounds(currentPolygon.getBounds());
+}
+
+// Edit Polygon Button
+document.getElementById('editPolygon').addEventListener('click', function() {
+    if (currentPolygon) {
+        currentPolygon.editing.enable();
+        this.textContent = '✅ Mode Edit Aktif';
+        this.classList.add('opacity-75');
+        alert('Mode edit aktif! Geser titik-titik polygon untuk mengubah bentuk area.');
+    } else {
+        alert('Tidak ada polygon untuk diedit. Gunakan tombol "Gambar Ulang".');
+    }
 });
 
-// Update on map click
-map.on('click', function(e) {
-    updateLocation(e.latlng.lat, e.latlng.lng);
+// Update data when editing
+map.on('draw:edited', function(e) {
+    const layers = e.layers;
+    layers.eachLayer(function(layer) {
+        updatePolygonData(layer);
+        const area = calculateArea(layer.getLatLngs()[0]);
+        layer.getPopup().setContent(`<b>Area Diupdate</b><br>Luas: ${area} hektar`);
+    });
+    
+    document.getElementById('editPolygon').innerHTML = '<span>✏️</span><span>Edit Area</span>';
+    document.getElementById('editPolygon').classList.remove('opacity-75');
+});
+
+// Redraw Polygon Button
+document.getElementById('redrawPolygon').addEventListener('click', function() {
+    if (currentPolygon) {
+        if (confirm('Yakin ingin menggambar ulang? Polygon lama akan dihapus.')) {
+            drawnItems.removeLayer(currentPolygon);
+            currentPolygon = null;
+        } else {
+            return;
+        }
+    }
+    
+    new L.Draw.Polygon(map, {
+        shapeOptions: {
+            color: '#10b981',
+            fillColor: '#10b981',
+            fillOpacity: 0.3,
+            weight: 3
+        }
+    }).enable();
+    
+    this.textContent = '✏️ Klik di peta untuk menggambar...';
+    this.classList.add('opacity-50');
+});
+
+// Handle new polygon creation
+map.on(L.Draw.Event.CREATED, function(e) {
+    const layer = e.layer;
+    
+    if (currentPolygon) {
+        drawnItems.removeLayer(currentPolygon);
+    }
+    
+    drawnItems.addLayer(layer);
+    currentPolygon = layer;
+    
+    updatePolygonData(layer);
+    
+    const area = calculateArea(layer.getLatLngs()[0]);
+    layer.bindPopup(`<b>Area Baru</b><br>Luas: ${area} hektar`).openPopup();
+    
+    document.getElementById('redrawPolygon').innerHTML = '<span>🔄</span><span>Gambar Ulang</span>';
+    document.getElementById('redrawPolygon').classList.remove('opacity-50');
+    
+    layer.editing.enable();
+});
+
+// Get current location
+document.getElementById('getCurrentLocation').addEventListener('click', function() {
+    if (navigator.geolocation) {
+        this.innerHTML = '<span>⏳</span><span>Mendapatkan lokasi...</span>';
+        this.disabled = true;
+        
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                map.setView([lat, lng], 15);
+                this.innerHTML = '<span>📍</span><span>Gunakan Lokasi Saya Saat Ini</span>';
+                this.disabled = false;
+            },
+            (error) => {
+                alert('Tidak dapat mengakses lokasi.');
+                this.innerHTML = '<span>📍</span><span>Gunakan Lokasi Saya Saat Ini</span>';
+                this.disabled = false;
+            }
+        );
+    } else {
+        alert('Browser tidak mendukung Geolocation');
+    }
 });
 
 // Search functionality
@@ -253,6 +421,7 @@ document.getElementById('searchBox').addEventListener('keypress', function(e) {
             return;
         }
         
+        const originalValue = this.value;
         this.value = '🔍 Mencari...';
         this.disabled = true;
         
@@ -262,16 +431,16 @@ document.getElementById('searchBox').addEventListener('keypress', function(e) {
                 if (data && data.length > 0) {
                     const lat = parseFloat(data[0].lat);
                     const lng = parseFloat(data[0].lon);
-                    updateLocation(lat, lng);
+                    map.setView([lat, lng], 13);
                 } else {
                     alert('Lokasi tidak ditemukan');
                 }
-                this.value = query;
+                this.value = originalValue;
                 this.disabled = false;
             })
             .catch(() => {
                 alert('Terjadi kesalahan');
-                this.value = query;
+                this.value = originalValue;
                 this.disabled = false;
             });
     }
@@ -279,12 +448,11 @@ document.getElementById('searchBox').addEventListener('keypress', function(e) {
 
 // Form validation
 document.getElementById('locationForm').addEventListener('submit', function(e) {
-    const lat = document.getElementById('latitude').value;
-    const lng = document.getElementById('longitude').value;
+    const polygonCoords = document.getElementById('polygon_coordinates').value;
     
-    if (!lat || !lng) {
+    if (!polygonCoords) {
         e.preventDefault();
-        alert('⚠️ Koordinat lokasi harus diisi!');
+        alert('⚠️ Silakan gambar atau edit area lokasi di peta terlebih dahulu!');
         return false;
     }
 });

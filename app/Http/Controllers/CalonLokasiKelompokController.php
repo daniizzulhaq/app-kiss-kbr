@@ -28,18 +28,29 @@ class CalonLokasiKelompokController extends Controller
             'nama_kelompok_desa' => 'required|string|max:255',
             'kecamatan' => 'required|string|max:255',
             'kabupaten' => 'required|string|max:255',
-            'latitude' => 'nullable|numeric|between:-90,90',
-            'longitude' => 'nullable|numeric|between:-180,180',
-            'koordinat_pdf_lokasi' => 'nullable|file|mimes:pdf|max:5120',
+            'polygon_coordinates' => 'required|string',
+            'center_latitude' => 'required|numeric|between:-90,90',
+            'center_longitude' => 'required|numeric|between:-180,180',
+            'pdf_dokumen_1' => 'nullable|file|mimes:pdf|max:5120',
+            'pdf_dokumen_2' => 'nullable|file|mimes:pdf|max:5120',
+            'pdf_dokumen_3' => 'nullable|file|mimes:pdf|max:5120',
+            'pdf_dokumen_4' => 'nullable|file|mimes:pdf|max:5120',
+            'pdf_dokumen_5' => 'nullable|file|mimes:pdf|max:5120',
             'deskripsi' => 'nullable|string',
         ]);
 
         $validated['user_id'] = auth()->id();
 
-        // Upload PDF jika ada
-        if ($request->hasFile('koordinat_pdf_lokasi')) {
-            $path = $request->file('koordinat_pdf_lokasi')->store('koordinat-lokasi', 'public');
-            $validated['koordinat_pdf_lokasi'] = $path;
+        // Decode polygon_coordinates JSON menjadi array
+        $validated['polygon_coordinates'] = json_decode($request->polygon_coordinates, true);
+
+        // Upload PDF
+        for ($i = 1; $i <= 5; $i++) {
+            $fieldName = "pdf_dokumen_{$i}";
+            if ($request->hasFile($fieldName)) {
+                $path = $request->file($fieldName)->store('dokumen-lokasi', 'public');
+                $validated[$fieldName] = $path;
+            }
         }
 
         CalonLokasi::create($validated);
@@ -48,19 +59,8 @@ class CalonLokasiKelompokController extends Controller
             ->with('success', 'Calon lokasi berhasil ditambahkan!');
     }
 
-    public function show(CalonLokasi $calonLokasi)
-    {
-        // Pastikan hanya pemilik yang bisa melihat
-        if ($calonLokasi->user_id !== auth()->id()) {
-            abort(403);
-        }
-
-        return view('kelompok.calon-lokasi.show', compact('calonLokasi'));
-    }
-
     public function edit(CalonLokasi $calonLokasi)
     {
-        // Hanya bisa edit jika status masih pending
         if ($calonLokasi->user_id !== auth()->id() || $calonLokasi->status_verifikasi !== 'pending') {
             abort(403);
         }
@@ -78,20 +78,30 @@ class CalonLokasiKelompokController extends Controller
             'nama_kelompok_desa' => 'required|string|max:255',
             'kecamatan' => 'required|string|max:255',
             'kabupaten' => 'required|string|max:255',
-            'latitude' => 'nullable|numeric|between:-90,90',
-            'longitude' => 'nullable|numeric|between:-180,180',
-            'koordinat_pdf_lokasi' => 'nullable|file|mimes:pdf|max:5120',
+            'polygon_coordinates' => 'required|string',
+            'center_latitude' => 'required|numeric|between:-90,90',
+            'center_longitude' => 'required|numeric|between:-180,180',
+            'pdf_dokumen_1' => 'nullable|file|mimes:pdf|max:5120',
+            'pdf_dokumen_2' => 'nullable|file|mimes:pdf|max:5120',
+            'pdf_dokumen_3' => 'nullable|file|mimes:pdf|max:5120',
+            'pdf_dokumen_4' => 'nullable|file|mimes:pdf|max:5120',
+            'pdf_dokumen_5' => 'nullable|file|mimes:pdf|max:5120',
             'deskripsi' => 'nullable|string',
         ]);
 
-        // Upload PDF baru jika ada
-        if ($request->hasFile('koordinat_pdf_lokasi')) {
-            // Hapus file lama
-            if ($calonLokasi->koordinat_pdf_lokasi) {
-                Storage::disk('public')->delete($calonLokasi->koordinat_pdf_lokasi);
+        // Decode polygon_coordinates
+        $validated['polygon_coordinates'] = json_decode($request->polygon_coordinates, true);
+
+        // Upload PDF baru
+        for ($i = 1; $i <= 5; $i++) {
+            $fieldName = "pdf_dokumen_{$i}";
+            if ($request->hasFile($fieldName)) {
+                if ($calonLokasi->$fieldName) {
+                    Storage::disk('public')->delete($calonLokasi->$fieldName);
+                }
+                $path = $request->file($fieldName)->store('dokumen-lokasi', 'public');
+                $validated[$fieldName] = $path;
             }
-            $path = $request->file('koordinat_pdf_lokasi')->store('koordinat-lokasi', 'public');
-            $validated['koordinat_pdf_lokasi'] = $path;
         }
 
         $calonLokasi->update($validated);
@@ -100,15 +110,27 @@ class CalonLokasiKelompokController extends Controller
             ->with('success', 'Calon lokasi berhasil diperbarui!');
     }
 
+    public function show(CalonLokasi $calonLokasi)
+{
+    // Pastikan user hanya bisa melihat miliknya sendiri
+    if ($calonLokasi->user_id !== auth()->id()) {
+        abort(403);
+    }
+
+    return view('kelompok.calon-lokasi.show', compact('calonLokasi'));
+}
+
     public function destroy(CalonLokasi $calonLokasi)
     {
         if ($calonLokasi->user_id !== auth()->id()) {
             abort(403);
         }
 
-        // Hapus file PDF jika ada
-        if ($calonLokasi->koordinat_pdf_lokasi) {
-            Storage::disk('public')->delete($calonLokasi->koordinat_pdf_lokasi);
+        for ($i = 1; $i <= 5; $i++) {
+            $fieldName = "pdf_dokumen_{$i}";
+            if ($calonLokasi->$fieldName) {
+                Storage::disk('public')->delete($calonLokasi->$fieldName);
+            }
         }
 
         $calonLokasi->delete();

@@ -29,11 +29,23 @@ class RealBibit extends Model
     /**
      * Relasi ke Kelompok
      */
-    
     public function kelompok()
     {
         return $this->belongsTo(Kelompok::class, 'id_kelompok', 'id');
     }
 
-    
+    /**
+     * Relasi ke User melalui Kelompok
+     */
+    public function pengelola()
+    {
+        return $this->hasOneThrough(
+            \App\Models\User::class,
+            Kelompok::class,
+            'id', // Foreign key di kelompok
+            'id', // Foreign key di users
+            'id_kelompok', // Local key di real_bibit
+            'user_id' // Local key di kelompok
+        );
+    }
 }

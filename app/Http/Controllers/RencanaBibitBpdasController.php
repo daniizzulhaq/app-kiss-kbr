@@ -16,7 +16,7 @@ class RencanaBibitBpdasController extends Controller
      */
     public function index(Request $request)
     {
-        $query = RencanaBibit::with('kelompok');
+        $query = RencanaBibit::with(['kelompok', 'kelompok.user']);
 
         // Filter by kelompok (menggunakan id dari tabel kelompoks)
         if ($request->filled('kelompok')) {
@@ -57,7 +57,7 @@ class RencanaBibitBpdasController extends Controller
      */
     public function show(RencanaBibit $rencanaBibit)
     {
-        $rencanaBibit->load('kelompok');
+        $rencanaBibit->load(['kelompok', 'kelompok.user']);
         return view('bpdas.rencana-bibit.show', compact('rencanaBibit'));
     }
 
@@ -107,7 +107,7 @@ class RencanaBibitBpdasController extends Controller
      */
     public function exportPdf(Request $request)
     {
-        $query = RencanaBibit::with('kelompok');
+        $query = RencanaBibit::with(['kelompok', 'kelompok.user']);
 
         // Apply same filters as index
         if ($request->filled('kelompok')) {

@@ -6,7 +6,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            font-size: 12px;
+            font-size: 10px;
             margin: 20px;
         }
         .header {
@@ -18,7 +18,7 @@
         .header h1 {
             margin: 0;
             color: #16A34A;
-            font-size: 20px;
+            font-size: 18px;
         }
         .header p {
             margin: 5px 0;
@@ -46,14 +46,16 @@
         th {
             background-color: #16A34A;
             color: white;
-            padding: 10px;
+            padding: 8px;
             text-align: left;
             font-weight: bold;
             border: 1px solid #ddd;
+            font-size: 9px;
         }
         td {
-            padding: 8px;
+            padding: 6px;
             border: 1px solid #ddd;
+            font-size: 9px;
         }
         tr:nth-child(even) {
             background-color: #f9fafb;
@@ -61,7 +63,7 @@
         .footer {
             margin-top: 30px;
             text-align: right;
-            font-size: 10px;
+            font-size: 8px;
             color: #666;
         }
         .summary {
@@ -77,9 +79,9 @@
         }
         .badge {
             display: inline-block;
-            padding: 4px 8px;
+            padding: 3px 6px;
             border-radius: 4px;
-            font-size: 10px;
+            font-size: 8px;
             font-weight: bold;
         }
         .badge-mpts { background: #dbeafe; color: #1e40af; }
@@ -103,7 +105,7 @@
         @if(request('kelompok'))
         <div class="info-row">
             <span class="info-label">Kelompok:</span>
-            <span>{{ $kelompoks->where('id_kelompok', request('kelompok'))->first()->nama_kelompok ?? '-' }}</span>
+            <span>{{ $kelompoks->where('id', request('kelompok'))->first()->nama_kelompok ?? '-' }}</span>
         </div>
         @endif
         @if(request('golongan'))
@@ -124,14 +126,15 @@
     <table>
         <thead>
             <tr>
-                <th class="text-center" width="5%">No</th>
-                <th width="20%">Kelompok</th>
-                <th width="15%">Desa</th>
-                <th width="20%">Jenis Bibit</th>
+                <th class="text-center" width="4%">No</th>
+                <th width="16%">Kelompok</th>
+                <th width="14%">Pengelola</th>
+                <th width="12%">Desa</th>
+                <th width="18%">Jenis Bibit</th>
                 <th class="text-center" width="10%">Golongan</th>
-                <th class="text-right" width="12%">Jumlah (Btg)</th>
+                <th class="text-right" width="10%">Jumlah (Btg)</th>
                 <th class="text-center" width="10%">Tinggi (cm)</th>
-                <th class="text-center" width="8%">Sertifikat</th>
+                <th class="text-center" width="6%">Sertif.</th>
             </tr>
         </thead>
         <tbody>
@@ -141,6 +144,7 @@
             <tr>
                 <td class="text-center">{{ $index + 1 }}</td>
                 <td>{{ $bibit->kelompok->nama_kelompok ?? '-' }}</td>
+                <td>{{ $bibit->kelompok->user->name ?? '-' }}</td>
                 <td>{{ $bibit->kelompok->desa ?? '-' }}</td>
                 <td><strong>{{ $bibit->jenis_bibit }}</strong></td>
                 <td class="text-center">
@@ -160,13 +164,13 @@
             </tr>
             @empty
             <tr>
-                <td colspan="8" class="text-center">Tidak ada data</td>
+                <td colspan="9" class="text-center">Tidak ada data</td>
             </tr>
             @endforelse
         </tbody>
         <tfoot>
             <tr>
-                <th colspan="5" class="text-right">TOTAL:</th>
+                <th colspan="6" class="text-right">TOTAL:</th>
                 <th class="text-right">{{ number_format($totalBatang, 0, ',', '.') }}</th>
                 <th colspan="2"></th>
             </tr>

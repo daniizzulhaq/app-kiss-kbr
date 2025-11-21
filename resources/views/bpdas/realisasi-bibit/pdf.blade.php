@@ -214,52 +214,54 @@
 
     <!-- Data Table -->
     <table class="data-table">
-        <thead>
-            <tr>
-                <th width="4%" class="text-center">No</th>
-                <th width="20%">Kelompok</th>
-                <th width="18%">Desa</th>
-                <th width="22%">Jenis Bibit</th>
-                <th width="12%">Golongan</th>
-                <th width="12%" class="text-right">Jumlah (Btg)</th>
-                <th width="12%" class="text-right">Tinggi (cm)</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($realBibits as $index => $bibit)
-            <tr>
-                <td class="text-center">{{ $index + 1 }}</td>
-                <td>{{ $bibit->kelompok->nama_kelompok ?? '-' }}</td>
-                <td>{{ $bibit->kelompok->desa ?? '-' }}</td>
-                <td><strong style="color: #16a34a;">{{ $bibit->jenis_bibit }}</strong></td>
-                <td>
-                    <span class="badge badge-blue">{{ $bibit->golongan ?? '-' }}</span>
-                </td>
-                <td class="text-right">
-                    <strong style="color: #16a34a;">{{ number_format($bibit->jumlah_btg) }}</strong>
-                </td>
-                <td class="text-right">{{ $bibit->tinggi ? number_format($bibit->tinggi, 2) : '-' }}</td>
-            </tr>
-            @empty
-            <tr>
-                <td colspan="7" class="no-data">
-                    🌱 Tidak ada data realisasi bibit yang sesuai dengan filter
-                </td>
-            </tr>
-            @endforelse
-        </tbody>
-        @if($realBibits->count() > 0)
-        <tfoot>
-            <tr style="background: #f0fdf4; font-weight: bold;">
-                <td colspan="5" class="text-right" style="padding-right: 15px;">TOTAL</td>
-                <td class="text-right" style="color: #16a34a; font-size: 10pt;">
-                    {{ number_format($totalBibit) }}
-                </td>
-                <td></td>
-            </tr>
-        </tfoot>
-        @endif
-    </table>
+    <thead>
+        <tr>
+            <th width="4%" class="text-center">No</th>
+            <th width="18%">Kelompok</th>
+            <th width="15%">Pengelola</th>
+            <th width="15%">Desa</th>
+            <th width="18%">Jenis Bibit</th>
+            <th width="10%">Golongan</th>
+            <th width="10%" class="text-right">Jumlah (Btg)</th>
+            <th width="10%" class="text-right">Tinggi (cm)</th>
+        </tr>
+    </thead>
+    <tbody>
+        @forelse($realBibits as $index => $bibit)
+        <tr>
+            <td class="text-center">{{ $index + 1 }}</td>
+            <td>{{ $bibit->kelompok->nama_kelompok ?? '-' }}</td>
+            <td>{{ $bibit->kelompok->user->name ?? '-' }}</td>
+            <td>{{ $bibit->kelompok->desa ?? '-' }}</td>
+            <td><strong style="color: #16a34a;">{{ $bibit->jenis_bibit }}</strong></td>
+            <td>
+                <span class="badge badge-blue">{{ $bibit->golongan ?? '-' }}</span>
+            </td>
+            <td class="text-right">
+                <strong style="color: #16a34a;">{{ number_format($bibit->jumlah_btg) }}</strong>
+            </td>
+            <td class="text-right">{{ $bibit->tinggi ? number_format($bibit->tinggi, 2) : '-' }}</td>
+        </tr>
+        @empty
+        <tr>
+            <td colspan="8" class="no-data">
+                🌱 Tidak ada data realisasi bibit yang sesuai dengan filter
+            </td>
+        </tr>
+        @endforelse
+    </tbody>
+    @if($realBibits->count() > 0)
+    <tfoot>
+        <tr style="background: #f0fdf4; font-weight: bold;">
+            <td colspan="6" class="text-right" style="padding-right: 15px;">TOTAL</td>
+            <td class="text-right" style="color: #16a34a; font-size: 10pt;">
+                {{ number_format($totalBibit) }}
+            </td>
+            <td></td>
+        </tr>
+    </tfoot>
+    @endif
+</table>
 
     <!-- Footer -->
     <div class="footer">

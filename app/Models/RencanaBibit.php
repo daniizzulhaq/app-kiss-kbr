@@ -75,6 +75,4 @@ class RencanaBibit extends Model
         }
         return '<span class="px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">➖ Non-Sertifikat</span>';
     }
-
-    
 }

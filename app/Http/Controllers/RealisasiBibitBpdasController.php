@@ -17,7 +17,7 @@ class RealisasiBibitBpdasController extends Controller
      */
     public function index(Request $request)
     {
-        $query = RealBibit::with('kelompok');
+        $query = RealBibit::with(['kelompok', 'kelompok.user']);
 
         // Filter berdasarkan kelompok
         if ($request->filled('kelompok_id')) {
@@ -45,7 +45,7 @@ class RealisasiBibitBpdasController extends Controller
      */
     public function show(RealBibit $realisasiBibit)
     {
-        $realisasiBibit->load('kelompok');
+        $realisasiBibit->load(['kelompok', 'kelompok.user']);
         return view('bpdas.realisasi-bibit.show', compact('realisasiBibit'));
     }
 

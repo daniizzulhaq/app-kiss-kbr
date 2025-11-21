@@ -122,7 +122,7 @@
                         class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent">
                     <option value="">Semua Kelompok</option>
                     @foreach($kelompoks as $kelompok)
-                        <option value="{{ $kelompok->id_kelompok }}" {{ request('kelompok') == $kelompok->id_kelompok ? 'selected' : '' }}>
+                        <option value="{{ $kelompok->id }}" {{ request('kelompok') == $kelompok->id ? 'selected' : '' }}>
                             {{ $kelompok->nama_kelompok }}
                         </option>
                     @endforeach
@@ -174,6 +174,7 @@
                     <tr class="bg-gradient-to-r from-green-600 to-green-700 text-white">
                         <th class="px-6 py-4 text-left text-sm font-semibold">No</th>
                         <th class="px-6 py-4 text-left text-sm font-semibold">Kelompok</th>
+                        <th class="px-6 py-4 text-left text-sm font-semibold">Pengelola</th>
                         <th class="px-6 py-4 text-left text-sm font-semibold">Jenis Bibit</th>
                         <th class="px-6 py-4 text-left text-sm font-semibold">Golongan</th>
                         <th class="px-6 py-4 text-left text-sm font-semibold">Jumlah (Btg)</th>
@@ -189,6 +190,9 @@
                         <td class="px-6 py-4">
                             <div class="font-semibold text-gray-800">{{ $bibit->kelompok->nama_kelompok ?? '-' }}</div>
                             <div class="text-xs text-gray-500">{{ $bibit->kelompok->desa ?? '' }}</div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="text-sm text-gray-700">{{ $bibit->kelompok->user->name ?? '-' }}</div>
                         </td>
                         <td class="px-6 py-4">
                             <div class="font-semibold text-gray-800">{{ $bibit->jenis_bibit }}</div>
@@ -214,7 +218,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="8" class="px-6 py-12 text-center">
+                        <td colspan="9" class="px-6 py-12 text-center">
                             <div class="flex flex-col items-center justify-center">
                                 <span class="text-6xl mb-4">🌱</span>
                                 <p class="text-gray-500 font-medium">Belum ada data rencana bibit</p>

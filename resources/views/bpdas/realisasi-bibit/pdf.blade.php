@@ -170,7 +170,7 @@
 <body>
     <!-- Header -->
     <div class="header">
-        <h1>📊 LAPORAN REALISASI BIBIT</h1>
+        <h1>LAPORAN REALISASI BIBIT</h1>
         <p>Sistem Kebun Bibit Rakyat (KBR)</p>
         <p style="margin-top: 5px; font-size: 9pt;">Dicetak pada: {{ $tanggalCetak }}</p>
     </div>

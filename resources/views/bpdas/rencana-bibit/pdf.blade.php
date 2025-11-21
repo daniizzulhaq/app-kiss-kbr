@@ -94,7 +94,7 @@
 </head>
 <body>
     <div class="header">
-        <h1>🌱 LAPORAN RENCANA BIBIT KELOMPOK</h1>
+        <h1>LAPORAN RENCANA BIBIT KELOMPOK</h1>
         <p>Sistem Kebun Bibit Rakyat (KBR)</p>
         <p>Tanggal Cetak: {{ date('d F Y, H:i') }} WIB</p>
     </div>
@@ -178,9 +178,9 @@
     </table>
 
     <div class="summary">
-        <div class="summary-item">📊 Total Jenis: {{ $rencanaBibits->count() }}</div>
-        <div class="summary-item">🌳 Total Batang: {{ number_format($totalBatang, 0, ',', '.') }}</div>
-        <div class="summary-item">📜 Bersertifikat: {{ $rencanaBibits->whereNotNull('sertifikat')->count() }}</div>
+        <div class="summary-item">Total Jenis: {{ $rencanaBibits->count() }}</div>
+        <div class="summary-item">Total Batang: {{ number_format($totalBatang, 0, ',', '.') }}</div>
+        <div class="summary-item">Bersertifikat: {{ $rencanaBibits->whereNotNull('sertifikat')->count() }}</div>
     </div>
 
     <div class="footer">

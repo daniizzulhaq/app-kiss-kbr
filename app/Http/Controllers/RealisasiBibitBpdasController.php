@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\RealBibit;
 use App\Models\Kelompok;
+use App\Exports\RealisasiBibitExport;
+use App\Exports\RealisasiBibitPdfExport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 class RealisasiBibitBpdasController extends Controller
 {
@@ -82,5 +85,37 @@ class RealisasiBibitBpdasController extends Controller
             'totalKeseluruhan',
             'totalKelompok'
         ));
+    }
+
+    /**
+     * Export to Excel
+     */
+    public function exportExcel(Request $request)
+    {
+        $fileName = 'realisasi-bibit-' . date('Y-m-d-His') . '.xlsx';
+        return Excel::download(new RealisasiBibitExport($request), $fileName);
+    }
+
+    /**
+     * Export to PDF
+     */
+    public function exportPdf(Request $request)
+    {
+        $pdfExport = new RealisasiBibitPdfExport($request);
+        $pdf = $pdfExport->generate();
+        
+        $fileName = 'realisasi-bibit-' . date('Y-m-d-His') . '.pdf';
+        return $pdf->download($fileName);
+    }
+
+    /**
+     * Preview PDF
+     */
+    public function previewPdf(Request $request)
+    {
+        $pdfExport = new RealisasiBibitPdfExport($request);
+        $pdf = $pdfExport->generate();
+        
+        return $pdf->stream('realisasi-bibit-preview.pdf');
     }
 }

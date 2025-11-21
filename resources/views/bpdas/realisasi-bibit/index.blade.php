@@ -4,6 +4,35 @@
 @section('content')
 <div class="container mx-auto px-4 py-8">
     <!-- Header -->
+    <!-- Header -->
+<div class="flex justify-between items-center mb-6">
+    <div>
+        <h1 class="text-3xl font-bold text-gray-800">Realisasi Bibit Kelompok</h1>
+        <p class="text-gray-600 mt-1">Monitoring realisasi bibit dari seluruh kelompok</p>
+    </div>
+    <div class="flex gap-3">
+        <!-- Tombol Export Excel -->
+        <a href="{{ route('bpdas.realisasi-bibit.export.excel', request()->query()) }}" 
+           class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg flex items-center gap-2 transition-all shadow-lg hover:shadow-xl">
+            <span class="text-xl">📗</span>
+            <span class="font-medium">Export Excel</span>
+        </a>
+        
+        <!-- Tombol Export PDF -->
+        <a href="{{ route('bpdas.realisasi-bibit.export.pdf', request()->query()) }}" 
+           class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg flex items-center gap-2 transition-all shadow-lg hover:shadow-xl">
+            <span class="text-xl">📕</span>
+            <span class="font-medium">Export PDF</span>
+        </a>
+        
+        <!-- Tombol Statistik -->
+        <a href="{{ route('bpdas.realisasi-bibit.statistik') }}" 
+           class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg flex items-center gap-2 transition-all shadow-lg hover:shadow-xl">
+            <span class="text-xl">📊</span>
+            <span class="font-medium">Lihat Statistik</span>
+        </a>
+    </div>
+</div>
     <div class="flex justify-between items-center mb-6">
         <div>
             <h1 class="text-3xl font-bold text-gray-800">Realisasi Bibit Kelompok</h1>

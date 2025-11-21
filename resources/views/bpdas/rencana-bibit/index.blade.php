@@ -11,10 +11,45 @@
                 <h1 class="text-4xl font-bold text-gray-800 mb-2">🌱 Rencana Bibit Kelompok</h1>
                 <p class="text-gray-600">Monitor rencana kebutuhan bibit dari semua kelompok tani</p>
             </div>
-            <a href="{{ route('bpdas.rencana-bibit.statistik') }}" 
-               class="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl font-semibold">
-                📊 Lihat Statistik
-            </a>
+            <div class="flex space-x-3">
+                <!-- Export Buttons -->
+                <div class="relative group">
+                    <button class="px-6 py-3 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white rounded-xl hover:from-emerald-700 hover:to-emerald-800 transition-all duration-300 shadow-lg hover:shadow-xl font-semibold flex items-center space-x-2">
+                        <span>📥</span>
+                        <span>Export</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    
+                    <!-- Dropdown Menu -->
+                    <div class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-10">
+                        <div class="py-2">
+                            <a href="{{ route('bpdas.rencana-bibit.export.excel', request()->all()) }}" 
+                               class="flex items-center space-x-3 px-4 py-3 hover:bg-green-50 transition-colors">
+                                <span class="text-2xl">📊</span>
+                                <div>
+                                    <div class="font-semibold text-gray-800">Excel</div>
+                                    <div class="text-xs text-gray-500">.xlsx format</div>
+                                </div>
+                            </a>
+                            <a href="{{ route('bpdas.rencana-bibit.export.pdf', request()->all()) }}" 
+                               class="flex items-center space-x-3 px-4 py-3 hover:bg-red-50 transition-colors">
+                                <span class="text-2xl">📄</span>
+                                <div>
+                                    <div class="font-semibold text-gray-800">PDF</div>
+                                    <div class="text-xs text-gray-500">.pdf format</div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <a href="{{ route('bpdas.rencana-bibit.statistik') }}" 
+                   class="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl font-semibold">
+                    📊 Lihat Statistik
+                </a>
+            </div>
         </div>
     </div>
 
@@ -120,6 +155,17 @@
         </form>
     </div>
 
+    <!-- Info Alert for Filtered Results -->
+    @if(request()->hasAny(['search', 'kelompok', 'golongan']))
+    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6 flex items-start space-x-3">
+        <span class="text-2xl">ℹ️</span>
+        <div class="flex-1">
+            <p class="text-blue-800 font-medium">Filter Aktif</p>
+            <p class="text-blue-600 text-sm">Data yang ditampilkan dan diexport sesuai dengan filter yang Anda terapkan.</p>
+        </div>
+    </div>
+    @endif
+
     <!-- Table -->
     <div class="bg-white rounded-2xl shadow-xl overflow-hidden slide-in">
         <div class="overflow-x-auto">
@@ -188,4 +234,13 @@
         @endif
     </div>
 </div>
+
+<style>
+    .group:hover .group-hover\:opacity-100 {
+        opacity: 1;
+    }
+    .group:hover .group-hover\:visible {
+        visibility: visible;
+    }
+</style>
 @endsection

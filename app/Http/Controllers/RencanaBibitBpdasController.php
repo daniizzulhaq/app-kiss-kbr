@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\RencanaBibit;
 use App\Models\Kelompok;
+use App\Exports\RencanaBibitExport;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class RencanaBibitBpdasController extends Controller
 {
@@ -87,5 +90,50 @@ class RencanaBibitBpdasController extends Controller
             'statPerKelompok',
             'topBibit'
         ));
+    }
+
+    /**
+     * Export to Excel
+     */
+    public function exportExcel(Request $request)
+    {
+        $filename = 'rencana-bibit-' . date('Y-m-d-His') . '.xlsx';
+        
+        return Excel::download(new RencanaBibitExport($request), $filename);
+    }
+
+    /**
+     * Export to PDF
+     */
+    public function exportPdf(Request $request)
+    {
+        $query = RencanaBibit::with('kelompok');
+
+        // Apply same filters as index
+        if ($request->filled('kelompok')) {
+            $query->where('id_kelompok', $request->kelompok);
+        }
+
+        if ($request->filled('golongan')) {
+            $query->where('golongan', $request->golongan);
+        }
+
+        if ($request->filled('search')) {
+            $query->where('jenis_bibit', 'like', '%' . $request->search . '%');
+        }
+
+        $rencanaBibits = $query->latest()->get();
+        $kelompoks = Kelompok::orderBy('nama_kelompok')->get();
+
+        $pdf = Pdf::loadView('bpdas.rencana-bibit.pdf', compact('rencanaBibits', 'kelompoks'))
+            ->setPaper('a4', 'landscape')
+            ->setOption('margin-top', 10)
+            ->setOption('margin-right', 10)
+            ->setOption('margin-bottom', 10)
+            ->setOption('margin-left', 10);
+
+        $filename = 'rencana-bibit-' . date('Y-m-d-His') . '.pdf';
+        
+        return $pdf->download($filename);
     }
 }

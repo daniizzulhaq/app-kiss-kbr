@@ -62,10 +62,16 @@ Route::get('/kelompok/{kelompok}', [KelompokBpdasController::class, 'show'])->na
          Route::get('/rencana-bibit', [RencanaBibitBpdasController::class, 'index'])->name('rencana-bibit.index');
     Route::get('/rencana-bibit/statistik', [RencanaBibitBpdasController::class, 'statistik'])->name('rencana-bibit.statistik');
     Route::get('/rencana-bibit/{rencanaBibit}', [RencanaBibitBpdasController::class, 'show'])->name('rencana-bibit.show');
+    Route::get('/rencana-bibit/export/excel', [RencanaBibitBpdasController::class, 'exportExcel'])->name('rencana-bibit.export.excel');
+    Route::get('/rencana-bibit/export/pdf', [RencanaBibitBpdasController::class, 'exportPdf'])->name('rencana-bibit.export.pdf');
+    
 
     Route::get('/realisasi-bibit', [RealisasiBibitBpdasController::class, 'index'])->name('realisasi-bibit.index');
     Route::get('/realisasi-bibit/statistik', [RealisasiBibitBpdasController::class, 'statistik'])->name('realisasi-bibit.statistik');
     Route::get('/realisasi-bibit/{realisasiBibit}', [RealisasiBibitBpdasController::class, 'show'])->name('realisasi-bibit.show');
+    Route::get('/realisasi-bibit/export/excel', [RealisasiBibitBpdasController::class, 'exportExcel'])->name('realisasi-bibit.export.excel');
+        Route::get('/realisasi-bibit/export/pdf', [RealisasiBibitBpdasController::class, 'exportPdf'])->name('realisasi-bibit.export.pdf');
+        Route::get('/realisasi-bibit/export/pdf-preview', [RealisasiBibitBpdasController::class, 'previewPdf'])->name('realisasi-bibit.export.pdf-preview');
 
     });
 

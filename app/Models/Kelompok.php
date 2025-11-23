@@ -53,5 +53,16 @@ class Kelompok extends Model
     public function realBibits()
 {
     return $this->hasMany(RealBibit::class, 'id_kelompok');
+
+}
+
+public function progressFisik()
+{
+    return $this->hasMany(ProgressFisik::class, 'kelompok_id');
+}
+
+public function anggaranKelompok()
+{
+    return $this->hasMany(AnggaranKelompok::class, 'kelompok_id');
 }
 }

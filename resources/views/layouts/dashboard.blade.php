@@ -78,6 +78,11 @@
     <span class="text-2xl">🌳</span>
     <span class="ml-3 font-medium">Realisasi Bibit Kelompok</span>
 </a>
+<a href="{{ route('bpdas.progress-fisik.monitoring') }}" 
+   class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('bpdas.progress-fisik.*') ? 'bg-green-700' : '' }}">
+    <span class="text-2xl">📊</span>
+    <span class="ml-3 font-medium">Progres Fisik Kelompok</span>
+</a>
         @else
             <!-- Menu Kelompok -->
             <a href="{{ route('kelompok.dashboard') }}" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('kelompok.dashboard') ? 'bg-green-700 shadow-lg' : '' }}">
@@ -107,6 +112,11 @@
             <span class="text-2xl">🌳</span>
             <span class="ml-3 font-medium">Realisasi Bibit</span>
          </a>
+        <a href="{{ route('kelompok.progress-fisik.index') }}" 
+   class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('kelompok.progress-fisik.*') ? 'bg-green-700' : '' }}">
+    <span class="text-2xl">📈</span>
+    <span class="ml-3 font-medium">Progres Fisik</span>
+</a>
         @endif
     </nav>
 

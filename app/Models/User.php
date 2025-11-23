@@ -38,5 +38,11 @@ class User extends Authenticatable
     public function isKelompok()
     {
         return $this->role === 'kelompok';
+
     }
+
+    public function kelompok()
+{
+    return $this->hasOne(Kelompok::class, 'user_id');
+}
 }

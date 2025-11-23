@@ -13,6 +13,10 @@ use App\Http\Controllers\RencanaBibitController;//
 use App\Http\Controllers\RencanaBibitBpdasController;//
 use App\Http\Controllers\RealisasiBibitController;
 use App\Http\Controllers\RealisasiBibitBpdasController;
+use App\Http\Controllers\ProgressFisikBpdasController;
+use App\Http\Controllers\ProgressFisikController;
+
+
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -73,6 +77,59 @@ Route::get('/kelompok/{kelompok}', [KelompokBpdasController::class, 'show'])->na
         Route::get('/realisasi-bibit/export/pdf', [RealisasiBibitBpdasController::class, 'exportPdf'])->name('realisasi-bibit.export.pdf');
         Route::get('/realisasi-bibit/export/pdf-preview', [RealisasiBibitBpdasController::class, 'previewPdf'])->name('realisasi-bibit.export.pdf-preview');
 
+         // Route yang lebih spesifik harus di ATAS
+     Route::get('/progress-fisik/monitoring', [ProgressFisikBpdasController::class, 'monitoring'])
+        ->name('progress-fisik.monitoring');
+    
+    Route::get('/progress-fisik/monitoring/anggaran', [ProgressFisikBpdasController::class, 'monitoringAnggaran'])
+        ->name('progress-fisik.monitoring-anggaran');
+    
+    // Halaman Verifikasi
+    Route::get('/progress-fisik/verifikasi', [ProgressFisikBpdasController::class, 'indexVerifikasi'])
+        ->name('progress-fisik.verifikasi-index');
+    
+    // Dashboard
+    Route::get('/progress-fisik/dashboard', [ProgressFisikBpdasController::class, 'dashboard'])
+        ->name('progress-fisik.dashboard');
+    
+    // === EXPORT ROUTES (HARUS SEBELUM PARAMETER DINAMIS) ===
+    // Export PDF Global
+    Route::get('/progress-fisik/export/pdf-global', [ProgressFisikBpdasController::class, 'exportPdfGlobal'])
+        ->name('progress-fisik.export.pdf-global');
+    
+    // Export PDF per user
+    Route::get('/progress-fisik/export/pdf-user/{userId}', [ProgressFisikBpdasController::class, 'exportPdfPerUser'])
+        ->name('progress-fisik.export.pdf-per-user');
+    
+    // Export PDF untuk user yang sedang login
+    Route::get('/progress-fisik/export/pdf-my', [ProgressFisikBpdasController::class, 'exportPdfMy'])
+        ->name('progress-fisik.export.pdf-my');
+    
+    // === VERIFIKASI ROUTES ===
+    Route::put('/progress-fisik/{progressFisik}/verifikasi', [ProgressFisikBpdasController::class, 'verifikasi'])
+        ->name('progress-fisik.verifikasi');
+    
+    Route::post('/progress-fisik/{progressFisik}/reset-verifikasi', [ProgressFisikBpdasController::class, 'resetVerifikasi'])
+        ->name('progress-fisik.reset-verifikasi');
+    
+    Route::post('/progress-fisik/verifikasi-massal', [ProgressFisikBpdasController::class, 'verifikasiMassal'])
+        ->name('progress-fisik.verifikasi-massal');
+    
+    // === EXPORT PER KELOMPOK (SEBELUM {kelompok}) ===
+    Route::get('/progress-fisik/{kelompok}/export/pdf', [ProgressFisikBpdasController::class, 'exportPdf'])
+        ->name('progress-fisik.export.pdf');
+    
+    Route::get('/progress-fisik/{kelompok}/export/excel', [ProgressFisikBpdasController::class, 'exportExcel'])
+        ->name('progress-fisik.export.excel');
+    
+    // === ROUTE DENGAN PARAMETER DINAMIS (PALING BAWAH) ===
+    Route::get('/progress-fisik/{kelompok}', [ProgressFisikBpdasController::class, 'show'])
+        ->name('progress-fisik.show');
+        
+    // Route index (jika ada)
+    Route::get('/progress-fisik', [ProgressFisikBpdasController::class, 'index'])
+        ->name('progress-fisik.index');
+
     });
 
     /*
@@ -103,6 +160,10 @@ Route::delete('/data-kelompok/{kelompok}', [KelompokController::class, 'destroy'
 Route::post('/data-kelompok/{kelompok}/delete-photo', [KelompokController::class, 'deletePhoto'])
     ->name('data-kelompok.delete-photo');
 
+    Route::resource('progress-fisik', ProgressFisikController::class);
+Route::delete('/progress-fisik/{dokumentasi}/foto', [ProgressFisikController::class, 'deleteFoto'])
+    ->name('progress-fisik.delete-foto');
+
 
 
 
@@ -125,6 +186,8 @@ Route::post('/data-kelompok/{kelompok}/delete-photo', [KelompokController::class
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+
 });
 
 // Authentication routes

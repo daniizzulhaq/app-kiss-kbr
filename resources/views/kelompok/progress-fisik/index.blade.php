@@ -45,6 +45,13 @@
             <h2 class="text-xl font-bold text-gray-800">Ringkasan Anggaran Tahun {{ date('Y') }}</h2>
         </div>
         
+        <!-- Di index.blade.php, setelah section Ringkasan Anggaran -->
+<div class="mb-4 text-right">
+    <a href="{{ route('kelompok.anggaran.setup') }}" 
+       class="text-sm text-blue-600 hover:text-blue-800 font-medium underline">
+        ✏️ Edit Total Anggaran
+    </a>
+</div>
         <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
             <!-- Total Anggaran -->
             <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-blue-500">

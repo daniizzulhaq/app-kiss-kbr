@@ -7,15 +7,15 @@ use App\Http\Controllers\PermasalahanKelompokController;
 use App\Http\Controllers\PermasalahanBpdasController;
 use App\Http\Controllers\CalonLokasiKelompokController;
 use App\Http\Controllers\GeotaggingBpdasController;
-use App\Http\Controllers\KelompokController;// ← WAJIB ADA
-use App\Http\Controllers\KelompokBpdasController;//
-use App\Http\Controllers\RencanaBibitController;//
-use App\Http\Controllers\RencanaBibitBpdasController;//
+use App\Http\Controllers\KelompokController;
+use App\Http\Controllers\KelompokBpdasController;
+use App\Http\Controllers\RencanaBibitController;
+use App\Http\Controllers\RencanaBibitBpdasController;
 use App\Http\Controllers\RealisasiBibitController;
 use App\Http\Controllers\RealisasiBibitBpdasController;
 use App\Http\Controllers\ProgressFisikBpdasController;
 use App\Http\Controllers\ProgressFisikController;
-
+use App\Http\Controllers\Auth\PasswordResetLinkController; // ← TAMBAHKAN INI
 
 use Illuminate\Support\Facades\Route;
 
@@ -164,7 +164,12 @@ Route::post('/data-kelompok/{kelompok}/delete-photo', [KelompokController::class
 Route::delete('/progress-fisik/{dokumentasi}/foto', [ProgressFisikController::class, 'deleteFoto'])
     ->name('progress-fisik.delete-foto');
 
+ Route::get('/anggaran/setup', [ProgressFisikController::class, 'setupAnggaran'])
+        ->name('anggaran.setup');
+    Route::post('/anggaran/setup', [ProgressFisikController::class, 'storeAnggaran'])
+        ->name('anggaran.store');
 
+        
 
 
 
@@ -188,6 +193,25 @@ Route::delete('/progress-fisik/{dokumentasi}/foto', [ProgressFisikController::cl
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
 
+});
+
+/*
+|--------------------------------------------------------------------------
+| RESET PASSWORD ROUTES (TANPA EMAIL)
+|--------------------------------------------------------------------------
+*/
+Route::middleware('guest')->group(function () {
+    // Tampilkan form reset password
+    Route::get('reset-password', [PasswordResetLinkController::class, 'create'])
+        ->name('password.reset');
+    
+    // Alias untuk forgot-password (opsional)
+    Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
+        ->name('password.request');
+    
+    // Proses reset password - GUNAKAN NAMA BERBEDA
+    Route::post('reset-password-direct', [PasswordResetLinkController::class, 'store'])
+        ->name('password.update.direct');
 });
 
 // Authentication routes

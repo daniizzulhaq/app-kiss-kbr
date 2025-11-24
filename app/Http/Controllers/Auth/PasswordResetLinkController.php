@@ -3,42 +3,57 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
 
 class PasswordResetLinkController extends Controller
 {
     /**
-     * Display the password reset link request view.
+     * Display the direct password reset form.
      */
     public function create(): View
     {
-        return view('auth.forgot-password');
+        return view('auth.reset-password-direct');
     }
 
     /**
-     * Handle an incoming password reset link request.
-     *
-     * @throws \Illuminate\Validation\ValidationException
+     * Handle the direct password reset request (without email).
      */
     public function store(Request $request): RedirectResponse
     {
-        $request->validate([
-            'email' => ['required', 'email'],
+        // Validasi input
+        $validated = $request->validate([
+            'email' => ['required', 'string'],
+            'password' => ['required', 'confirmed', 'min:8'],
+        ], [
+            'email.required' => 'Email atau username harus diisi',
+            'password.required' => 'Password baru harus diisi',
+            'password.confirmed' => 'Konfirmasi password tidak cocok',
+            'password.min' => 'Password minimal 8 karakter',
         ]);
 
-        // We will send the password reset link to this user. Once we have attempted
-        // to send the link, we will examine the response then see the message we
-        // need to show to the user. Finally, we'll send out a proper response.
-        $status = Password::sendResetLink(
-            $request->only('email')
-        );
+        // Cari user berdasarkan email atau name (username)
+        $user = User::where('email', $validated['email'])
+                    ->orWhere('name', $validated['email'])
+                    ->first();
 
-        return $status == Password::RESET_LINK_SENT
-                    ? back()->with('status', __($status))
-                    : back()->withInput($request->only('email'))
-                        ->withErrors(['email' => __($status)]);
+        // Jika user tidak ditemukan
+        if (!$user) {
+            return back()
+                ->withInput($request->only('email'))
+                ->withErrors(['email' => 'Email atau username tidak ditemukan dalam sistem.']);
+        }
+
+        // Update password user
+        $user->password = Hash::make($validated['password']);
+        $user->save();
+
+        // Redirect ke login dengan pesan sukses
+        return redirect()->route('login')
+            ->with('status', 'Password berhasil direset! Silakan login dengan password baru Anda.');
     }
 }

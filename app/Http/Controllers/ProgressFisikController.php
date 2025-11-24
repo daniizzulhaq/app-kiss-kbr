@@ -14,10 +14,29 @@ use Illuminate\Support\Facades\Storage;
 class ProgressFisikController extends Controller
 {
     /**
+     * Cek apakah user memiliki kelompok
+     */
+    private function checkKelompok()
+    {
+        $user = auth()->user();
+        
+        if (!$user->kelompok) {
+            return redirect()->route('kelompok.data-kelompok.create')
+                ->with('warning', 'Anda belum tergabung dalam kelompok. Silakan buat atau bergabung dengan kelompok terlebih dahulu.');
+        }
+        
+        return null; // Return null jika kelompok sudah ada
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index()
     {
+        // Cek kelompok terlebih dahulu
+        $checkResult = $this->checkKelompok();
+        if ($checkResult) return $checkResult;
+
         $kelompok = auth()->user()->kelompok;
         
         // Get atau create anggaran kelompok
@@ -27,12 +46,18 @@ class ProgressFisikController extends Controller
                 'tahun' => date('Y')
             ],
             [
-                'total_anggaran' => 100000000,
+                'total_anggaran' => 0, // Default 0, user harus input
                 'anggaran_dialokasikan' => 0,
                 'realisasi_anggaran' => 0,
-                'sisa_anggaran' => 100000000,
+                'sisa_anggaran' => 0,
             ]
         );
+
+        // Jika anggaran masih 0 atau belum di-set, redirect ke setup
+        if ($anggaran->total_anggaran == 0) {
+            return redirect()->route('kelompok.anggaran.setup')
+                ->with('info', 'Silakan input total anggaran kelompok Anda terlebih dahulu');
+        }
 
         // Update realisasi
         $anggaran->updateRealisasi();
@@ -55,7 +80,7 @@ class ProgressFisikController extends Controller
             return $item->masterKegiatan->kategori->nama ?? 'Tanpa Kategori';
         });
 
-        // Get daftar kegiatan yang sudah ditambahkan (untuk ditampilkan sebagai info)
+        // Get daftar kegiatan yang sudah ditambahkan
         $addedKegiatanIds = $progressList->pluck('master_kegiatan_id')->toArray();
         $addedKegiatanList = MasterKegiatan::with('kategori')
             ->whereIn('id', $addedKegiatanIds)
@@ -73,11 +98,108 @@ class ProgressFisikController extends Controller
         ));
     }
 
+    public function setupAnggaran()
+    {
+        // Cek kelompok terlebih dahulu
+        $checkResult = $this->checkKelompok();
+        if ($checkResult) return $checkResult;
+
+        $kelompok = auth()->user()->kelompok;
+        
+        $anggaran = AnggaranKelompok::firstOrCreate(
+            [
+                'kelompok_id' => $kelompok->id,
+                'tahun' => date('Y')
+            ],
+            [
+                'total_anggaran' => 0,
+                'anggaran_dialokasikan' => 0,
+                'realisasi_anggaran' => 0,
+                'sisa_anggaran' => 0,
+            ]
+        );
+
+        return view('kelompok.anggaran.setup', compact('anggaran'));
+    }
+
+    public function storeAnggaran(Request $request)
+    {
+        // Cek kelompok terlebih dahulu
+        $checkResult = $this->checkKelompok();
+        if ($checkResult) return $checkResult;
+
+        $request->validate([
+            'total_anggaran' => 'required|numeric|min:1000000|max:1000000000', // Min 1 juta, max 1 miliar
+        ], [
+            'total_anggaran.required' => 'Total anggaran harus diisi',
+            'total_anggaran.numeric' => 'Total anggaran harus berupa angka',
+            'total_anggaran.min' => 'Total anggaran minimal Rp 1.000.000',
+            'total_anggaran.max' => 'Total anggaran maksimal Rp 1.000.000.000',
+        ]);
+
+        $kelompok = auth()->user()->kelompok;
+        
+        $anggaran = AnggaranKelompok::where('kelompok_id', $kelompok->id)
+            ->where('tahun', date('Y'))
+            ->first();
+
+        if (!$anggaran) {
+            return back()->with('error', 'Data anggaran tidak ditemukan')->withInput();
+        }
+
+        // VALIDASI: Jika sudah ada kegiatan yang diajukan, tidak boleh ubah anggaran
+        $hasProgress = ProgressFisik::where('kelompok_id', $kelompok->id)->exists();
+        
+        if ($hasProgress && $anggaran->total_anggaran > 0) {
+            return back()->with('error', 
+                'Tidak dapat mengubah total anggaran karena sudah ada kegiatan yang diajukan. ' .
+                'Silakan hubungi admin jika perlu mengubah anggaran.'
+            )->withInput();
+        }
+
+        // VALIDASI: Total anggaran baru harus >= anggaran yang sudah dialokasikan
+        if ($request->total_anggaran < $anggaran->anggaran_dialokasikan) {
+            return back()->with('error', 
+                'Total anggaran baru (Rp ' . number_format($request->total_anggaran, 0, ',', '.') . ') ' .
+                'tidak boleh lebih kecil dari anggaran yang sudah dialokasikan ' .
+                '(Rp ' . number_format($anggaran->anggaran_dialokasikan, 0, ',', '.') . ')'
+            )->withInput();
+        }
+
+        DB::beginTransaction();
+        try {
+            $anggaranLama = $anggaran->total_anggaran;
+            
+            $anggaran->update([
+                'total_anggaran' => $request->total_anggaran,
+                'sisa_anggaran' => $request->total_anggaran - $anggaran->anggaran_dialokasikan,
+            ]);
+
+            DB::commit();
+
+            $message = $anggaranLama == 0 
+                ? 'Total anggaran berhasil disimpan: Rp ' . number_format($request->total_anggaran, 0, ',', '.')
+                : 'Total anggaran berhasil diperbarui dari Rp ' . number_format($anggaranLama, 0, ',', '.') . 
+                  ' menjadi Rp ' . number_format($request->total_anggaran, 0, ',', '.');
+
+            return redirect()->route('kelompok.progress-fisik.index')
+                ->with('success', $message);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage())->withInput();
+        }
+    }
+
     /**
      * Show the form for creating a new resource.
      */
     public function create()
     {
+        // Cek kelompok terlebih dahulu
+        $checkResult = $this->checkKelompok();
+        if ($checkResult) return $checkResult;
+
         $kelompok = auth()->user()->kelompok;
         
         // Get anggaran
@@ -85,9 +207,9 @@ class ProgressFisikController extends Controller
             ->where('tahun', date('Y'))
             ->first();
 
-        if (!$anggaran) {
-            return redirect()->route('kelompok.progress-fisik.index')
-                ->with('error', 'Anggaran belum tersedia');
+        if (!$anggaran || $anggaran->total_anggaran == 0) {
+            return redirect()->route('kelompok.anggaran.setup')
+                ->with('error', 'Silakan input total anggaran terlebih dahulu');
         }
 
         // Get kategori dengan master kegiatan
@@ -95,12 +217,12 @@ class ProgressFisikController extends Controller
             ->orderBy('kode')
             ->get();
 
-        // Get kegiatan yang sudah ada - PENTING untuk mencegah duplikasi
+        // Get kegiatan yang sudah ada
         $existingKegiatan = ProgressFisik::where('kelompok_id', $kelompok->id)
             ->pluck('master_kegiatan_id')
             ->toArray();
 
-        // Hitung jumlah kegiatan tersedia vs sudah ditambahkan
+        // Hitung jumlah kegiatan
         $totalKegiatan = MasterKegiatan::count();
         $totalTambahkan = count($existingKegiatan);
         $sisaKegiatan = $totalKegiatan - $totalTambahkan;
@@ -120,6 +242,10 @@ class ProgressFisikController extends Controller
      */
     public function store(Request $request)
     {
+        // Cek kelompok terlebih dahulu
+        $checkResult = $this->checkKelompok();
+        if ($checkResult) return $checkResult;
+
         $request->validate([
             'master_kegiatan_id' => 'required|exists:master_kegiatan,id',
             'volume_target' => 'required|numeric|min:0',
@@ -202,8 +328,14 @@ class ProgressFisikController extends Controller
      */
     public function show(ProgressFisik $progressFisik)
     {
+        // Cek kelompok terlebih dahulu untuk user non-admin
+        if (!auth()->user()->hasRole(['admin', 'verifikator'])) {
+            $checkResult = $this->checkKelompok();
+            if ($checkResult) return $checkResult;
+        }
+
         // Pastikan progress ini milik kelompok user atau user adalah admin
-        if ($progressFisik->kelompok_id != auth()->user()->kelompok->id 
+        if ($progressFisik->kelompok_id != auth()->user()->kelompok?->id 
             && !auth()->user()->hasRole(['admin', 'verifikator'])) {
             abort(403);
         }
@@ -218,6 +350,10 @@ class ProgressFisikController extends Controller
      */
     public function edit(ProgressFisik $progressFisik)
     {
+        // Cek kelompok terlebih dahulu
+        $checkResult = $this->checkKelompok();
+        if ($checkResult) return $checkResult;
+
         // Pastikan progress ini milik kelompok user
         if ($progressFisik->kelompok_id != auth()->user()->kelompok->id) {
             abort(403);
@@ -241,6 +377,10 @@ class ProgressFisikController extends Controller
      */
     public function update(Request $request, ProgressFisik $progressFisik)
     {
+        // Cek kelompok terlebih dahulu
+        $checkResult = $this->checkKelompok();
+        if ($checkResult) return $checkResult;
+
         // Pastikan progress ini milik kelompok user
         if ($progressFisik->kelompok_id != auth()->user()->kelompok->id) {
             abort(403);
@@ -333,6 +473,10 @@ class ProgressFisikController extends Controller
      */
     public function destroy(ProgressFisik $progressFisik)
     {
+        // Cek kelompok terlebih dahulu
+        $checkResult = $this->checkKelompok();
+        if ($checkResult) return $checkResult;
+
         // Pastikan progress ini milik kelompok user
         if ($progressFisik->kelompok_id != auth()->user()->kelompok->id) {
             abort(403);
@@ -379,6 +523,10 @@ class ProgressFisikController extends Controller
      */
     public function deleteFoto(DokumentasiProgress $dokumentasi)
     {
+        // Cek kelompok terlebih dahulu
+        $checkResult = $this->checkKelompok();
+        if ($checkResult) return $checkResult;
+
         // Pastikan dokumentasi ini milik kelompok user
         if ($dokumentasi->progressFisik->kelompok_id != auth()->user()->kelompok->id) {
             abort(403);

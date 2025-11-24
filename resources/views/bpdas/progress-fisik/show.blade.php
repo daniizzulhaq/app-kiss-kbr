@@ -2,92 +2,94 @@
 
 @section('title', 'Detail Progress Fisik - Sistem KBR')
 @section('content')
-<div class="container mx-auto px-4 py-8">
+<div class="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
     <!-- Header -->
-    <div class="mb-6">
-        <div class="flex justify-between items-center">
-            <div>
-                <h1 class="text-3xl font-bold text-gray-800">Detail Progress Fisik: {{ $kelompok->nama_kelompok }}</h1>
-                <p class="text-sm text-gray-600 mt-1">Ketua: {{ $kelompok->nama_ketua }}</p>
+    <div class="mb-4 sm:mb-6">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+            <div class="flex-1">
+                <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">
+                    Detail Progress Fisik: {{ $kelompok->nama_kelompok }}
+                </h1>
+                <p class="text-xs sm:text-sm text-gray-600 mt-1">Ketua: {{ $kelompok->nama_ketua }}</p>
             </div>
             <a href="{{ route('bpdas.progress-fisik.monitoring') }}" 
-               class="text-gray-600 hover:text-gray-900 font-medium">
+               class="text-gray-600 hover:text-gray-900 font-medium text-sm inline-flex items-center gap-1">
                 ← Kembali
             </a>
         </div>
     </div>
 
     @if(session('success'))
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-6" role="alert">
+        <div class="bg-green-100 border border-green-400 text-green-700 px-3 py-2 sm:px-4 sm:py-3 rounded relative mb-4 sm:mb-6 text-sm" role="alert">
             <span class="block sm:inline">{{ session('success') }}</span>
         </div>
     @endif
 
     @if(session('error'))
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6" role="alert">
+        <div class="bg-red-100 border border-red-400 text-red-700 px-3 py-2 sm:px-4 sm:py-3 rounded relative mb-4 sm:mb-6 text-sm" role="alert">
             <span class="block sm:inline">{{ session('error') }}</span>
         </div>
     @endif
 
     <!-- Statistik -->
-    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
-        <div class="bg-blue-50 p-4 rounded-lg">
-            <p class="text-sm text-gray-600">Total Kegiatan</p>
-            <p class="text-2xl font-bold text-blue-600">{{ $statistikKegiatan['total'] }}</p>
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 sm:gap-4 mb-4 sm:mb-6">
+        <div class="bg-blue-50 p-3 sm:p-4 rounded-lg">
+            <p class="text-xs sm:text-sm text-gray-600">Total Kegiatan</p>
+            <p class="text-xl sm:text-2xl font-bold text-blue-600">{{ $statistikKegiatan['total'] }}</p>
         </div>
-        <div class="bg-green-50 p-4 rounded-lg">
-            <p class="text-sm text-gray-600">Selesai</p>
-            <p class="text-2xl font-bold text-green-600">{{ $statistikKegiatan['selesai'] }}</p>
+        <div class="bg-green-50 p-3 sm:p-4 rounded-lg">
+            <p class="text-xs sm:text-sm text-gray-600">Selesai</p>
+            <p class="text-xl sm:text-2xl font-bold text-green-600">{{ $statistikKegiatan['selesai'] }}</p>
         </div>
-        <div class="bg-yellow-50 p-4 rounded-lg">
-            <p class="text-sm text-gray-600">Pending</p>
-            <p class="text-2xl font-bold text-yellow-600">{{ $statistikKegiatan['pending'] }}</p>
+        <div class="bg-yellow-50 p-3 sm:p-4 rounded-lg">
+            <p class="text-xs sm:text-sm text-gray-600">Pending</p>
+            <p class="text-xl sm:text-2xl font-bold text-yellow-600">{{ $statistikKegiatan['pending'] }}</p>
         </div>
-        <div class="bg-purple-50 p-4 rounded-lg">
-            <p class="text-sm text-gray-600">Disetujui</p>
-            <p class="text-2xl font-bold text-purple-600">{{ $statistikKegiatan['disetujui'] }}</p>
+        <div class="bg-purple-50 p-3 sm:p-4 rounded-lg">
+            <p class="text-xs sm:text-sm text-gray-600">Disetujui</p>
+            <p class="text-xl sm:text-2xl font-bold text-purple-600">{{ $statistikKegiatan['disetujui'] }}</p>
         </div>
-        <div class="bg-red-50 p-4 rounded-lg">
-            <p class="text-sm text-gray-600">Ditolak</p>
-            <p class="text-2xl font-bold text-red-600">{{ $statistikKegiatan['ditolak'] }}</p>
+        <div class="bg-red-50 p-3 sm:p-4 rounded-lg col-span-2 sm:col-span-1">
+            <p class="text-xs sm:text-sm text-gray-600">Ditolak</p>
+            <p class="text-xl sm:text-2xl font-bold text-red-600">{{ $statistikKegiatan['ditolak'] }}</p>
         </div>
     </div>
 
     <!-- Anggaran -->
     @if($anggaran)
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
-            <div class="p-6">
-                <h3 class="text-lg font-semibold mb-4">Anggaran Tahun {{ $anggaran->tahun }}</h3>
+        <div class="bg-white overflow-hidden shadow-sm rounded-lg mb-4 sm:mb-6">
+            <div class="p-4 sm:p-6">
+                <h3 class="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Anggaran Tahun {{ $anggaran->tahun }}</h3>
                 
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4">
                     <div>
-                        <p class="text-sm text-gray-600">Total Anggaran</p>
-                        <p class="text-lg font-bold text-gray-800">
+                        <p class="text-xs sm:text-sm text-gray-600">Total Anggaran</p>
+                        <p class="text-sm sm:text-lg font-bold text-gray-800 break-words">
                             Rp {{ number_format($anggaran->total_anggaran, 0, ',', '.') }}
                         </p>
                     </div>
                     <div>
-                        <p class="text-sm text-gray-600">Realisasi</p>
-                        <p class="text-lg font-bold text-green-600">
+                        <p class="text-xs sm:text-sm text-gray-600">Realisasi</p>
+                        <p class="text-sm sm:text-lg font-bold text-green-600 break-words">
                             Rp {{ number_format($anggaran->realisasi_anggaran, 0, ',', '.') }}
                         </p>
                     </div>
                     <div>
-                        <p class="text-sm text-gray-600">Sisa</p>
-                        <p class="text-lg font-bold text-blue-600">
+                        <p class="text-xs sm:text-sm text-gray-600">Sisa</p>
+                        <p class="text-sm sm:text-lg font-bold text-blue-600 break-words">
                             Rp {{ number_format($anggaran->sisa_anggaran, 0, ',', '.') }}
                         </p>
                     </div>
                     <div>
-                        <p class="text-sm text-gray-600">Progress Anggaran</p>
-                        <p class="text-lg font-bold text-purple-600">
+                        <p class="text-xs sm:text-sm text-gray-600">Progress Anggaran</p>
+                        <p class="text-sm sm:text-lg font-bold text-purple-600">
                             {{ number_format($anggaran->persentase_realisasi, 1) }}%
                         </p>
                     </div>
                 </div>
 
-                <div class="w-full bg-gray-200 rounded-full h-4">
-                    <div class="bg-gradient-to-r from-green-500 to-blue-500 h-4 rounded-full" 
+                <div class="w-full bg-gray-200 rounded-full h-3 sm:h-4">
+                    <div class="bg-gradient-to-r from-green-500 to-blue-500 h-3 sm:h-4 rounded-full" 
                          style="width: {{ $anggaran->persentase_realisasi }}%"></div>
                 </div>
             </div>
@@ -95,16 +97,16 @@
     @endif
 
     <!-- Progress Fisik -->
-    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
-        <div class="p-6">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-semibold">Total Progress Fisik</h3>
-                <span class="text-2xl font-bold text-green-600">
+    <div class="bg-white overflow-hidden shadow-sm rounded-lg mb-4 sm:mb-6">
+        <div class="p-4 sm:p-6">
+            <div class="flex justify-between items-center mb-3 sm:mb-4">
+                <h3 class="text-base sm:text-lg font-semibold">Total Progress Fisik</h3>
+                <span class="text-xl sm:text-2xl font-bold text-green-600">
                     {{ number_format($totalProgress, 1) }}%
                 </span>
             </div>
-            <div class="w-full bg-gray-200 rounded-full h-4">
-                <div class="bg-green-500 h-4 rounded-full" 
+            <div class="w-full bg-gray-200 rounded-full h-3 sm:h-4">
+                <div class="bg-green-500 h-3 sm:h-4 rounded-full" 
                      style="width: {{ $totalProgress }}%"></div>
             </div>
         </div>
@@ -112,59 +114,59 @@
 
     <!-- Daftar Kegiatan per Kategori -->
     @foreach($progressByKategori as $kategori => $progressItems)
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
-            <div class="p-6">
-                <h4 class="text-md font-semibold mb-4 text-gray-800 border-b pb-2">
+        <div class="bg-white overflow-hidden shadow-sm rounded-lg mb-4 sm:mb-6">
+            <div class="p-4 sm:p-6">
+                <h4 class="text-sm sm:text-md font-semibold mb-3 sm:mb-4 text-gray-800 border-b pb-2">
                     {{ $kategori }}
                 </h4>
 
-                <div class="space-y-4">
+                <div class="space-y-3 sm:space-y-4">
                     @foreach($progressItems as $progress)
-                        <div class="border rounded-lg p-4 hover:shadow-md transition-shadow">
-                            <div class="flex justify-between items-start mb-3">
+                        <div class="border rounded-lg p-3 sm:p-4 hover:shadow-md transition-shadow">
+                            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-3">
                                 <div class="flex-1">
-                                    <h5 class="font-semibold text-gray-900">
+                                    <h5 class="font-semibold text-sm sm:text-base text-gray-900">
                                         {{ $progress->masterKegiatan->nama_kegiatan }}
                                     </h5>
-                                    <p class="text-sm text-gray-600 mt-1">
+                                    <p class="text-xs sm:text-sm text-gray-600 mt-1">
                                         Satuan: {{ $progress->masterKegiatan->satuan }}
                                     </p>
                                 </div>
-                                <div class="text-right">
+                                <div class="text-left sm:text-right">
                                     @if($progress->status_verifikasi == 'pending')
-                                        <span class="px-3 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">
+                                        <span class="inline-block px-2 sm:px-3 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">
                                             ⏳ Pending
                                         </span>
                                     @elseif($progress->status_verifikasi == 'disetujui')
-                                        <span class="px-3 py-1 text-xs rounded-full bg-green-100 text-green-800">
+                                        <span class="inline-block px-2 sm:px-3 py-1 text-xs rounded-full bg-green-100 text-green-800">
                                             ✅ Disetujui
                                         </span>
                                     @else
-                                        <span class="px-3 py-1 text-xs rounded-full bg-red-100 text-red-800">
+                                        <span class="inline-block px-2 sm:px-3 py-1 text-xs rounded-full bg-red-100 text-red-800">
                                             ❌ Ditolak
                                         </span>
                                     @endif
                                 </div>
                             </div>
 
-                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-3 text-sm">
+                            <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 mb-3 text-xs sm:text-sm">
                                 <div>
                                     <p class="text-gray-600">Target</p>
-                                    <p class="font-semibold">{{ number_format($progress->volume_target, 2) }} {{ $progress->masterKegiatan->satuan }}</p>
+                                    <p class="font-semibold break-words">{{ number_format($progress->volume_target, 2) }} {{ $progress->masterKegiatan->satuan }}</p>
                                 </div>
                                 <div>
                                     <p class="text-gray-600">Realisasi</p>
-                                    <p class="font-semibold {{ $progress->volume_realisasi > 0 ? 'text-green-600' : 'text-gray-400' }}">
+                                    <p class="font-semibold break-words {{ $progress->volume_realisasi > 0 ? 'text-green-600' : 'text-gray-400' }}">
                                         {{ number_format($progress->volume_realisasi, 2) }} {{ $progress->masterKegiatan->satuan }}
                                     </p>
                                 </div>
                                 <div>
                                     <p class="text-gray-600">Total Biaya</p>
-                                    <p class="font-semibold">Rp {{ number_format($progress->total_biaya, 0, ',', '.') }}</p>
+                                    <p class="font-semibold break-words">Rp {{ number_format($progress->total_biaya, 0, ',', '.') }}</p>
                                 </div>
                                 <div>
                                     <p class="text-gray-600">Biaya Realisasi</p>
-                                    <p class="font-semibold {{ $progress->biaya_realisasi > 0 ? 'text-green-600' : 'text-gray-400' }}">
+                                    <p class="font-semibold break-words {{ $progress->biaya_realisasi > 0 ? 'text-green-600' : 'text-gray-400' }}">
                                         Rp {{ number_format($progress->biaya_realisasi, 0, ',', '.') }}
                                     </p>
                                 </div>
@@ -186,16 +188,16 @@
                             <!-- Dokumentasi -->
                             @if($progress->dokumentasi->count() > 0)
                                 <div class="mb-3">
-                                    <p class="text-sm font-medium text-gray-700 mb-2">📸 Dokumentasi:</p>
+                                    <p class="text-xs sm:text-sm font-medium text-gray-700 mb-2">📸 Dokumentasi:</p>
                                     <div class="flex gap-2 flex-wrap">
                                         @foreach($progress->dokumentasi->take(4) as $dok)
                                             <img src="{{ Storage::url($dok->foto) }}" 
                                                  alt="Dokumentasi" 
-                                                 class="w-20 h-20 object-cover rounded cursor-pointer hover:opacity-80 border-2 border-gray-200"
+                                                 class="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded cursor-pointer hover:opacity-80 border-2 border-gray-200"
                                                  onclick="window.open('{{ Storage::url($dok->foto) }}', '_blank')">
                                         @endforeach
                                         @if($progress->dokumentasi->count() > 4)
-                                            <div class="w-20 h-20 bg-gray-100 rounded flex items-center justify-center text-gray-600 text-sm border-2 border-gray-200">
+                                            <div class="w-16 h-16 sm:w-20 sm:h-20 bg-gray-100 rounded flex items-center justify-center text-gray-600 text-xs sm:text-sm border-2 border-gray-200">
                                                 +{{ $progress->dokumentasi->count() - 4 }}
                                             </div>
                                         @endif
@@ -205,9 +207,9 @@
 
                             <!-- Keterangan -->
                             @if($progress->keterangan)
-                                <div class="mb-3 text-sm p-3 bg-gray-50 rounded">
+                                <div class="mb-3 text-xs sm:text-sm p-2 sm:p-3 bg-gray-50 rounded">
                                     <p class="text-gray-600 font-medium">📝 Keterangan:</p>
-                                    <p class="text-gray-800 mt-1">{{ $progress->keterangan }}</p>
+                                    <p class="text-gray-800 mt-1 break-words">{{ $progress->keterangan }}</p>
                                 </div>
                             @endif
 
@@ -215,22 +217,22 @@
                             @if($progress->status_verifikasi == 'pending')
                                 <form action="{{ route('bpdas.progress-fisik.verifikasi', $progress) }}" 
                                       method="POST" 
-                                      class="mt-4 p-4 bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-300 rounded-lg"
+                                      class="mt-4 p-3 sm:p-4 bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-300 rounded-lg"
                                       id="form-verifikasi-{{ $progress->id }}">
                                     @csrf
                                     @method('PUT')
                                     
-                                    <h6 class="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                                        <span class="text-lg">🔍</span>
+                                    <h6 class="font-semibold text-sm sm:text-base text-gray-800 mb-3 flex items-center gap-2">
+                                        <span class="text-base sm:text-lg">🔍</span>
                                         Form Verifikasi BPDAS
                                     </h6>
 
-                                    <!-- Input Volume Realisasi (MUNCUL SAAT KLIK APPROVE) -->
-                                    <div id="volume-container-{{ $progress->id }}" style="display: none;" class="mb-4 p-3 bg-white rounded-lg border-2 border-green-300">
-                                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <!-- Input Volume Realisasi -->
+                                    <div id="volume-container-{{ $progress->id }}" style="display: none;" class="mb-4 p-2 sm:p-3 bg-white rounded-lg border-2 border-green-300">
+                                        <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
                                             📊 Volume Realisasi <span class="text-red-500">*</span>
                                         </label>
-                                        <div class="flex gap-2 items-center">
+                                        <div class="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
                                             <input type="number" 
                                                    name="volume_realisasi" 
                                                    id="volume-input-{{ $progress->id }}"
@@ -238,9 +240,9 @@
                                                    min="0"
                                                    max="{{ $progress->volume_target }}"
                                                    value="{{ old('volume_realisasi', $progress->volume_target) }}"
-                                                   class="flex-1 px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 font-semibold"
+                                                   class="flex-1 px-3 py-2 text-sm border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 font-semibold"
                                                    oninput="hitungPreview{{ $progress->id }}()">
-                                            <span class="px-4 py-2 bg-gray-100 border-2 border-gray-300 rounded-lg text-gray-700 font-semibold">
+                                            <span class="px-3 py-2 bg-gray-100 border-2 border-gray-300 rounded-lg text-gray-700 font-semibold text-xs sm:text-sm text-center sm:text-left">
                                                 {{ $progress->masterKegiatan->satuan }}
                                             </span>
                                         </div>
@@ -248,13 +250,13 @@
                                             ℹ️ Maksimal: {{ number_format($progress->volume_target, 2) }} {{ $progress->masterKegiatan->satuan }}
                                         </p>
                                         
-                                        <!-- Preview Perhitungan Real-time -->
-                                        <div class="mt-3 p-3 bg-blue-50 border-l-4 border-blue-500 rounded">
+                                        <!-- Preview Perhitungan -->
+                                        <div class="mt-3 p-2 sm:p-3 bg-blue-50 border-l-4 border-blue-500 rounded">
                                             <p class="text-xs font-semibold text-blue-900 mb-2">📈 Preview Perhitungan:</p>
-                                            <div class="grid grid-cols-2 gap-3 text-sm">
+                                            <div class="grid grid-cols-2 gap-2 sm:gap-3 text-xs sm:text-sm">
                                                 <div>
                                                     <span class="text-blue-700">Biaya Realisasi:</span>
-                                                    <p class="font-bold text-blue-900" id="preview-biaya-{{ $progress->id }}">Rp 0</p>
+                                                    <p class="font-bold text-blue-900 break-words" id="preview-biaya-{{ $progress->id }}">Rp 0</p>
                                                 </div>
                                                 <div>
                                                     <span class="text-blue-700">Progress Fisik:</span>
@@ -266,14 +268,14 @@
 
                                     <!-- Catatan Verifikasi -->
                                     <div class="mb-4">
-                                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                        <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
                                             💬 Catatan Verifikasi 
                                             <span id="required-label-{{ $progress->id }}" style="display: none;" class="text-red-500">*</span>
                                         </label>
                                         <textarea name="catatan" 
                                                   id="catatan-{{ $progress->id }}"
                                                   rows="3"
-                                                  class="w-full border-2 border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 px-4 py-2"
+                                                  class="w-full text-xs sm:text-sm border-2 border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 px-3 py-2"
                                                   placeholder="Tambahkan catatan verifikasi..."></textarea>
                                         <p class="text-xs text-gray-500 mt-1">
                                             ℹ️ Catatan akan dilihat oleh kelompok
@@ -281,18 +283,18 @@
                                     </div>
 
                                     <!-- Tombol Aksi -->
-                                    <div class="flex gap-3">
+                                    <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
                                         <button type="button" 
                                                 id="btn-approve-{{ $progress->id }}"
                                                 onclick="prepareApprove{{ $progress->id }}()"
-                                                class="flex-1 px-4 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg transition duration-300 font-semibold flex items-center justify-center gap-2 shadow-md">
-                                            <span class="text-lg">✅</span>
+                                                class="w-full sm:flex-1 px-4 py-2 sm:py-3 text-sm sm:text-base bg-green-600 hover:bg-green-700 text-white rounded-lg transition duration-300 font-semibold flex items-center justify-center gap-2 shadow-md">
+                                            <span class="text-base sm:text-lg">✅</span>
                                             <span>Setujui</span>
                                         </button>
                                         <button type="button" 
                                                 onclick="prepareReject{{ $progress->id }}()"
-                                                class="flex-1 px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg transition duration-300 font-semibold flex items-center justify-center gap-2 shadow-md">
-                                            <span class="text-lg">❌</span>
+                                                class="w-full sm:flex-1 px-4 py-2 sm:py-3 text-sm sm:text-base bg-red-600 hover:bg-red-700 text-white rounded-lg transition duration-300 font-semibold flex items-center justify-center gap-2 shadow-md">
+                                            <span class="text-base sm:text-lg">❌</span>
                                             <span>Tolak</span>
                                         </button>
                                     </div>
@@ -306,12 +308,10 @@
                                     const biayaSatuan = {{ $progress->biaya_satuan }};
                                     const volumeRealisasi = parseFloat(document.getElementById('volume-input-{{ $progress->id }}').value) || 0;
                                     
-                                    // Hitung biaya realisasi
                                     const biayaRealisasi = volumeRealisasi * biayaSatuan;
                                     document.getElementById('preview-biaya-{{ $progress->id }}').textContent = 
                                         'Rp ' + biayaRealisasi.toLocaleString('id-ID', {minimumFractionDigits: 0, maximumFractionDigits: 0});
                                     
-                                    // Hitung persentase
                                     const persentase = volumeTarget > 0 ? (volumeRealisasi / volumeTarget) * 100 : 0;
                                     document.getElementById('preview-progress-{{ $progress->id }}').textContent = 
                                         persentase.toFixed(1) + '%';
@@ -324,25 +324,15 @@
                                     const btnApprove = document.getElementById('btn-approve-{{ $progress->id }}');
                                     
                                     if (container.style.display === 'none') {
-                                        // Tampilkan input volume realisasi
                                         container.style.display = 'block';
                                         volumeInput.setAttribute('required', 'required');
-                                        
-                                        // Catatan opsional untuk approve
                                         catatanInput.removeAttribute('required');
                                         document.getElementById('required-label-{{ $progress->id }}').style.display = 'none';
-                                        
-                                        // Fokus ke input volume
                                         volumeInput.focus();
-                                        
-                                        // Hitung preview
                                         hitungPreview{{ $progress->id }}();
-                                        
-                                        // Ubah tombol jadi submit
-                                        btnApprove.innerHTML = '<span class="text-lg">✅</span><span>Konfirmasi Persetujuan</span>';
+                                        btnApprove.innerHTML = '<span class="text-base sm:text-lg">✅</span><span>Konfirmasi Persetujuan</span>';
                                         btnApprove.classList.add('ring-4', 'ring-green-300');
                                     } else {
-                                        // Validasi
                                         const volumeRealisasi = parseFloat(volumeInput.value);
                                         if (!volumeRealisasi || volumeRealisasi <= 0) {
                                             alert('❌ Volume realisasi harus diisi dan lebih dari 0!');
@@ -356,7 +346,6 @@
                                             return false;
                                         }
                                         
-                                        // Konfirmasi
                                         const biayaRealisasi = volumeRealisasi * {{ $progress->biaya_satuan }};
                                         const persentase = (volumeRealisasi / {{ $progress->volume_target }}) * 100;
                                         
@@ -378,11 +367,8 @@
                                     const container = document.getElementById('volume-container-{{ $progress->id }}');
                                     const volumeInput = document.getElementById('volume-input-{{ $progress->id }}');
                                     
-                                    // Sembunyikan input volume realisasi
                                     container.style.display = 'none';
                                     volumeInput.removeAttribute('required');
-                                    
-                                    // Catatan wajib diisi saat reject
                                     catatanInput.setAttribute('required', 'required');
                                     document.getElementById('required-label-{{ $progress->id }}').style.display = 'inline';
                                     
@@ -406,20 +392,20 @@
                                 </script>
 
                             @elseif($progress->catatan_verifikasi || $progress->status_verifikasi != 'pending')
-                                <div class="mt-3 p-4 rounded-lg {{ $progress->status_verifikasi == 'disetujui' ? 'bg-green-50 border-2 border-green-300' : 'bg-red-50 border-2 border-red-300' }}">
-                                    <p class="text-sm font-semibold {{ $progress->status_verifikasi == 'disetujui' ? 'text-green-900' : 'text-red-900' }} mb-2">
+                                <div class="mt-3 p-3 sm:p-4 rounded-lg {{ $progress->status_verifikasi == 'disetujui' ? 'bg-green-50 border-2 border-green-300' : 'bg-red-50 border-2 border-red-300' }}">
+                                    <p class="text-xs sm:text-sm font-semibold {{ $progress->status_verifikasi == 'disetujui' ? 'text-green-900' : 'text-red-900' }} mb-2">
                                         {{ $progress->status_verifikasi == 'disetujui' ? '✅ Status: Disetujui' : '❌ Status: Ditolak' }}
                                     </p>
                                     
                                     @if($progress->status_verifikasi == 'disetujui')
-                                        <div class="mb-3 grid grid-cols-3 gap-2 text-xs">
+                                        <div class="mb-3 grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
                                             <div class="bg-white p-2 rounded">
                                                 <p class="text-gray-600">Volume Realisasi:</p>
-                                                <p class="font-bold text-green-700">{{ number_format($progress->volume_realisasi, 2) }} {{ $progress->masterKegiatan->satuan }}</p>
+                                                <p class="font-bold text-green-700 break-words">{{ number_format($progress->volume_realisasi, 2) }} {{ $progress->masterKegiatan->satuan }}</p>
                                             </div>
                                             <div class="bg-white p-2 rounded">
                                                 <p class="text-gray-600">Biaya Realisasi:</p>
-                                                <p class="font-bold text-green-700">Rp {{ number_format($progress->biaya_realisasi, 0, ',', '.') }}</p>
+                                                <p class="font-bold text-green-700 break-words">Rp {{ number_format($progress->biaya_realisasi, 0, ',', '.') }}</p>
                                             </div>
                                             <div class="bg-white p-2 rounded">
                                                 <p class="text-gray-600">Progress:</p>
@@ -430,16 +416,16 @@
                                     
                                     @if($progress->catatan_verifikasi)
                                         <div class="bg-white bg-opacity-50 p-2 rounded mb-2">
-                                            <p class="text-sm font-medium {{ $progress->status_verifikasi == 'disetujui' ? 'text-green-900' : 'text-red-900' }}">
+                                            <p class="text-xs sm:text-sm font-medium {{ $progress->status_verifikasi == 'disetujui' ? 'text-green-900' : 'text-red-900' }}">
                                                 💬 Catatan Verifikasi:
                                             </p>
-                                            <p class="text-sm {{ $progress->status_verifikasi == 'disetujui' ? 'text-green-800' : 'text-red-800' }} mt-1">
+                                            <p class="text-xs sm:text-sm {{ $progress->status_verifikasi == 'disetujui' ? 'text-green-800' : 'text-red-800' }} mt-1 break-words">
                                                 {{ $progress->catatan_verifikasi }}
                                             </p>
                                         </div>
                                     @endif
                                     
-                                    <p class="text-xs text-gray-600">
+                                    <p class="text-xs text-gray-600 break-words">
                                         👤 Diverifikasi oleh: <strong>{{ $progress->verifier->name }}</strong> • 
                                         📅 {{ $progress->verified_at->format('d M Y, H:i') }} WIB
                                     </p>
@@ -451,14 +437,5 @@
             </div>
         </div>
     @endforeach
-
-    <!-- Tombol Export -->
-    <div class="flex justify-end gap-3">
-        <a href="{{ route('bpdas.progress-fisik.export.pdf', $kelompok) }}" 
-           class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg transition duration-300 font-semibold flex items-center gap-2 shadow-lg">
-            <span class="text-lg">📄</span>
-            <span>Export PDF</span>
-        </a>
-    </div>
 </div>
 @endsection

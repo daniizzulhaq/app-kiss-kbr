@@ -2,17 +2,17 @@
 
 @section('title', 'Tambah Kegiatan Progress Fisik - Sistem KBR')
 @section('content')
-<div class="container mx-auto px-4 py-8">
+<div class="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
     <!-- Header -->
-    <div class="mb-6">
-        <div class="flex justify-between items-center">
+    <div class="mb-4 sm:mb-6">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
             <div>
-                <h1 class="text-3xl font-bold text-gray-800">Tambah Kegiatan Progress Fisik</h1>
-                <p class="text-gray-600 mt-1">Pilih dan tambahkan kegiatan baru untuk kelompok Anda</p>
+                <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">Tambah Kegiatan Progress Fisik</h1>
+                <p class="text-sm sm:text-base text-gray-600 mt-1">Pilih dan tambahkan kegiatan baru untuk kelompok Anda</p>
             </div>
             <a href="{{ route('kelompok.progress-fisik.index') }}" 
-               class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg flex items-center gap-2 transition-all shadow-lg hover:shadow-xl">
-                <span class="text-xl">←</span>
+               class="bg-gray-600 hover:bg-gray-700 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-xl text-sm sm:text-base">
+                <span class="text-lg sm:text-xl">←</span>
                 <span class="font-medium">Kembali</span>
             </a>
         </div>
@@ -20,43 +20,43 @@
 
     <!-- Alert Error -->
     @if(session('error'))
-    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-lg shadow">
+    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-3 sm:p-4 mb-4 sm:mb-6 rounded-lg shadow">
         <div class="flex items-center">
-            <span class="text-2xl mr-3">❌</span>
-            <p class="font-medium">{{ session('error') }}</p>
+            <span class="text-xl sm:text-2xl mr-2 sm:mr-3">❌</span>
+            <p class="font-medium text-sm sm:text-base">{{ session('error') }}</p>
         </div>
     </div>
     @endif
 
     <!-- Statistik Kegiatan -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div class="bg-gradient-to-r from-blue-50 to-blue-100 p-4 rounded-lg border-l-4 border-blue-500 shadow">
-            <p class="text-sm text-gray-600 font-medium">Total Kegiatan</p>
-            <p class="text-3xl font-bold text-blue-600 mt-1">{{ $totalKegiatan }}</p>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-6">
+        <div class="bg-gradient-to-r from-blue-50 to-blue-100 p-3 sm:p-4 rounded-lg border-l-4 border-blue-500 shadow">
+            <p class="text-xs sm:text-sm text-gray-600 font-medium">Total Kegiatan</p>
+            <p class="text-2xl sm:text-3xl font-bold text-blue-600 mt-1">{{ $totalKegiatan }}</p>
         </div>
-        <div class="bg-gradient-to-r from-green-50 to-green-100 p-4 rounded-lg border-l-4 border-green-500 shadow">
-            <p class="text-sm text-gray-600 font-medium">Sudah Ditambahkan</p>
-            <p class="text-3xl font-bold text-green-600 mt-1">{{ $totalTambahkan }}</p>
+        <div class="bg-gradient-to-r from-green-50 to-green-100 p-3 sm:p-4 rounded-lg border-l-4 border-green-500 shadow">
+            <p class="text-xs sm:text-sm text-gray-600 font-medium">Sudah Ditambahkan</p>
+            <p class="text-2xl sm:text-3xl font-bold text-green-600 mt-1">{{ $totalTambahkan }}</p>
         </div>
-        <div class="bg-gradient-to-r from-yellow-50 to-yellow-100 p-4 rounded-lg border-l-4 border-yellow-500 shadow">
-            <p class="text-sm text-gray-600 font-medium">Kegiatan Tersedia</p>
-            <p class="text-3xl font-bold text-yellow-600 mt-1">{{ $sisaKegiatan }}</p>
+        <div class="bg-gradient-to-r from-yellow-50 to-yellow-100 p-3 sm:p-4 rounded-lg border-l-4 border-yellow-500 shadow">
+            <p class="text-xs sm:text-sm text-gray-600 font-medium">Kegiatan Tersedia</p>
+            <p class="text-2xl sm:text-3xl font-bold text-yellow-600 mt-1">{{ $sisaKegiatan }}</p>
         </div>
     </div>
 
     <!-- Info Anggaran -->
-    <div class="bg-gradient-to-r from-blue-50 to-green-50 border-l-4 border-blue-500 p-6 mb-6 rounded-lg shadow-md">
-        <div class="flex items-center gap-4">
-            <span class="text-4xl">💰</span>
+    <div class="bg-gradient-to-r from-blue-50 to-green-50 border-l-4 border-blue-500 p-4 sm:p-6 mb-4 sm:mb-6 rounded-lg shadow-md">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+            <span class="text-3xl sm:text-4xl">💰</span>
             <div class="flex-1">
-                <p class="text-sm text-gray-700 font-medium">Sisa Anggaran Tersedia</p>
-                <p class="text-3xl font-bold text-blue-600 mt-1">
+                <p class="text-xs sm:text-sm text-gray-700 font-medium">Sisa Anggaran Tersedia</p>
+                <p class="text-2xl sm:text-3xl font-bold text-blue-600 mt-1 break-words">
                     Rp {{ number_format($anggaran->sisa_anggaran, 0, ',', '.') }}
                 </p>
             </div>
-            <div class="text-right">
+            <div class="w-full sm:w-auto sm:text-right">
                 <p class="text-xs text-gray-600">Total Anggaran</p>
-                <p class="text-lg font-semibold text-gray-700">
+                <p class="text-base sm:text-lg font-semibold text-gray-700">
                     Rp {{ number_format($anggaran->total_anggaran, 0, ',', '.') }}
                 </p>
             </div>
@@ -65,26 +65,26 @@
 
     <!-- Alert jika semua kegiatan sudah ditambahkan -->
     @if($sisaKegiatan == 0)
-    <div class="bg-yellow-50 border-l-4 border-yellow-500 p-6 mb-6 rounded-lg shadow">
-        <div class="flex items-center gap-3">
-            <span class="text-3xl">⚠️</span>
+    <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 sm:p-6 mb-4 sm:mb-6 rounded-lg shadow">
+        <div class="flex items-start gap-3">
+            <span class="text-2xl sm:text-3xl">⚠️</span>
             <div>
-                <p class="font-bold text-yellow-800">Semua kegiatan sudah ditambahkan!</p>
-                <p class="text-sm text-yellow-700 mt-1">Anda telah menambahkan semua kegiatan yang tersedia. Silakan kelola kegiatan yang sudah ada di halaman utama.</p>
+                <p class="font-bold text-yellow-800 text-sm sm:text-base">Semua kegiatan sudah ditambahkan!</p>
+                <p class="text-xs sm:text-sm text-yellow-700 mt-1">Anda telah menambahkan semua kegiatan yang tersedia. Silakan kelola kegiatan yang sudah ada di halaman utama.</p>
             </div>
         </div>
     </div>
     @endif
 
     <!-- Form Card -->
-    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-        <div class="p-8">
+    <div class="bg-white rounded-lg sm:rounded-xl shadow-lg overflow-hidden">
+        <div class="p-4 sm:p-8">
             <form action="{{ route('kelompok.progress-fisik.store') }}" method="POST">
                 @csrf
 
                 <!-- Pilih Kegiatan per Kategori -->
-                <div class="mb-8">
-                    <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <div class="mb-6 sm:mb-8">
+                    <h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-3 sm:mb-4 flex items-center gap-2">
                         <span>📋</span>
                         Pilih Kegiatan
                     </h3>
@@ -99,62 +99,58 @@
                             });
                         @endphp
 
-                        <div class="mb-8 border border-gray-200 rounded-lg overflow-hidden">
-                            <div class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4">
-                                <div class="flex items-center justify-between">
-                                    <div>
-                                        <h4 class="text-lg font-bold text-white">
+                        <div class="mb-4 sm:mb-8 border border-gray-200 rounded-lg overflow-hidden">
+                            <div class="bg-gradient-to-r from-green-600 to-green-700 px-4 sm:px-6 py-3 sm:py-4">
+                                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
+                                    <div class="flex-1">
+                                        <h4 class="text-base sm:text-lg font-bold text-white">
                                             {{ $kategori->kode }}. {{ $kategori->nama }}
                                         </h4>
                                         @if($kategori->deskripsi)
-                                            <p class="text-sm text-green-100 mt-1">{{ $kategori->deskripsi }}</p>
+                                            <p class="text-xs sm:text-sm text-green-100 mt-1">{{ $kategori->deskripsi }}</p>
                                         @endif
                                     </div>
-                                    <div class="text-right">
+                                    <div class="text-left sm:text-right">
                                         <p class="text-xs text-green-200">Kegiatan</p>
-                                        <p class="text-lg font-bold text-white">
+                                        <p class="text-base sm:text-lg font-bold text-white">
                                             {{ $kegiatanTersedia->count() }} / {{ $kategori->masterKegiatan->count() }}
                                         </p>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="p-4 bg-gray-50">
+                            <div class="p-3 sm:p-4 bg-gray-50">
                                 <!-- Kegiatan yang masih tersedia -->
                                 @if($kegiatanTersedia->count() > 0)
-                                    <div class="mb-4">
-                                        <p class="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                                            <span class="w-3 h-3 bg-green-500 rounded-full"></span>
+                                    <div class="mb-3 sm:mb-4">
+                                        <p class="text-xs sm:text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                                            <span class="w-2 h-2 sm:w-3 sm:h-3 bg-green-500 rounded-full"></span>
                                             Kegiatan Tersedia ({{ $kegiatanTersedia->count() }})
                                         </p>
                                         <div class="space-y-2">
                                             @foreach($kegiatanTersedia as $kegiatan)
-                                                <div class="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-all cursor-pointer border-2 border-transparent hover:border-green-400">
-                                                    <label class="flex items-start gap-4 cursor-pointer">
+                                                <div class="bg-white p-3 sm:p-4 rounded-lg shadow-sm hover:shadow-md transition-all cursor-pointer border-2 border-transparent hover:border-green-400">
+                                                    <label class="flex items-start gap-2 sm:gap-4 cursor-pointer">
                                                         <input type="radio" 
                                                                name="master_kegiatan_id" 
                                                                value="{{ $kegiatan->id }}" 
                                                                id="kegiatan_{{ $kegiatan->id }}"
-                                                               class="mt-1 text-green-600 focus:ring-green-500 w-5 h-5"
+                                                               class="mt-0.5 sm:mt-1 text-green-600 focus:ring-green-500 w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0"
                                                                {{ old('master_kegiatan_id') == $kegiatan->id ? 'checked' : '' }}>
                                                         
-                                                        <div class="flex-1">
-                                                            <div class="flex items-start justify-between gap-4">
-                                                                <div class="flex-1">
-                                                                    <p class="text-sm font-semibold text-gray-900">
-                                                                        {{ $kegiatan->nomor }}. {{ $kegiatan->nama_kegiatan }}
-                                                                    </p>
-                                                                    <div class="flex items-center gap-2 mt-2 flex-wrap">
-                                                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                                                                            📏 {{ $kegiatan->satuan }}
-                                                                        </span>
-                                                                        @if($kegiatan->is_honor)
-                                                                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                                                                💰 Honor/Upah
-                                                                            </span>
-                                                                        @endif
-                                                                    </div>
-                                                                </div>
+                                                        <div class="flex-1 min-w-0">
+                                                            <p class="text-xs sm:text-sm font-semibold text-gray-900 break-words">
+                                                                {{ $kegiatan->nomor }}. {{ $kegiatan->nama_kegiatan }}
+                                                            </p>
+                                                            <div class="flex items-center gap-1.5 sm:gap-2 mt-2 flex-wrap">
+                                                                <span class="px-2 py-0.5 sm:py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                                                                    📏 {{ $kegiatan->satuan }}
+                                                                </span>
+                                                                @if($kegiatan->is_honor)
+                                                                    <span class="px-2 py-0.5 sm:py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                                                        💰 Honor/Upah
+                                                                    </span>
+                                                                @endif
                                                             </div>
                                                         </div>
                                                     </label>
@@ -166,28 +162,28 @@
 
                                 <!-- Kegiatan yang sudah ditambahkan -->
                                 @if($kegiatanDitambahkan->count() > 0)
-                                    <div class="mt-4 pt-4 border-t border-gray-200">
-                                        <p class="text-sm font-semibold text-gray-500 mb-2 flex items-center gap-2">
-                                            <span class="w-3 h-3 bg-gray-400 rounded-full"></span>
+                                    <div class="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-200">
+                                        <p class="text-xs sm:text-sm font-semibold text-gray-500 mb-2 flex items-center gap-2">
+                                            <span class="w-2 h-2 sm:w-3 sm:h-3 bg-gray-400 rounded-full"></span>
                                             Sudah Ditambahkan ({{ $kegiatanDitambahkan->count() }})
                                         </p>
                                         <div class="space-y-2">
                                             @foreach($kegiatanDitambahkan as $kegiatan)
-                                                <div class="bg-gray-100 p-4 rounded-lg border border-gray-300 opacity-60">
-                                                    <div class="flex items-start gap-4">
+                                                <div class="bg-gray-100 p-3 sm:p-4 rounded-lg border border-gray-300 opacity-60">
+                                                    <div class="flex items-start gap-2 sm:gap-4">
                                                         <input type="radio" 
                                                                disabled
-                                                               class="mt-1 w-5 h-5 cursor-not-allowed">
+                                                               class="mt-0.5 sm:mt-1 w-4 h-4 sm:w-5 sm:h-5 cursor-not-allowed flex-shrink-0">
                                                         
-                                                        <div class="flex-1">
-                                                            <p class="text-sm font-semibold text-gray-600">
+                                                        <div class="flex-1 min-w-0">
+                                                            <p class="text-xs sm:text-sm font-semibold text-gray-600 break-words">
                                                                 {{ $kegiatan->nomor }}. {{ $kegiatan->nama_kegiatan }}
                                                             </p>
-                                                            <div class="flex items-center gap-2 mt-2 flex-wrap">
-                                                                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-200 text-gray-600">
+                                                            <div class="flex items-center gap-1.5 sm:gap-2 mt-2 flex-wrap">
+                                                                <span class="px-2 py-0.5 sm:py-1 text-xs font-semibold rounded-full bg-gray-200 text-gray-600">
                                                                     📏 {{ $kegiatan->satuan }}
                                                                 </span>
-                                                                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-700">
+                                                                <span class="px-2 py-0.5 sm:py-1 text-xs font-semibold rounded-full bg-red-100 text-red-700">
                                                                     ✅ Sudah Ditambahkan
                                                                 </span>
                                                             </div>
@@ -201,9 +197,9 @@
 
                                 <!-- Info jika semua kegiatan kategori ini sudah ditambahkan -->
                                 @if($kegiatanTersedia->count() == 0)
-                                    <div class="text-center py-6">
-                                        <span class="text-4xl">✅</span>
-                                        <p class="text-gray-600 font-medium mt-2">
+                                    <div class="text-center py-4 sm:py-6">
+                                        <span class="text-3xl sm:text-4xl">✅</span>
+                                        <p class="text-gray-600 font-medium mt-2 text-sm sm:text-base">
                                             Semua kegiatan dalam kategori ini sudah ditambahkan
                                         </p>
                                     </div>
@@ -214,22 +210,22 @@
                 </div>
 
                 @error('master_kegiatan_id')
-                    <div class="mb-4 bg-red-50 border-l-4 border-red-500 p-4 rounded">
-                        <p class="text-red-700 text-sm font-medium">{{ $message }}</p>
+                    <div class="mb-3 sm:mb-4 bg-red-50 border-l-4 border-red-500 p-3 sm:p-4 rounded">
+                        <p class="text-red-700 text-xs sm:text-sm font-medium">{{ $message }}</p>
                     </div>
                 @enderror
 
                 <!-- Detail Kegiatan -->
-                <div class="border-t pt-8">
-                    <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+                <div class="border-t pt-6 sm:pt-8">
+                    <h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center gap-2">
                         <span>📝</span>
                         Detail Kegiatan
                     </h3>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                         <!-- Volume Target -->
                         <div>
-                            <label for="volume_target" class="block text-sm font-bold text-gray-700 mb-2">
+                            <label for="volume_target" class="block text-xs sm:text-sm font-bold text-gray-700 mb-2">
                                 Volume Target <span class="text-red-500">*</span>
                             </label>
                             <input type="number" 
@@ -237,17 +233,17 @@
                                    name="volume_target" 
                                    id="volume_target"
                                    value="{{ old('volume_target') }}"
-                                   class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 text-lg"
+                                   class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 text-base sm:text-lg px-3 py-2"
                                    placeholder="Masukkan volume target"
                                    required>
                             @error('volume_target')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
                             @enderror
                         </div>
 
                         <!-- Biaya Satuan -->
                         <div>
-                            <label for="biaya_satuan" class="block text-sm font-bold text-gray-700 mb-2">
+                            <label for="biaya_satuan" class="block text-xs sm:text-sm font-bold text-gray-700 mb-2">
                                 Biaya Per Satuan (Rp) <span class="text-red-500">*</span>
                             </label>
                             <input type="number" 
@@ -255,28 +251,28 @@
                                    name="biaya_satuan" 
                                    id="biaya_satuan"
                                    value="{{ old('biaya_satuan') }}"
-                                   class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 text-lg"
+                                   class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 text-base sm:text-lg px-3 py-2"
                                    placeholder="Masukkan biaya per satuan"
                                    required>
                             @error('biaya_satuan')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
                             @enderror
                         </div>
                     </div>
 
                     <!-- Total Biaya Display -->
-                    <div class="mt-6 p-6 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg border-l-4 border-yellow-500 shadow-md">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-sm text-gray-700 font-medium">Total Biaya Kegiatan</p>
-                                <p class="text-4xl font-bold text-yellow-600 mt-2" id="total_biaya_display">Rp 0</p>
+                    <div class="mt-4 sm:mt-6 p-4 sm:p-6 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg border-l-4 border-yellow-500 shadow-md">
+                        <div class="flex items-start sm:items-center justify-between gap-3">
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs sm:text-sm text-gray-700 font-medium">Total Biaya Kegiatan</p>
+                                <p class="text-2xl sm:text-4xl font-bold text-yellow-600 mt-1 sm:mt-2 break-words" id="total_biaya_display">Rp 0</p>
                             </div>
-                            <span class="text-6xl">💵</span>
+                            <span class="text-4xl sm:text-6xl flex-shrink-0">💵</span>
                         </div>
-                        <div class="mt-4 pt-4 border-t border-yellow-200">
-                            <div class="flex justify-between text-sm">
+                        <div class="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-yellow-200">
+                            <div class="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-0 text-xs sm:text-sm">
                                 <span class="text-gray-600">Sisa anggaran setelah kegiatan ini:</span>
-                                <span class="font-bold text-gray-800" id="sisa_anggaran_display">
+                                <span class="font-bold text-gray-800 break-words" id="sisa_anggaran_display">
                                     Rp {{ number_format($anggaran->sisa_anggaran, 0, ',', '.') }}
                                 </span>
                             </div>
@@ -284,44 +280,44 @@
                     </div>
 
                     <!-- Tanggal Mulai -->
-                    <div class="mt-6">
-                        <label for="tanggal_mulai" class="block text-sm font-bold text-gray-700 mb-2">
+                    <div class="mt-4 sm:mt-6">
+                        <label for="tanggal_mulai" class="block text-xs sm:text-sm font-bold text-gray-700 mb-2">
                             📅 Tanggal Mulai
                         </label>
                         <input type="date" 
                                name="tanggal_mulai" 
                                id="tanggal_mulai"
                                value="{{ old('tanggal_mulai', date('Y-m-d')) }}"
-                               class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 text-lg">
+                               class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 text-base sm:text-lg px-3 py-2">
                         @error('tanggal_mulai')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </div>
 
                     <!-- Keterangan -->
-                    <div class="mt-6">
-                        <label for="keterangan" class="block text-sm font-bold text-gray-700 mb-2">
+                    <div class="mt-4 sm:mt-6">
+                        <label for="keterangan" class="block text-xs sm:text-sm font-bold text-gray-700 mb-2">
                             📄 Keterangan
                         </label>
                         <textarea name="keterangan" 
                                   id="keterangan" 
                                   rows="4"
-                                  class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500"
+                                  class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 text-sm sm:text-base px-3 py-2"
                                   placeholder="Tambahkan keterangan atau catatan untuk kegiatan ini...">{{ old('keterangan') }}</textarea>
                         @error('keterangan')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </div>
                 </div>
 
                 <!-- Tombol Action -->
-                <div class="flex justify-end gap-4 mt-8 pt-6 border-t">
+                <div class="flex flex-col sm:flex-row sm:justify-end gap-3 sm:gap-4 mt-6 sm:mt-8 pt-4 sm:pt-6 border-t">
                     <a href="{{ route('kelompok.progress-fisik.index') }}" 
-                       class="px-8 py-3 border-2 border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-all shadow-md hover:shadow-lg">
+                       class="w-full sm:w-auto px-6 sm:px-8 py-2.5 sm:py-3 border-2 border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-all shadow-md hover:shadow-lg text-center text-sm sm:text-base">
                         ❌ Batal
                     </a>
                     <button type="submit" 
-                            class="px-8 py-3 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold rounded-lg transition-all shadow-lg hover:shadow-xl"
+                            class="w-full sm:w-auto px-6 sm:px-8 py-2.5 sm:py-3 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold rounded-lg transition-all shadow-lg hover:shadow-xl text-sm sm:text-base"
                             {{ $sisaKegiatan == 0 ? 'disabled' : '' }}>
                         ✅ Simpan Kegiatan
                     </button>
@@ -366,7 +362,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!document.getElementById('warning_anggaran')) {
                 const warning = document.createElement('div');
                 warning.id = 'warning_anggaran';
-                warning.className = 'mt-2 p-3 bg-red-100 border border-red-400 text-red-700 rounded text-sm font-medium';
+                warning.className = 'mt-2 p-2 sm:p-3 bg-red-100 border border-red-400 text-red-700 rounded text-xs sm:text-sm font-medium';
                 warning.innerHTML = '⚠️ Total biaya melebihi sisa anggaran yang tersedia!';
                 sisaAnggaranDisplay.parentElement.parentElement.appendChild(warning);
             }

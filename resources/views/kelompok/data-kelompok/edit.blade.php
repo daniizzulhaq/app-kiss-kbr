@@ -3,119 +3,119 @@
 @section('title', 'Edit Data Kelompok')
 
 @section('content')
-<div class="py-12">
-    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+<div class="py-6 sm:py-8 lg:py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <!-- Header -->
-        <div class="mb-8">
-            <h1 class="text-4xl font-bold text-gray-800 mb-2">✏️ Edit Data Kelompok</h1>
-            <p class="text-gray-600">Perbarui data kelompok dengan lengkap dan benar.</p>
+        <div class="mb-6 sm:mb-8">
+            <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 mb-2">✏️ Edit Data Kelompok</h1>
+            <p class="text-sm sm:text-base text-gray-600">Perbarui data kelompok dengan lengkap dan benar.</p>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             
             <!-- Form Section -->
-            <div class="bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
+            <div class="bg-white p-4 sm:p-6 lg:p-8 rounded-xl sm:rounded-2xl shadow-xl border border-gray-100">
                 <form action="{{ route('kelompok.data-kelompok.update', $kelompok) }}" method="POST" enctype="multipart/form-data" id="kelompokForm">
                     @csrf
                     @method('PUT')
 
                     <!-- Nama Kelompok -->
-                    <div class="mb-6">
-                        <label for="nama_kelompok" class="block text-sm text-gray-700 font-semibold mb-2">
+                    <div class="mb-4 sm:mb-6">
+                        <label for="nama_kelompok" class="block text-xs sm:text-sm text-gray-700 font-semibold mb-2">
                             Nama Kelompok <span class="text-red-500">*</span>
                         </label>
                         <input type="text" name="nama_kelompok" id="nama_kelompok" required
                             value="{{ old('nama_kelompok', $kelompok->nama_kelompok) }}"
-                            class="w-full px-4 py-3 rounded-xl border-gray-300 shadow-sm focus:border-green-600 focus:ring-green-600 @error('nama_kelompok') border-red-500 @enderror">
+                            class="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg sm:rounded-xl border-gray-300 shadow-sm focus:border-green-600 focus:ring-green-600 @error('nama_kelompok') border-red-500 @enderror">
                         @error('nama_kelompok')
                             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                         @enderror
                     </div>
 
                     <!-- Blok & Desa -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
                         <div>
-                            <label class="block text-sm text-gray-700 font-semibold mb-2">Blok</label>
+                            <label class="block text-xs sm:text-sm text-gray-700 font-semibold mb-2">Blok</label>
                             <input type="text" name="blok" value="{{ old('blok', $kelompok->blok) }}"
-                                class="w-full px-4 py-3 rounded-xl border-gray-300 shadow-sm focus:border-green-600 focus:ring-green-600">
+                                class="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg sm:rounded-xl border-gray-300 shadow-sm focus:border-green-600 focus:ring-green-600">
                             @error('blok') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
 
                         <div>
-                            <label class="block text-sm text-gray-700 font-semibold mb-2">Desa</label>
+                            <label class="block text-xs sm:text-sm text-gray-700 font-semibold mb-2">Desa</label>
                             <input type="text" name="desa" value="{{ old('desa', $kelompok->desa) }}"
-                                class="w-full px-4 py-3 rounded-xl border-gray-300 shadow-sm focus:border-green-600 focus:ring-green-600">
+                                class="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg sm:rounded-xl border-gray-300 shadow-sm focus:border-green-600 focus:ring-green-600">
                             @error('desa') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
                     </div>
 
                     <!-- Kecamatan & Kabupaten -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
                         <div>
-                            <label class="block text-sm text-gray-700 font-semibold mb-2">Kecamatan</label>
+                            <label class="block text-xs sm:text-sm text-gray-700 font-semibold mb-2">Kecamatan</label>
                             <input type="text" name="kecamatan" value="{{ old('kecamatan', $kelompok->kecamatan) }}"
-                                class="w-full px-4 py-3 rounded-xl border-gray-300 shadow-sm focus:border-green-600 focus:ring-green-600">
+                                class="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg sm:rounded-xl border-gray-300 shadow-sm focus:border-green-600 focus:ring-green-600">
                             @error('kecamatan') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
 
                         <div>
-                            <label class="block text-sm text-gray-700 font-semibold mb-2">Kabupaten</label>
+                            <label class="block text-xs sm:text-sm text-gray-700 font-semibold mb-2">Kabupaten</label>
                             <input type="text" name="kabupaten" value="{{ old('kabupaten', $kelompok->kabupaten) }}"
-                                class="w-full px-4 py-3 rounded-xl border-gray-300 shadow-sm focus:border-green-600 focus:ring-green-600">
+                                class="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg sm:rounded-xl border-gray-300 shadow-sm focus:border-green-600 focus:ring-green-600">
                             @error('kabupaten') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
                     </div>
 
                     <!-- Koordinat (Hidden, Auto-fill dari map) -->
-                    <div class="mb-6">
-                        <label class="block text-sm text-gray-700 font-semibold mb-2">
+                    <div class="mb-4 sm:mb-6">
+                        <label class="block text-xs sm:text-sm text-gray-700 font-semibold mb-2">
                             📍 Koordinat Lokasi
                         </label>
-                        <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-3 rounded-lg">
-                            <p class="text-sm text-blue-800 flex items-start">
+                        <div class="bg-blue-50 border-l-4 border-blue-400 p-3 sm:p-4 mb-3 rounded-lg">
+                            <p class="text-xs sm:text-sm text-blue-800 flex items-start">
                                 <span class="mr-2">💡</span>
-                                <span><strong>Klik pada peta</strong> di sebelah kanan untuk memperbarui lokasi. Koordinat akan terisi otomatis!</span>
+                                <span><strong>Klik pada peta</strong> di bawah untuk memperbarui lokasi. Koordinat akan terisi otomatis!</span>
                             </p>
                         </div>
                         <input type="text" name="koordinat" id="koordinat" 
                             placeholder="Klik peta untuk mengisi koordinat"
                             value="{{ old('koordinat', $kelompok->koordinat) }}" readonly
-                            class="w-full px-4 py-3 rounded-xl border-gray-300 shadow-sm bg-gray-50 focus:border-green-600 focus:ring-green-600">
+                            class="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-lg sm:rounded-xl border-gray-300 shadow-sm bg-gray-50 focus:border-green-600 focus:ring-green-600 break-all">
                         @error('koordinat') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
 
                     <!-- Anggota & Kontak -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
                         <div>
-                            <label class="block text-sm text-gray-700 font-semibold mb-2">Jumlah Anggota</label>
+                            <label class="block text-xs sm:text-sm text-gray-700 font-semibold mb-2">Jumlah Anggota</label>
                             <input type="number" name="anggota" min="0" value="{{ old('anggota', $kelompok->anggota) }}"
-                                class="w-full px-4 py-3 rounded-xl border-gray-300 shadow-sm focus:border-green-600 focus:ring-green-600">
+                                class="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg sm:rounded-xl border-gray-300 shadow-sm focus:border-green-600 focus:ring-green-600">
                             @error('anggota') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
 
                         <div>
-                            <label class="block text-sm text-gray-700 font-semibold mb-2">Kontak</label>
+                            <label class="block text-xs sm:text-sm text-gray-700 font-semibold mb-2">Kontak</label>
                             <input type="text" name="kontak" placeholder="cth: 08123456789"
                                 value="{{ old('kontak', $kelompok->kontak) }}"
-                                class="w-full px-4 py-3 rounded-xl border-gray-300 shadow-sm focus:border-green-600 focus:ring-green-600">
+                                class="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg sm:rounded-xl border-gray-300 shadow-sm focus:border-green-600 focus:ring-green-600">
                             @error('kontak') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
                     </div>
 
                     <!-- SPKS -->
-                    <div class="mb-6">
-                        <label class="block text-sm text-gray-700 font-semibold mb-2">SPKS</label>
+                    <div class="mb-4 sm:mb-6">
+                        <label class="block text-xs sm:text-sm text-gray-700 font-semibold mb-2">SPKS</label>
                         <input type="text" name="spks" value="{{ old('spks', $kelompok->spks) }}"
-                            class="w-full px-4 py-3 rounded-xl border-gray-300 shadow-sm focus:border-green-600 focus:ring-green-600">
+                            class="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg sm:rounded-xl border-gray-300 shadow-sm focus:border-green-600 focus:ring-green-600">
                         @error('spks') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
 
                     <!-- Rekening -->
-                    <div class="mb-6">
-                        <label class="block text-sm text-gray-700 font-semibold mb-2">Rekening</label>
+                    <div class="mb-4 sm:mb-6">
+                        <label class="block text-xs sm:text-sm text-gray-700 font-semibold mb-2">Rekening</label>
                         <textarea name="rekening" rows="3"
-                            class="w-full px-4 py-3 rounded-xl border-gray-300 shadow-sm focus:border-green-600 focus:ring-green-600">{{ old('rekening', $kelompok->rekening) }}</textarea>
+                            class="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg sm:rounded-xl border-gray-300 shadow-sm focus:border-green-600 focus:ring-green-600">{{ old('rekening', $kelompok->rekening) }}</textarea>
                         @error('rekening') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
 
@@ -134,23 +134,23 @@
                     @endphp
 
                     @if(!empty($dokumentasiArray))
-                    <div class="mb-6">
-                        <label class="block text-sm text-gray-700 font-semibold mb-2">
+                    <div class="mb-4 sm:mb-6">
+                        <label class="block text-xs sm:text-sm text-gray-700 font-semibold mb-2">
                             📸 Foto Dokumentasi Saat Ini
                         </label>
-                        <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 mb-4">
                             @foreach($dokumentasiArray as $index => $foto)
                             <div class="relative group">
                                 <img src="{{ Storage::url($foto) }}" 
-                                     class="w-full h-32 object-cover rounded-lg border-2 border-gray-300"
+                                     class="w-full h-24 sm:h-32 object-cover rounded-lg border-2 border-gray-300"
                                      alt="Foto {{ $index + 1 }}">
-                                <div class="absolute top-2 right-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">
+                                <div class="absolute top-1 sm:top-2 right-1 sm:right-2 bg-blue-600 text-white text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded">
                                     Foto {{ $index + 1 }}
                                 </div>
                                 <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all rounded-lg flex items-center justify-center">
                                     <button type="button" 
                                             onclick="deletePhoto({{ $kelompok->id }}, '{{ $foto }}', this)"
-                                            class="opacity-0 group-hover:opacity-100 bg-red-600 text-white px-3 py-1 rounded-lg text-sm font-semibold hover:bg-red-700 transition-all">
+                                            class="opacity-0 group-hover:opacity-100 bg-red-600 text-white px-2 sm:px-3 py-1 rounded-lg text-xs sm:text-sm font-semibold hover:bg-red-700 transition-all">
                                         🗑️ Hapus
                                     </button>
                                 </div>
@@ -161,12 +161,12 @@
                     @endif
 
                     <!-- Upload Foto Baru -->
-                    <div class="mb-6">
-                        <label class="block text-sm text-gray-700 font-semibold mb-2">
+                    <div class="mb-4 sm:mb-6">
+                        <label class="block text-xs sm:text-sm text-gray-700 font-semibold mb-2">
                             📸 Upload Foto Baru (Maksimal 5 Foto)
                         </label>
-                        <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-3 rounded-lg">
-                            <p class="text-sm text-blue-800 flex items-start">
+                        <div class="bg-blue-50 border-l-4 border-blue-400 p-3 sm:p-4 mb-3 rounded-lg">
+                            <p class="text-xs sm:text-sm text-blue-800 flex items-start">
                                 <span class="mr-2">💡</span>
                                 <span>Upload foto dokumentasi tambahan. Format: JPG, PNG. Maksimal 2MB per foto. Foto yang sudah ada tidak akan terhapus kecuali Anda menghapusnya secara manual.</span>
                             </p>
@@ -177,7 +177,7 @@
                                id="dokumentasi" 
                                multiple 
                                accept="image/jpeg,image/jpg,image/png"
-                               class="w-full px-4 py-3 rounded-xl border-gray-300 shadow-sm focus:border-green-600 focus:ring-green-600"
+                               class="w-full px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm rounded-lg sm:rounded-xl border-gray-300 shadow-sm focus:border-green-600 focus:ring-green-600"
                                onchange="previewImages(event)">
                         
                         @error('dokumentasi.*')
@@ -185,18 +185,18 @@
                         @enderror
                         
                         <!-- Preview Container untuk foto baru -->
-                        <div id="imagePreviewContainer" class="mt-4 grid grid-cols-2 md:grid-cols-3 gap-3"></div>
+                        <div id="imagePreviewContainer" class="mt-3 sm:mt-4 grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3"></div>
                     </div>
 
                     <!-- Buttons -->
-                    <div class="flex justify-end gap-4 pt-4 border-t border-gray-200">
+                    <div class="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4 pt-4 border-t border-gray-200">
                         <a href="{{ route('kelompok.data-kelompok.index') }}"
-                            class="px-6 py-3 rounded-xl bg-gray-300 hover:bg-gray-400 text-gray-700 font-semibold transition-all duration-200">
+                            class="w-full sm:w-auto text-center px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg sm:rounded-xl bg-gray-300 hover:bg-gray-400 text-gray-700 font-semibold transition-all duration-200 text-sm sm:text-base">
                             Batal
                         </a>
 
                         <button type="submit"
-                            class="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md hover:shadow-xl transition-all duration-300">
+                            class="w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg sm:rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md hover:shadow-xl transition-all duration-300 text-sm sm:text-base">
                             ✅ Update Data
                         </button>
                     </div>
@@ -205,35 +205,35 @@
             </div>
 
             <!-- Map Section -->
-            <div class="bg-white rounded-2xl shadow-xl p-6 border border-gray-100 sticky top-6">
-                <div class="mb-4">
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">🗺️ Pilih Lokasi di Peta</h3>
-                    <p class="text-sm text-gray-600">Klik pada peta untuk memperbarui lokasi kelompok</p>
+            <div class="bg-white rounded-xl sm:rounded-2xl shadow-xl p-4 sm:p-6 border border-gray-100 lg:sticky lg:top-6">
+                <div class="mb-3 sm:mb-4">
+                    <h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-2">🗺️ Pilih Lokasi di Peta</h3>
+                    <p class="text-xs sm:text-sm text-gray-600">Klik pada peta untuk memperbarui lokasi kelompok</p>
                 </div>
 
                 <!-- Search Box -->
-                <div class="mb-4">
+                <div class="mb-3 sm:mb-4">
                     <input type="text" 
                            id="searchBox" 
-                           placeholder="🔍 Cari lokasi (contoh: Purwodadi, Jawa Tengah)"
-                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                           placeholder="🔍 Cari lokasi (contoh: Purwodadi)"
+                           class="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                 </div>
 
                 <!-- Map Container -->
-                <div id="map" class="w-full h-96 rounded-lg border-2 border-gray-300 shadow-inner"></div>
+                <div id="map" class="w-full h-64 sm:h-80 lg:h-96 rounded-lg border-2 border-gray-300 shadow-inner"></div>
 
                 <!-- Current Location Button -->
                 <button type="button" 
                         id="getCurrentLocation"
-                        class="mt-4 w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2">
+                        class="mt-3 sm:mt-4 w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2 text-xs sm:text-sm">
                     <span>📍</span>
                     <span>Gunakan Lokasi Saya Saat Ini</span>
                 </button>
 
                 <!-- Selected Coordinates Display -->
-                <div id="selectedCoords" class="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-                    <p class="text-sm font-semibold text-green-800 mb-1">✅ Lokasi Terpilih:</p>
-                    <p class="text-xs text-green-700 font-mono" id="coordsDisplay">{{ $kelompok->koordinat ?? '-' }}</p>
+                <div id="selectedCoords" class="mt-3 sm:mt-4 p-3 sm:p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <p class="text-xs sm:text-sm font-semibold text-green-800 mb-1">✅ Lokasi Terpilih:</p>
+                    <p class="text-xs text-green-700 font-mono break-all" id="coordsDisplay">{{ $kelompok->koordinat ?? '-' }}</p>
                 </div>
             </div>
 
@@ -265,8 +265,9 @@ if (existingCoordinates) {
     }
 }
 
-// Initialize map
-const map = L.map('map').setView([initialLat, initialLng], initialZoom);
+// Initialize map with mobile-friendly zoom
+const isMobile = window.innerWidth < 640;
+const map = L.map('map').setView([initialLat, initialLng], isMobile ? (initialZoom - 1) : initialZoom);
 
 // Add OpenStreetMap tiles
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -284,9 +285,21 @@ function updateLocation(lat, lng) {
         map.removeLayer(marker);
     }
     
+    // Marker size based on screen size
+    const markerSize = isMobile ? 24 : 30;
+    
+    // Custom icon
+    const customIcon = L.divIcon({
+        className: 'custom-marker',
+        html: `<div style="background-color: #16a34a; width: ${markerSize}px; height: ${markerSize}px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; font-size: ${isMobile ? '14px' : '16px'};">📍</div>`,
+        iconSize: [markerSize, markerSize],
+        iconAnchor: [markerSize/2, markerSize/2]
+    });
+    
     // Add new marker (draggable)
     marker = L.marker([lat, lng], {
-        draggable: true
+        draggable: true,
+        icon: customIcon
     }).addTo(map);
     
     // Update form input (format: lat, lng)
@@ -296,8 +309,12 @@ function updateLocation(lat, lng) {
     document.getElementById('selectedCoords').classList.remove('hidden');
     document.getElementById('coordsDisplay').textContent = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
     
-    // Add popup to marker
-    marker.bindPopup(`<b>Lokasi Terpilih</b><br>Lat: ${lat.toFixed(6)}<br>Lng: ${lng.toFixed(6)}`).openPopup();
+    // Add popup to marker - smaller on mobile
+    const popupContent = isMobile 
+        ? `<div style="font-size: 12px;"><b>Lokasi Terpilih</b><br>${lat.toFixed(6)}, ${lng.toFixed(6)}</div>`
+        : `<b>Lokasi Terpilih</b><br>Lat: ${lat.toFixed(6)}<br>Lng: ${lng.toFixed(6)}`;
+    
+    marker.bindPopup(popupContent).openPopup();
     
     // Update location when marker is dragged
     marker.on('dragend', function(e) {
@@ -327,7 +344,7 @@ document.getElementById('getCurrentLocation').addEventListener('click', function
                 const lat = position.coords.latitude;
                 const lng = position.coords.longitude;
                 
-                map.setView([lat, lng], 15);
+                map.setView([lat, lng], isMobile ? 14 : 15);
                 updateLocation(lat, lng);
                 
                 this.innerHTML = '<span>📍</span><span>Gunakan Lokasi Saya Saat Ini</span>';
@@ -367,11 +384,15 @@ document.getElementById('searchBox').addEventListener('keypress', function(e) {
                     const lat = parseFloat(data[0].lat);
                     const lng = parseFloat(data[0].lon);
                     
-                    map.setView([lat, lng], 13);
+                    map.setView([lat, lng], isMobile ? 12 : 13);
                     updateLocation(lat, lng);
                     
                     this.value = '';
-                    this.placeholder = `✅ ${data[0].display_name}`;
+                    // Truncate long display names on mobile
+                    const displayName = isMobile && data[0].display_name.length > 30 
+                        ? data[0].display_name.substring(0, 30) + '...'
+                        : data[0].display_name;
+                    this.placeholder = `✅ ${displayName}`;
                 } else {
                     alert('Lokasi tidak ditemukan. Coba kata kunci lain.');
                     this.value = originalValue;
@@ -413,11 +434,12 @@ function previewImages(event) {
         reader.onload = function(e) {
             const div = document.createElement('div');
             div.className = 'relative group';
+            const imageHeight = isMobile ? 'h-24' : 'h-32';
             div.innerHTML = `
                 <img src="${e.target.result}" 
-                     class="w-full h-32 object-cover rounded-lg border-2 border-green-300"
+                     class="w-full ${imageHeight} object-cover rounded-lg border-2 border-green-300"
                      alt="Preview ${index + 1}">
-                <div class="absolute top-2 right-2 bg-green-600 text-white text-xs px-2 py-1 rounded">
+                <div class="absolute top-1 sm:top-2 right-1 sm:right-2 bg-green-600 text-white text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded">
                     Foto Baru ${index + 1}
                 </div>
             `;
@@ -466,7 +488,6 @@ function deletePhoto(kelompokId, photoPath, button) {
     });
 }
 
-
 // Form validation
 document.getElementById('kelompokForm').addEventListener('submit', function(e) {
     const koordinat = document.getElementById('koordinat').value;
@@ -482,5 +503,10 @@ document.getElementById('kelompokForm').addEventListener('submit', function(e) {
 setTimeout(function() {
     map.invalidateSize();
 }, 100);
+
+// Re-render map on window resize
+window.addEventListener('resize', function() {
+    map.invalidateSize();
+});
 </script>
 @endsection

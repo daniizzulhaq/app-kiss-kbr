@@ -30,9 +30,21 @@
 
     <!-- Menu Fitur Utama -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Dashboard -->
+        <a href="{{ route('bpdas.dashboard') }}" 
+            class="group bg-red-50 hover:bg-red-100 p-6 rounded-xl border border-red-200 transition-all hover:shadow-lg hover:-translate-y-1">
+            <div class="flex items-start space-x-4">
+                <div class="text-4xl">🏠</div>
+                <div>
+                    <h4 class="font-bold text-lg text-gray-800 mb-2">Dashboard</h4>
+                    <p class="text-sm text-gray-600">Ringkasan dan statistik sistem</p>
+                </div>
+            </div>
+        </a>
+
         <!-- Terima Permasalahan -->
         <a href="{{ route('bpdas.permasalahan.index') }}" 
-            class="group bg-red-50 hover:bg-red-100 p-6 rounded-xl border border-red-200 transition-all hover:shadow-lg hover:-translate-y-1">
+            class="group bg-yellow-50 hover:bg-yellow-100 p-6 rounded-xl border border-yellow-200 transition-all hover:shadow-lg hover:-translate-y-1">
             <div class="flex items-start space-x-4">
                 <div class="text-4xl">⚠️</div>
                 <div>
@@ -42,21 +54,21 @@
             </div>
         </a>
 
-        <!-- Realisasi Tenaga -->
-        <a href="#" 
-            class="group bg-green-50 hover:bg-green-100 p-6 rounded-xl border border-green-200 transition-all hover:shadow-lg hover:-translate-y-1">
+        <!-- Data Kelompok -->
+        <a href="{{ route('bpdas.kelompok.index') }}" 
+            class="group bg-purple-50 hover:bg-purple-100 p-6 rounded-xl border border-purple-200 transition-all hover:shadow-lg hover:-translate-y-1">
             <div class="flex items-start space-x-4">
-                <div class="text-4xl">👷‍♂️</div>
+                <div class="text-4xl">👥</div>
                 <div>
-                    <h4 class="font-bold text-lg text-gray-800 mb-2">Realisasi Tenaga</h4>
-                    <p class="text-sm text-gray-600">Monitor pelaksanaan tenaga kerja di lapangan</p>
+                    <h4 class="font-bold text-lg text-gray-800 mb-2">Data Kelompok</h4>
+                    <p class="text-sm text-gray-600">Kelola data kelompok tani KBR</p>
                 </div>
             </div>
         </a>
 
         <!-- Geotagging -->
-        <a href="#" 
-            class="group bg-blue-50 hover:bg-blue-100 p-6 rounded-xl border border-blue-200 transition-all hover:shadow-lg hover:-translate-y-1">
+        <a href="{{ route('bpdas.geotagging.index') }}" 
+            class="group bg-pink-50 hover:bg-pink-100 p-6 rounded-xl border border-pink-200 transition-all hover:shadow-lg hover:-translate-y-1">
             <div class="flex items-start space-x-4">
                 <div class="text-4xl">📍</div>
                 <div>
@@ -66,40 +78,87 @@
             </div>
         </a>
 
-        <!-- Rencana Tenaga -->
-        <a href="#" 
-            class="group bg-purple-50 hover:bg-purple-100 p-6 rounded-xl border border-purple-200 transition-all hover:shadow-lg hover:-translate-y-1">
+        <!-- Rencana Bibit Kelompok -->
+        <a href="{{ route('bpdas.rencana-bibit.index') }}" 
+            class="group bg-green-50 hover:bg-green-100 p-6 rounded-xl border border-green-200 transition-all hover:shadow-lg hover:-translate-y-1">
             <div class="flex items-start space-x-4">
-                <div class="text-4xl">📋</div>
+                <div class="text-4xl">🌱</div>
                 <div>
-                    <h4 class="font-bold text-lg text-gray-800 mb-2">Rencana Tenaga</h4>
-                    <p class="text-sm text-gray-600">Atur perencanaan kebutuhan tenaga kerja</p>
+                    <h4 class="font-bold text-lg text-gray-800 mb-2">Rencana Bibit Kelompok</h4>
+                    <p class="text-sm text-gray-600">Monitoring rencana pengadaan bibit kelompok</p>
                 </div>
             </div>
         </a>
 
-        <!-- Rencana Pembuatan -->
-        <a href="#" 
-            class="group bg-orange-50 hover:bg-orange-100 p-6 rounded-xl border border-orange-200 transition-all hover:shadow-lg hover:-translate-y-1">
-            <div class="flex items-start space-x-4">
-                <div class="text-4xl">🧱</div>
-                <div>
-                    <h4 class="font-bold text-lg text-gray-800 mb-2">Rencana Pembuatan</h4>
-                    <p class="text-sm text-gray-600">Susun rencana pembangunan sarana & prasarana</p>
-                </div>
-            </div>
-        </a>
-
-        <!-- Rencana Pembelian Bibit -->
-        <a href="#" 
+        <!-- Realisasi Bibit Kelompok -->
+        <a href="{{ route('bpdas.realisasi-bibit.index') }}" 
             class="group bg-emerald-50 hover:bg-emerald-100 p-6 rounded-xl border border-emerald-200 transition-all hover:shadow-lg hover:-translate-y-1">
             <div class="flex items-start space-x-4">
                 <div class="text-4xl">🌳</div>
                 <div>
-                    <h4 class="font-bold text-lg text-gray-800 mb-2">Rencana Pembelian Bibit</h4>
-                    <p class="text-sm text-gray-600">Rencana pengadaan bibit tanaman KBR</p>
+                    <h4 class="font-bold text-lg text-gray-800 mb-2">Realisasi Bibit Kelompok</h4>
+                    <p class="text-sm text-gray-600">Monitor realisasi distribusi bibit</p>
                 </div>
             </div>
         </a>
+
+        <!-- Progress Fisik Kelompok -->
+        <a href="{{ route('bpdas.progress-fisik.index') }}" 
+            class="group bg-blue-50 hover:bg-blue-100 p-6 rounded-xl border border-blue-200 transition-all hover:shadow-lg hover:-translate-y-1">
+            <div class="flex items-start space-x-4">
+                <div class="text-4xl">📊</div>
+                <div>
+                    <h4 class="font-bold text-lg text-gray-800 mb-2">Progress Fisik Kelompok</h4>
+                    <p class="text-sm text-gray-600">Monitoring progress dan verifikasi kegiatan</p>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Statistik Ringkas -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-8">
+        <!-- Total Kelompok -->
+        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-purple-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600 mb-1">Total Kelompok</p>
+                    <h3 class="text-3xl font-bold text-gray-800">{{ $totalKelompok ?? 0 }}</h3>
+                </div>
+                <div class="text-4xl">👥</div>
+            </div>
+        </div>
+
+        <!-- Permasalahan Pending -->
+        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-yellow-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600 mb-1">Permasalahan Pending</p>
+                    <h3 class="text-3xl font-bold text-gray-800">{{ $permasalahanPending ?? 0 }}</h3>
+                </div>
+                <div class="text-4xl">⚠️</div>
+            </div>
+        </div>
+
+        <!-- Progress Menunggu Verifikasi -->
+        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600 mb-1">Menunggu Verifikasi</p>
+                    <h3 class="text-3xl font-bold text-gray-800">{{ $progressPending ?? 0 }}</h3>
+                </div>
+                <div class="text-4xl">⏳</div>
+            </div>
+        </div>
+
+        <!-- Total Geotagging -->
+        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-pink-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600 mb-1">Total Geotagging</p>
+                    <h3 class="text-3xl font-bold text-gray-800">{{ $totalGeotagging ?? 0 }}</h3>
+                </div>
+                <div class="text-4xl">📍</div>
+            </div>
+        </div>
     </div>
 @endsection

@@ -107,7 +107,7 @@
                     </a>
                     <a href="{{ route('bpdas.geotagging.index') }}" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('bpdas.geotagging.*') ? 'bg-green-700 shadow-lg' : '' }}">
                         <span class="text-2xl">📍</span>
-                        <span class="ml-3 font-medium text-sm md:text-base">Geotagging</span>
+                        <span class="ml-3 font-medium text-sm md:text-base">Data Lokasi Persemaian</span>
                     </a>
                     <a href="{{ route('bpdas.rencana-bibit.index') }}" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300">
                         <span class="text-2xl">🌳</span>
@@ -121,6 +121,15 @@
                         <span class="text-2xl">📊</span>
                         <span class="ml-3 font-medium text-sm md:text-base">Progres Fisik Kelompok</span>
                     </a>
+                      <a href="{{ route('bpdas.peta-lokasi.index') }}" 
+                        class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('bpdas.peta-lokasi.*') ? 'bg-green-700' : '' }}">
+                        <span class="text-2xl">📍</span>
+                        <span class="ml-3 font-medium text-sm md:text-base">Verifikasi Peta Lokasi</span>
+                    </a>
+                    <a href="" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('kelompok.progress-fisik.*') ? 'bg-green-700' : '' }}">
+                        <span class="text-2xl"></span>
+                        <span class="ml-3 font-medium text-sm md:text-base">Data Peta Geotagging Kelompok</span>
+                    </a>
                 @else
                     <!-- Menu Kelompok -->
                     <a href="{{ route('kelompok.dashboard') }}" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('kelompok.dashboard') ? 'bg-green-700 shadow-lg' : '' }}">
@@ -133,7 +142,7 @@
                     </a>
                     <a href="{{ route('kelompok.calon-lokasi.index') }}" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('kelompok.calon-lokasi.*') ? 'bg-green-700 shadow-lg' : '' }}">
                         <span class="text-2xl">📍</span>
-                        <span class="ml-3 font-medium text-sm md:text-base">Calon Lokasi Persemayan</span>
+                        <span class="ml-3 font-medium text-sm md:text-base">Calon Lokasi Persemaian</span>
                     </a>
                     <a href="{{ route('kelompok.data-kelompok.index') }}" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('kelompok.data-kelompok.*') ? 'bg-green-700' : '' }}">
                         <span class="text-2xl">👷‍♂️</span>
@@ -150,6 +159,15 @@
                     <a href="{{ route('kelompok.progress-fisik.index') }}" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('kelompok.progress-fisik.*') ? 'bg-green-700' : '' }}">
                         <span class="text-2xl">📈</span>
                         <span class="ml-3 font-medium text-sm md:text-base">Progres Fisik</span>
+                    </a>
+                     <a href="{{ route('kelompok.peta-lokasi.index') }}" 
+   class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('kelompok.peta-lokasi.*') ? 'bg-green-700' : '' }}">
+    <span class="text-2xl">📍</span>
+    <span class="ml-3 font-medium text-sm md:text-base"> Peta Lokasi Kelompok</span>
+</a>
+                     <a href="" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('kelompok.progress-fisik.*') ? 'bg-green-700' : '' }}">
+                        <span class="text-2xl"></span>
+                        <span class="ml-3 font-medium text-sm md:text-base">Upload Peta Geotagging</span>
                     </a>
                 @endif
             </nav>

@@ -65,4 +65,9 @@ public function anggaranKelompok()
 {
     return $this->hasMany(AnggaranKelompok::class, 'kelompok_id');
 }
+
+public function petaLokasis()
+{
+    return $this->hasMany(PetaLokasi::class, 'kelompok_id');
+}
 }

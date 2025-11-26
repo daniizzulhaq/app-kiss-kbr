@@ -16,7 +16,8 @@ use App\Http\Controllers\RealisasiBibitBpdasController;
 use App\Http\Controllers\ProgressFisikBpdasController;
 use App\Http\Controllers\ProgressFisikController;
 use App\Http\Controllers\Auth\PasswordResetLinkController; // ← TAMBAHKAN INI
-
+use App\Http\Controllers\PetaLokasiBpdasController; // ← TAMBAHKAN INI
+use App\Http\Controllers\PetaLokasiController; // ← TAMBAHKAN INI
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -130,6 +131,10 @@ Route::get('/kelompok/{kelompok}', [KelompokBpdasController::class, 'show'])->na
     Route::get('/progress-fisik', [ProgressFisikBpdasController::class, 'index'])
         ->name('progress-fisik.index');
 
+    Route::get('/peta-lokasi', [PetaLokasiBpdasController::class, 'index'])->name('peta-lokasi.index');
+Route::get('/peta-lokasi/{petaLokasi}', [PetaLokasiBpdasController::class, 'show'])->name('peta-lokasi.show');
+Route::put('/peta-lokasi/{petaLokasi}/verifikasi', [PetaLokasiBpdasController::class, 'verifikasi'])->name('peta-lokasi.verifikasi');
+
     });
 
     /*
@@ -169,7 +174,7 @@ Route::delete('/progress-fisik/{dokumentasi}/foto', [ProgressFisikController::cl
     Route::post('/anggaran/setup', [ProgressFisikController::class, 'storeAnggaran'])
         ->name('anggaran.store');
 
-        
+        Route::resource('peta-lokasi', PetaLokasiController::class);
 
 
 

@@ -12,7 +12,7 @@
             <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
                 <div>
                     <h2 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">Detail Laporan Permasalahan</h2>
-                    <p class="text-sm sm:text-base text-gray-600 mt-1">ID: #{{ $permasalahan->id }}</p>
+                    <p class=" hidden text-sm sm:text-base text-gray-600 mt-1">ID: #{{ $permasalahan->id }}</p>
                 </div>
                 <span class="inline-block px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-semibold {{ $permasalahan->getStatusBadgeClass() }}">
                     {{ $permasalahan->getStatusLabel() }}

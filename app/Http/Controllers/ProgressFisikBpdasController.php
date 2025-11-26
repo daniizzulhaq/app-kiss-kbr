@@ -18,14 +18,15 @@ class ProgressFisikBpdasController extends Controller
     {
         $query = Kelompok::with(['anggaranKelompok' => function($q) {
             $q->where('tahun', date('Y'));
-        }]);
+        }, 'user']);
 
         // Filter
         if ($request->filled('search')) {
             $query->where(function($q) use ($request) {
                 $q->where('nama_kelompok', 'like', '%' . $request->search . '%')
-                  ->orWhere('nama_ketua', 'like', '%' . $request->search . '%')
-                  ->orWhere('kode_kelompok', 'like', '%' . $request->search . '%');
+                  ->orWhereHas('user', function($query) use ($request) {
+                      $query->where('name', 'like', '%' . $request->search . '%');
+                  });
             });
         }
 
@@ -253,48 +254,48 @@ class ProgressFisikBpdasController extends Controller
      * Halaman monitoring progress semua kelompok
      */
     public function monitoring(Request $request)
-{
-    $query = Kelompok::with(['anggaranKelompok' => function($q) {
-        $q->where('tahun', date('Y'));
-    }, 'progressFisik.masterKegiatan', 'user']);  // Tambahkan 'user' untuk pengelola
+    {
+        $query = Kelompok::with(['anggaranKelompok' => function($q) {
+            $q->where('tahun', date('Y'));
+        }, 'progressFisik.masterKegiatan', 'user']);
 
-    if ($request->filled('search')) {
-        $query->where(function($q) use ($request) {
-            $q->where('nama_kelompok', 'like', '%' . $request->search . '%')
-              ->orWhere('nama_ketua', 'like', '%' . $request->search . '%')
-              ->orWhere('kode_kelompok', 'like', '%' . $request->search . '%');
+        if ($request->filled('search')) {
+            $query->where(function($q) use ($request) {
+                $q->where('nama_kelompok', 'like', '%' . $request->search . '%')
+                  ->orWhereHas('user', function($query) use ($request) {
+                      $query->where('name', 'like', '%' . $request->search . '%');
+                  });
+            });
+        }
+
+        $kelompokList = $query->get()->map(function($kelompok) {
+            $progressList = $kelompok->progressFisik;
+            $anggaran = $kelompok->anggaranKelompok->first();
+            
+            // Hitung progress hanya dari yang disetujui
+            $approvedProgress = $progressList->where('status_verifikasi', 'disetujui');
+            
+            return [
+                'id' => $kelompok->id,
+                'user_id' => $kelompok->user_id,
+                'nama' => $kelompok->nama_kelompok,
+                'ketua' => $kelompok->nama_ketua,
+                'pengelola' => $kelompok->user->name ?? '-',
+                'anggaran' => $anggaran,
+                'total_kegiatan' => $progressList->count(),
+                'kegiatan_selesai' => $progressList->where('is_selesai', true)->count(),
+                'kegiatan_pending' => $progressList->where('status_verifikasi', 'pending')->count(),
+                'kegiatan_disetujui' => $progressList->where('status_verifikasi', 'disetujui')->count(),
+                'kegiatan_ditolak' => $progressList->where('status_verifikasi', 'ditolak')->count(),
+                'progress_rata' => $approvedProgress->count() > 0 
+                    ? round($approvedProgress->avg('persentase_fisik'), 2) 
+                    : 0,
+                'pending_verifikasi' => $progressList->where('status_verifikasi', 'pending')->count(),
+            ];
         });
+
+        return view('bpdas.progress-fisik.monitoring', compact('kelompokList'));
     }
-
-    $kelompokList = $query->get()->map(function($kelompok) {
-        $progressList = $kelompok->progressFisik;
-        $anggaran = $kelompok->anggaranKelompok->first();
-        
-        // Hitung progress hanya dari yang disetujui
-        $approvedProgress = $progressList->where('status_verifikasi', 'disetujui');
-        
-        return [
-            'id' => $kelompok->id,
-            'user_id' => $kelompok->user_id,  // Tambahkan user_id untuk link export PDF
-            'kode' => $kelompok->kode_kelompok,
-            'nama' => $kelompok->nama_kelompok,
-            'ketua' => $kelompok->nama_ketua,
-            'pengelola' => $kelompok->user->name ?? '-',  // Tambahkan data pengelola
-            'anggaran' => $anggaran,
-            'total_kegiatan' => $progressList->count(),
-            'kegiatan_selesai' => $progressList->where('is_selesai', true)->count(),
-            'kegiatan_pending' => $progressList->where('status_verifikasi', 'pending')->count(),
-            'kegiatan_disetujui' => $progressList->where('status_verifikasi', 'disetujui')->count(),
-            'kegiatan_ditolak' => $progressList->where('status_verifikasi', 'ditolak')->count(),
-            'progress_rata' => $approvedProgress->count() > 0 
-                ? round($approvedProgress->avg('persentase_fisik'), 2) 
-                : 0,
-            'pending_verifikasi' => $progressList->where('status_verifikasi', 'pending')->count(),
-        ];
-    });
-
-    return view('bpdas.progress-fisik.monitoring', compact('kelompokList'));
-}
 
     /**
      * Halaman khusus verifikasi (daftar progress yang pending)
@@ -525,68 +526,68 @@ class ProgressFisikBpdasController extends Controller
     }
 
     public function exportPdfPerUser(Request $request, $userId)
-{
-    $tahun = $request->get('tahun', date('Y'));
-    
-    $pengelola = \App\Models\User::findOrFail($userId);
-    
-    $kelompokList = Kelompok::with([
-        'anggaranKelompok' => function($q) use ($tahun) {
-            $q->where('tahun', $tahun);
-        },
-        'progressFisik.masterKegiatan.kategori',
-        'user'
-    ])
-    ->where('user_id', $userId)
-    ->get();
+    {
+        $tahun = $request->get('tahun', date('Y'));
+        
+        $pengelola = \App\Models\User::findOrFail($userId);
+        
+        $kelompokList = Kelompok::with([
+            'anggaranKelompok' => function($q) use ($tahun) {
+                $q->where('tahun', $tahun);
+            },
+            'progressFisik.masterKegiatan.kategori',
+            'user'
+        ])
+        ->where('user_id', $userId)
+        ->get();
 
-    $statistikPengelola = [
-        'total_kelompok' => $kelompokList->count(),
-        'total_anggaran' => $kelompokList->sum(function($k) {
-            return $k->anggaranKelompok->first()->total_anggaran ?? 0;
-        }),
-        'total_dialokasikan' => $kelompokList->sum(function($k) {
-            return $k->anggaranKelompok->first()->anggaran_dialokasikan ?? 0;
-        }),
-        'total_realisasi' => $kelompokList->sum(function($k) {
-            return $k->anggaranKelompok->first()->realisasi_anggaran ?? 0;
-        }),
-        'total_sisa' => $kelompokList->sum(function($k) {
-            return $k->anggaranKelompok->first()->sisa_anggaran ?? 0;
-        }),
-        'total_kegiatan' => $kelompokList->sum(function($k) {
-            return $k->progressFisik->count();
-        }),
-        'kegiatan_disetujui' => $kelompokList->sum(function($k) {
-            return $k->progressFisik->where('status_verifikasi', 'disetujui')->count();
-        }),
-        'kegiatan_pending' => $kelompokList->sum(function($k) {
-            return $k->progressFisik->where('status_verifikasi', 'pending')->count();
-        }),
-        'kegiatan_ditolak' => $kelompokList->sum(function($k) {
-            return $k->progressFisik->where('status_verifikasi', 'ditolak')->count();
-        }),
-    ];
+        $statistikPengelola = [
+            'total_kelompok' => $kelompokList->count(),
+            'total_anggaran' => $kelompokList->sum(function($k) {
+                return $k->anggaranKelompok->first()->total_anggaran ?? 0;
+            }),
+            'total_dialokasikan' => $kelompokList->sum(function($k) {
+                return $k->anggaranKelompok->first()->anggaran_dialokasikan ?? 0;
+            }),
+            'total_realisasi' => $kelompokList->sum(function($k) {
+                return $k->anggaranKelompok->first()->realisasi_anggaran ?? 0;
+            }),
+            'total_sisa' => $kelompokList->sum(function($k) {
+                return $k->anggaranKelompok->first()->sisa_anggaran ?? 0;
+            }),
+            'total_kegiatan' => $kelompokList->sum(function($k) {
+                return $k->progressFisik->count();
+            }),
+            'kegiatan_disetujui' => $kelompokList->sum(function($k) {
+                return $k->progressFisik->where('status_verifikasi', 'disetujui')->count();
+            }),
+            'kegiatan_pending' => $kelompokList->sum(function($k) {
+                return $k->progressFisik->where('status_verifikasi', 'pending')->count();
+            }),
+            'kegiatan_ditolak' => $kelompokList->sum(function($k) {
+                return $k->progressFisik->where('status_verifikasi', 'ditolak')->count();
+            }),
+        ];
 
-    $pdf = Pdf::loadView('bpdas.progress-fisik.pdf-per-user', compact(
-        'kelompokList',
-        'statistikPengelola',
-        'pengelola',
-        'tahun'
-    ));
+        $pdf = Pdf::loadView('bpdas.progress-fisik.pdf-per-user', compact(
+            'kelompokList',
+            'statistikPengelola',
+            'pengelola',
+            'tahun'
+        ));
 
-    $pdf->setPaper('a4', 'landscape');
+        $pdf->setPaper('a4', 'landscape');
 
-    return $pdf->download('laporan-progress-fisik-' . \Illuminate\Support\Str::slug($pengelola->name) . '-' . $tahun . '.pdf');
-}
+        return $pdf->download('laporan-progress-fisik-' . \Illuminate\Support\Str::slug($pengelola->name) . '-' . $tahun . '.pdf');
+    }
 
-/**
- * Export PDF untuk user yang sedang login
- */
-public function exportPdfMy(Request $request)
-{
-    return $this->exportPdfPerUser($request, auth()->id());
-}
+    /**
+     * Export PDF untuk user yang sedang login
+     */
+    public function exportPdfMy(Request $request)
+    {
+        return $this->exportPdfPerUser($request, auth()->id());
+    }
 
     /**
      * Dashboard ringkasan untuk BPDAS

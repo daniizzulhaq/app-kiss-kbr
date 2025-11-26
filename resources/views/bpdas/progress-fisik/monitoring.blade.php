@@ -77,7 +77,7 @@
                 <div class="flex-1">
                     <input type="text" 
                            name="search" 
-                           placeholder="Cari nama kelompok, kode, atau ketua..."
+                           placeholder="Cari nama kelompok atau kode kelompok..."
                            value="{{ request('search') }}"
                            class="w-full text-sm sm:text-base border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500">
                 </div>
@@ -233,7 +233,7 @@
                 <div class="flex items-start justify-between mb-3">
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2 mb-1">
-                            <span class="text-xs font-medium text-gray-500">#{!! $index + 1 !!}</span>
+                            <span class="text-xs font-medium text-gray-500">#{{ $index + 1 }}</span>
                             @if($item['pending_verifikasi'] > 0)
                                 <span class="px-2 py-0.5 text-xs font-bold rounded-full bg-yellow-100 text-yellow-800 border border-yellow-200">
                                     ⏳ {{ $item['pending_verifikasi'] }}

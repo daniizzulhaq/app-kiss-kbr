@@ -70,14 +70,14 @@
                             👥
                         </div>
                         <div>
-                            @if(Auth::user()->role === 'bpdas')
-                                <h2 class="text-xl md:text-2xl font-bold">BPDAS</h2>
-                                <p class="text-xs text-green-200">Panel BPDAS</p>
-                            @else
-                                <h2 class="text-xl md:text-2xl font-bold">Kelompok Tani</h2>
-                                <p class="text-xs text-green-200">Panel Kelompok</p>
-                            @endif
-                        </div>
+    @if(Auth::user()->role === 'bpdas')
+        <h2 class="text-xl md:text-2xl font-bold">BPDAS</h2>
+        <p class="text-xs text-green-200">Panel BPDAS</p>
+    @else
+        <h2 class="text-xl md:text-2xl font-bold">{{ Auth::user()->name }}</h2>
+        <p class="text-xs text-green-200">Pengelola Kelompok</p>
+    @endif
+</div>
                     </div>
                     <!-- Tombol Close untuk Mobile -->
                     <button onclick="toggleSidebar()" class="md:hidden text-white hover:bg-green-700 p-2 rounded-lg">
@@ -86,7 +86,7 @@
                         </svg>
                     </button>
                 </div>
-                <p class="text-sm text-green-300 font-medium">Sistem KISS KBR</p>
+                <p class="text-sm text-green-300 font-medium">Mondigi KBR</p>
             </div>
 
             <!-- Menu Sidebar -->
@@ -133,7 +133,7 @@
                     </a>
                     <a href="{{ route('kelompok.calon-lokasi.index') }}" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('kelompok.calon-lokasi.*') ? 'bg-green-700 shadow-lg' : '' }}">
                         <span class="text-2xl">📍</span>
-                        <span class="ml-3 font-medium text-sm md:text-base">Calon Lokasi</span>
+                        <span class="ml-3 font-medium text-sm md:text-base">Calon Lokasi Persemayan</span>
                     </a>
                     <a href="{{ route('kelompok.data-kelompok.index') }}" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('kelompok.data-kelompok.*') ? 'bg-green-700' : '' }}">
                         <span class="text-2xl">👷‍♂️</span>

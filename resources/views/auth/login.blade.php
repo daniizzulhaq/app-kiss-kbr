@@ -91,17 +91,17 @@
             
             <!-- Header Section -->
             <div class="text-center">
-                <!-- Icon Pertanian Modern -->
-                <div class="mx-auto h-20 w-20 bg-white rounded-3xl shadow-2xl flex items-center justify-center mb-6 transform hover:scale-110 transition-transform duration-300">
-                    <svg class="h-12 w-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
+                <!-- Logo Image with White Background -->
+                <div class="mx-auto h-32 w-32 bg-white/95 backdrop-blur-sm rounded-full shadow-2xl flex items-center justify-center mb-6 transform hover:scale-110 transition-transform duration-300 p-4">
+                    <img src="{{ asset('images/logokem.png') }}" 
+                         alt="Logo Mondigi KBR" 
+                         class="w-full h-full object-contain">
                 </div>
                 
                 <h2 class="text-4xl font-extrabold text-white mb-2 tracking-tight">
-                    🌾 Sistem Pertanian
+                     Mondigi KBR
                 </h2>
-                <p class="text-green-100 text-sm">Platform Manajemen Pertanian Modern</p>
+                <p class="text-green-100 text-sm">Monitoring dan Evaluasi Digital Kebun Bibit Rakyat</p>
             </div>
 
             <!-- Session Status -->

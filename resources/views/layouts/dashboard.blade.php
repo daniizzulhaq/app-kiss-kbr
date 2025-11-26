@@ -126,10 +126,12 @@
                         <span class="text-2xl">📍</span>
                         <span class="ml-3 font-medium text-sm md:text-base">Verifikasi Peta Lokasi</span>
                     </a>
-                    <a href="" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('kelompok.progress-fisik.*') ? 'bg-green-700' : '' }}">
-                        <span class="text-2xl"></span>
-                        <span class="ml-3 font-medium text-sm md:text-base">Data Peta Geotagging Kelompok</span>
-                    </a>
+                    <!-- Untuk BPDAS -->
+<a href="{{ route('bpdas.peta-geotagging.index') }}" 
+   class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('bpdas.peta-geotagging.*') ? 'bg-green-700' : '' }}">
+    <span class="text-2xl">🗺️</span>
+    <span class="ml-3 font-medium text-sm md:text-base">Verifikasi Peta Geotagging</span>
+</a>
                 @else
                     <!-- Menu Kelompok -->
                     <a href="{{ route('kelompok.dashboard') }}" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('kelompok.dashboard') ? 'bg-green-700 shadow-lg' : '' }}">
@@ -165,10 +167,11 @@
     <span class="text-2xl">📍</span>
     <span class="ml-3 font-medium text-sm md:text-base"> Peta Lokasi Kelompok</span>
 </a>
-                     <a href="" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('kelompok.progress-fisik.*') ? 'bg-green-700' : '' }}">
-                        <span class="text-2xl"></span>
-                        <span class="ml-3 font-medium text-sm md:text-base">Upload Peta Geotagging</span>
-                    </a>
+                     <a href="{{ route('kelompok.peta-geotagging.index') }}" 
+   class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('kelompok.peta-geotagging.*') ? 'bg-green-700' : '' }}">
+    <span class="text-2xl">🗺️</span>
+    <span class="ml-3 font-medium text-sm md:text-base">Data Peta Geotagging</span>
+</a>
                 @endif
             </nav>
 

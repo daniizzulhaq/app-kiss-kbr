@@ -15,9 +15,11 @@ use App\Http\Controllers\RealisasiBibitController;
 use App\Http\Controllers\RealisasiBibitBpdasController;
 use App\Http\Controllers\ProgressFisikBpdasController;
 use App\Http\Controllers\ProgressFisikController;
-use App\Http\Controllers\Auth\PasswordResetLinkController; // ← TAMBAHKAN INI
-use App\Http\Controllers\PetaLokasiBpdasController; // ← TAMBAHKAN INI
-use App\Http\Controllers\PetaLokasiController; // ← TAMBAHKAN INI
+use App\Http\Controllers\Auth\PasswordResetLinkController; 
+use App\Http\Controllers\PetaLokasiBpdasController; 
+use App\Http\Controllers\PetaLokasiController; 
+use App\Http\Controllers\PetaGeotaggingBpdasController; 
+use App\Http\Controllers\PetaGeotaggingController; 
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -135,6 +137,11 @@ Route::get('/kelompok/{kelompok}', [KelompokBpdasController::class, 'show'])->na
 Route::get('/peta-lokasi/{petaLokasi}', [PetaLokasiBpdasController::class, 'show'])->name('peta-lokasi.show');
 Route::put('/peta-lokasi/{petaLokasi}/verifikasi', [PetaLokasiBpdasController::class, 'verifikasi'])->name('peta-lokasi.verifikasi');
 
+   Route::get('/peta-geotagging', [PetaGeotaggingBpdasController::class, 'index'])->name('peta-geotagging.index');
+    Route::get('/peta-geotagging/{petaGeotagging}', [PetaGeotaggingBpdasController::class, 'show'])->name('peta-geotagging.show');
+    Route::put('/peta-geotagging/{petaGeotagging}/verifikasi', [PetaGeotaggingBpdasController::class, 'verifikasi'])->name('peta-geotagging.verifikasi');
+
+
     });
 
     /*
@@ -176,7 +183,7 @@ Route::delete('/progress-fisik/{dokumentasi}/foto', [ProgressFisikController::cl
 
         Route::resource('peta-lokasi', PetaLokasiController::class);
 
-
+  Route::resource('peta-geotagging', PetaGeotaggingController::class);
 
         // Calon Lokasi
         Route::resource('calon-lokasi', CalonLokasiKelompokController::class);

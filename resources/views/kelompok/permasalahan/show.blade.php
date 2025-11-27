@@ -12,7 +12,7 @@
             <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
                 <div>
                     <h2 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">Detail Laporan Permasalahan</h2>
-                    <p class=" hidden text-sm sm:text-base text-gray-600 mt-1">ID: #{{ $permasalahan->id }}</p>
+                    <p class="hidden text-sm sm:text-base text-gray-600 mt-1">ID: #{{ $permasalahan->id }}</p>
                 </div>
                 <span class="inline-block px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-semibold {{ $permasalahan->getStatusBadgeClass() }}">
                     {{ $permasalahan->getStatusLabel() }}
@@ -119,7 +119,7 @@
                 </div>
                 @endif
 
-                <!-- Tanggapan Kelompok -->
+                <!-- Tanggapan Kelompok (Jika Ada) -->
                 @if($permasalahan->tanggapan_kelompok)
                 <div>
                     <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4 flex items-center gap-2">
@@ -138,13 +138,6 @@
             <!-- Actions -->
             <div class="bg-gray-50 px-4 sm:px-6 lg:px-8 py-3 sm:py-4 border-t border-gray-200">
                 <div class="flex flex-col sm:flex-row gap-2 sm:gap-3 sm:justify-end">
-                    @if($permasalahan->status === 'selesai' && !$permasalahan->tanggapan_kelompok)
-                    <button onclick="document.getElementById('tanggapanModal').classList.remove('hidden')"
-                            class="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-white px-4 sm:px-6 py-2 rounded-lg font-medium transition text-sm sm:text-base">
-                        Berikan Tanggapan
-                    </button>
-                    @endif
-                    
                     @if($permasalahan->status !== 'selesai')
                     <a href="{{ route('kelompok.permasalahan.edit', $permasalahan) }}" 
                        class="w-full sm:w-auto text-center bg-blue-600 hover:bg-blue-700 text-white px-4 sm:px-6 py-2 rounded-lg font-medium transition text-sm sm:text-base">
@@ -156,41 +149,4 @@
         </div>
     </div>
 </div>
-
-<!-- Modal Tanggapan -->
-<div id="tanggapanModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-3 sm:p-4">
-    <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
-        <form action="{{ route('kelompok.permasalahan.tanggapan.store', $permasalahan) }}" method="POST">
-            @csrf
-            <div class="p-4 sm:p-6">
-                <h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-3 sm:mb-4">Berikan Tanggapan</h3>
-                <textarea name="tanggapan_kelompok" 
-                          rows="5" 
-                          class="w-full text-sm sm:text-base rounded-lg border-gray-300 focus:border-green-500 focus:ring focus:ring-green-200"
-                          placeholder="Tuliskan tanggapan Anda terhadap solusi yang diberikan..."
-                          required></textarea>
-            </div>
-            <div class="bg-gray-50 px-4 sm:px-6 py-3 sm:py-4 border-t border-gray-200 flex flex-col-reverse sm:flex-row gap-2 sm:gap-3 sm:justify-end rounded-b-xl">
-                <button type="button" 
-                        onclick="document.getElementById('tanggapanModal').classList.add('hidden')"
-                        class="w-full sm:w-auto px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-lg font-medium transition text-sm sm:text-base">
-                    Batal
-                </button>
-                <button type="submit" 
-                        class="w-full sm:w-auto px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition text-sm sm:text-base">
-                    Kirim Tanggapan
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- Script untuk menutup modal saat klik di luar -->
-<script>
-document.getElementById('tanggapanModal')?.addEventListener('click', function(e) {
-    if (e.target === this) {
-        this.classList.add('hidden');
-    }
-});
-</script>
 @endsection

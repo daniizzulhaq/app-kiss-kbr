@@ -10,7 +10,7 @@
             <div>
                 <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 mb-1 sm:mb-2 flex items-center gap-2">
                     <span>📍</span>
-                    <span>Calon Lokasi Persemayam</span>
+                    <span>Calon Lokasi Persemaian</span>
                 </h1>
                 <p class="text-sm sm:text-base text-gray-600">Kelola data calon lokasi kegiatan kelompok tani</p>
             </div>

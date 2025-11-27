@@ -12,7 +12,7 @@
             <div class="flex justify-between items-start">
                 <div>
                     <h2 class="text-3xl font-bold text-gray-800">Detail Laporan Permasalahan</h2>
-                    <p class="text-gray-600 mt-1">ID: #{{ $permasalahan->id }}</p>
+                    <p class="hidden text-gray-600 mt-1">ID: #{{ $permasalahan->id }}</p>
                 </div>
                 <span class="px-4 py-2 rounded-full text-sm font-semibold {{ $permasalahan->getStatusBadgeClass() }}">
                     {{ $permasalahan->getStatusLabel() }}
@@ -123,6 +123,54 @@
             </div>
         </div>
 
+        <!-- Tanggapan Kelompok -->
+        @if($permasalahan->tanggapan_kelompok)
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-6">
+            <div class="p-8">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    <span class="text-2xl">✅</span>
+                    Tanggapan dari Kelompok
+                </h3>
+                <div class="bg-purple-50 border-l-4 border-purple-500 rounded-lg p-6">
+                    <div class="flex items-start gap-4">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                                {{ substr($permasalahan->kelompok, 0, 1) }}
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-2">
+                                <p class="font-semibold text-gray-900">{{ $permasalahan->kelompok }}</p>
+                                <span class="px-2 py-0.5 bg-purple-200 text-purple-800 text-xs rounded-full">
+                                    Kelompok
+                                </span>
+                            </div>
+                            <p class="text-gray-700 whitespace-pre-wrap leading-relaxed mb-3">
+                                {{ $permasalahan->tanggapan_kelompok }}
+                            </p>
+                            <p class="text-sm text-gray-500">
+                                <span class="font-medium">Diberikan pada:</span> 
+                                {{ $permasalahan->updated_at->format('d M Y, H:i') }} WIB
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Info Badge jika sudah ditanggapi -->
+                <div class="mt-4 bg-green-50 border border-green-200 rounded-lg p-4">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                        <p class="text-sm text-green-800 font-medium">
+                            Kelompok telah memberikan tanggapan terhadap solusi yang Anda berikan
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+
         <!-- Form Solusi -->
         <div class="bg-white rounded-xl shadow-lg overflow-hidden">
             <div class="p-8">
@@ -135,6 +183,19 @@
                     <div class="bg-green-50 border-l-4 border-green-500 rounded-lg p-4 mb-6">
                         <p class="text-sm text-gray-600 mb-2">Solusi saat ini:</p>
                         <p class="text-gray-900 whitespace-pre-line">{{ $permasalahan->solusi }}</p>
+                        
+                        @if($permasalahan->ditangani_pada)
+                            <div class="mt-3 pt-3 border-t border-green-200 text-sm text-gray-600">
+                                <p>
+                                    <strong>Ditangani oleh:</strong> 
+                                    {{ $permasalahan->penangananBpdas->name ?? 'BPDAS' }}
+                                </p>
+                                <p>
+                                    <strong>Pada:</strong> 
+                                    {{ $permasalahan->ditangani_pada->format('d M Y, H:i') }} WIB
+                                </p>
+                            </div>
+                        @endif
                     </div>
                 @endif
 
@@ -153,6 +214,9 @@
                         @error('solusi')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
+                        <p class="mt-1 text-xs text-gray-500">
+                            💡 Tip: Berikan solusi yang jelas dan detail agar kelompok dapat memahami langkah-langkah yang perlu dilakukan
+                        </p>
                     </div>
 
                     <div class="mb-6">
@@ -170,6 +234,9 @@
                         @error('status')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
+                        <p class="mt-1 text-xs text-gray-500">
+                            ℹ️ Ubah status ke "Selesai" jika solusi sudah diberikan dan siap untuk ditindaklanjuti
+                        </p>
                     </div>
 
                     <div class="flex gap-4">

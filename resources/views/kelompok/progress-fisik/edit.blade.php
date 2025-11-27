@@ -34,6 +34,9 @@
             <span class="text-4xl">📋</span>
             <div class="flex-1">
                 <h3 class="text-xl font-bold text-blue-900">{{ $progressFisik->masterKegiatan->nama_kegiatan }}</h3>
+                @if($progressFisik->nama_detail)
+                    <p class="text-lg text-blue-700 font-semibold mt-1">📝 {{ $progressFisik->nama_detail }}</p>
+                @endif
                 <div class="flex flex-wrap gap-3 mt-2">
                     <span class="px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
                         📂 {{ $progressFisik->masterKegiatan->kategori->nama }}
@@ -79,9 +82,45 @@
         <div class="p-8">
             <form action="{{ route('kelompok.progress-fisik.update', $progressFisik) }}" 
                   method="POST" 
-                  enctype="multipart/form-data">
+                  enctype="multipart/form-data"
+                  id="formUpdateProgress">
                 @csrf
                 @method('PUT')
+
+                <!-- Detail Kegiatan -->
+                <div class="mb-8">
+                    <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2 border-b pb-3">
+                        <span>📝</span>
+                        Detail Spesifik Kegiatan
+                    </h3>
+
+                    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-lg mb-4">
+                        <div class="flex items-start gap-3">
+                            <span class="text-xl">💡</span>
+                            <div class="text-sm text-yellow-800">
+                                <p class="font-semibold mb-1">Keterangan:</p>
+                                <p>Gunakan field ini untuk memberikan detail spesifik dari kegiatan yang dipilih. 
+                                   Contoh: Untuk "Pengadaan Benih", bisa diisi "Pengadaan Benih Mahoni" atau "Pengadaan Benih Jati".</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="nama_detail" class="block text-sm font-bold text-gray-700 mb-2">
+                            Nama Detail Kegiatan
+                        </label>
+                        <input type="text" 
+                               name="nama_detail" 
+                               id="nama_detail"
+                               value="{{ old('nama_detail', $progressFisik->nama_detail) }}"
+                               class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 text-lg"
+                               placeholder="Contoh: Pengadaan Benih Mahoni, Pembuatan Jalan Usaha Tani, dll.">
+                        <p class="text-xs text-gray-500 mt-1">Opsional - Kosongkan jika tidak perlu detail tambahan</p>
+                        @error('nama_detail')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
 
                 <!-- Target & Biaya -->
                 <div class="mb-8">
@@ -276,44 +315,47 @@
                 </div>
                 @endif
 
-                <!-- Upload Foto Baru -->
-                <div class="mb-8">
-                    <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                        <span>📸</span>
-                        Tambah Dokumentasi Baru
-                    </h3>
-                    
-                    <div id="foto-container" class="space-y-4">
-                        <div class="foto-item bg-gray-50 p-4 rounded-lg border border-gray-200">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Pilih Foto</label>
-                                    <input type="file" 
-                                           name="foto[]" 
-                                           accept="image/*"
-                                           class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Keterangan Foto</label>
-                                    <input type="text" 
-                                           name="keterangan_foto[]" 
-                                           placeholder="Contoh: Pekerjaan pembibitan tahap 1"
-                                           class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+             <!-- Upload Foto Baru -->
+<div class="mb-8">
+    <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+        <span>📸</span>
+        Tambah Dokumentasi Baru (Opsional)
+    </h3>
+    
+    <div class="mb-4 bg-blue-50 border-l-4 border-blue-400 p-4 rounded-lg">
+        <div class="flex items-start gap-2">
+            <span class="text-lg">ℹ️</span>
+            <div class="text-sm text-blue-800">
+                <p class="font-semibold mb-1">Informasi Upload Foto:</p>
+                <ul class="list-disc list-inside space-y-1">
+                    <li>Upload foto bersifat opsional - Anda bisa update data tanpa menambah foto</li>
+                    <li>Format: JPG, JPEG, PNG (Max 2MB per file)</li>
+                    <li>Foto yang sudah diupload sebelumnya tidak akan hilang</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Container untuk foto items -->
+    <div id="foto-container" class="space-y-4 mb-4"></div>
 
-                    <button type="button" 
-                            id="tambah-foto" 
-                            class="mt-4 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-md hover:shadow-lg transition-all">
-                        ➕ Tambah Foto Lainnya
-                    </button>
+    <!-- Tombol Tambah -->
+    <button type="button" 
+            id="btn-tambah-foto" 
+            class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transition-all inline-flex items-center gap-2 cursor-pointer">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+        </svg>
+        <span>Tambah Field Foto</span>
+    </button>
+    <p class="text-xs text-gray-500 mt-2">Klik tombol di atas untuk menambah field upload foto</p>
 
-                    @error('foto.*')
-                        <p class="text-red-500 text-sm mt-2">{{ $message }}</p>
-                    @enderror
-                </div>
+    @error('foto.*')
+        <div class="mt-3 bg-red-50 border-l-4 border-red-500 p-3 rounded">
+            <p class="text-red-700 text-sm font-medium">{{ $message }}</p>
+        </div>
+    @enderror
+</div>
 
                 <!-- Tombol Action -->
                 <div class="flex justify-end gap-4 pt-6 border-t">
@@ -333,68 +375,206 @@
 
 @push('scripts')
 <script>
-    // Hitung total biaya otomatis
-    function hitungTotalBiaya() {
-        const volume = parseFloat(document.getElementById('volume_target').value) || 0;
-        const biaya = parseFloat(document.getElementById('biaya_satuan').value) || 0;
-        const total = volume * biaya;
-        
-        document.getElementById('total_biaya_display').textContent = 
-            'Rp ' + new Intl.NumberFormat('id-ID').format(total);
-    }
+console.log('Script loaded');
 
-    // Hitung persentase progress
-    function hitungPersentase() {
-        const target = parseFloat(document.getElementById('volume_target').value) || 0;
-        const realisasi = parseFloat(document.getElementById('volume_realisasi').value) || 0;
+// Hitung total biaya
+function hitungTotalBiaya() {
+    const volume = parseFloat(document.getElementById('volume_target').value) || 0;
+    const biaya = parseFloat(document.getElementById('biaya_satuan').value) || 0;
+    const total = volume * biaya;
+    document.getElementById('total_biaya_display').textContent = 
+        'Rp ' + new Intl.NumberFormat('id-ID').format(total);
+}
+
+// Hitung persentase
+function hitungPersentase() {
+    const target = parseFloat(document.getElementById('volume_target').value) || 0;
+    const realisasi = parseFloat(document.getElementById('volume_realisasi').value) || 0;
+    
+    if (target > 0) {
+        const persentase = (realisasi / target) * 100;
+        const persentaseDisplay = Math.min(persentase, 100);
         
-        if (target > 0) {
-            const persentase = (realisasi / target) * 100;
-            const persentaseDisplay = Math.min(persentase, 100);
-            
-            document.getElementById('persentase_display').textContent = persentase.toFixed(1) + '%';
-            document.getElementById('progress_text').textContent = Math.round(persentase) + '%';
-            
-            const progressBar = document.getElementById('progress_bar');
-            progressBar.style.width = persentaseDisplay + '%';
-            
-            // Ubah warna dan gradient berdasarkan persentase
-            if (persentase >= 100) {
-                progressBar.className = 'h-8 rounded-full transition-all duration-300 flex items-center justify-end pr-3 bg-gradient-to-r from-green-400 to-green-600';
-            } else if (persentase >= 50) {
-                progressBar.className = 'h-8 rounded-full transition-all duration-300 flex items-center justify-end pr-3 bg-gradient-to-r from-blue-400 to-blue-600';
-            } else {
-                progressBar.className = 'h-8 rounded-full transition-all duration-300 flex items-center justify-end pr-3 bg-gradient-to-r from-yellow-400 to-yellow-600';
-            }
-            
-            // Sembunyikan teks jika progress terlalu kecil
-            if (persentaseDisplay < 10) {
-                document.getElementById('progress_text').style.display = 'none';
-            } else {
-                document.getElementById('progress_text').style.display = 'block';
-            }
+        document.getElementById('persentase_display').textContent = persentase.toFixed(1) + '%';
+        document.getElementById('progress_text').textContent = Math.round(persentase) + '%';
+        
+        const progressBar = document.getElementById('progress_bar');
+        progressBar.style.width = persentaseDisplay + '%';
+        
+        if (persentase >= 100) {
+            progressBar.className = 'h-8 rounded-full transition-all duration-300 flex items-center justify-end pr-3 bg-gradient-to-r from-green-400 to-green-600';
+        } else if (persentase >= 50) {
+            progressBar.className = 'h-8 rounded-full transition-all duration-300 flex items-center justify-end pr-3 bg-gradient-to-r from-blue-400 to-blue-600';
+        } else {
+            progressBar.className = 'h-8 rounded-full transition-all duration-300 flex items-center justify-end pr-3 bg-gradient-to-r from-yellow-400 to-yellow-600';
+        }
+        
+        if (persentaseDisplay < 10) {
+            document.getElementById('progress_text').style.display = 'none';
+        } else {
+            document.getElementById('progress_text').style.display = 'block';
         }
     }
+}
 
-    document.getElementById('volume_target').addEventListener('input', () => {
-        hitungTotalBiaya();
-        hitungPersentase();
-    });
-    document.getElementById('biaya_satuan').addEventListener('input', hitungTotalBiaya);
-    document.getElementById('volume_realisasi').addEventListener('input', hitungPersentase);
+// Counter untuk ID unik
+let fotoCounter = 0;
 
-    // Tambah input foto
-    document.getElementById('tambah-foto').addEventListener('click', function() {
-        const container = document.getElementById('foto-container');
-        const newItem = document.querySelector('.foto-item').cloneNode(true);
-        newItem.querySelectorAll('input').forEach(input => input.value = '');
-        container.appendChild(newItem);
-    });
+// Fungsi tambah foto item
+function tambahFotoItem() {
+    fotoCounter++;
+    console.log('Menambah foto item ke-' + fotoCounter);
+    
+    const container = document.getElementById('foto-container');
+    
+    // Buat wrapper div
+    const wrapper = document.createElement('div');
+    wrapper.className = 'foto-item bg-gradient-to-r from-gray-50 to-gray-100 p-5 rounded-xl border-2 border-blue-300 relative shadow-md';
+    wrapper.id = 'foto-item-' + fotoCounter;
+    
+    // HTML content
+    wrapper.innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-bold text-gray-700 mb-2">
+                    📷 Pilih Foto
+                </label>
+                <input type="file" 
+                       name="foto[]" 
+                       accept="image/jpeg,image/jpg,image/png"
+                       onchange="previewImage(this)"
+                       class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white focus:outline-none p-2">
+                <p class="text-xs text-gray-500 mt-1">Max 2MB - JPG, JPEG, PNG</p>
+            </div>
+            <div>
+                <label class="block text-sm font-bold text-gray-700 mb-2">
+                    📝 Keterangan Foto
+                </label>
+                <input type="text" 
+                       name="keterangan_foto[]" 
+                       placeholder="Contoh: Pekerjaan pembibitan tahap 1"
+                       class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 px-3 py-2">
+            </div>
+        </div>
+        <div class="mt-4 preview-container hidden">
+            <p class="text-xs font-semibold text-gray-600 mb-2">Preview:</p>
+            <img src="" alt="Preview" class="preview-image w-48 h-48 object-cover rounded-lg border-4 border-green-400 shadow-lg">
+        </div>
+        <button type="button" 
+                onclick="hapusFotoItem('foto-item-${fotoCounter}')"
+                class="absolute -top-3 -right-3 bg-red-500 hover:bg-red-600 text-white w-10 h-10 rounded-full font-bold shadow-lg transition-all hover:scale-110 flex items-center justify-center"
+                title="Hapus">
+            ✕
+        </button>
+    `;
+    
+    container.appendChild(wrapper);
+    console.log('Foto item ditambahkan');
+}
 
-    // Inisialisasi perhitungan saat halaman dimuat
-    document.addEventListener('DOMContentLoaded', function() {
-        hitungPersentase();
+// Fungsi hapus foto item
+function hapusFotoItem(itemId) {
+    console.log('Menghapus ' + itemId);
+    const item = document.getElementById(itemId);
+    if (item) {
+        item.remove();
+        console.log('Item dihapus');
+    }
+}
+
+// Fungsi preview image
+function previewImage(input) {
+    const wrapper = input.closest('.foto-item');
+    const previewContainer = wrapper.querySelector('.preview-container');
+    const previewImage = wrapper.querySelector('.preview-image');
+    
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewImage.src = e.target.result;
+            previewContainer.classList.remove('hidden');
+        }
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+// Cleanup input kosong sebelum submit
+function cleanupEmptyFotoInputs() {
+    const allFotoItems = document.querySelectorAll('.foto-item');
+    allFotoItems.forEach(item => {
+        const fileInput = item.querySelector('input[type="file"]');
+        if (fileInput && (!fileInput.files || fileInput.files.length === 0)) {
+            item.remove();
+        }
     });
+}
+
+// Event saat DOM ready
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM Ready');
+    
+    // Event listeners untuk kalkulasi
+    const volumeTarget = document.getElementById('volume_target');
+    const biayaSatuan = document.getElementById('biaya_satuan');
+    const volumeRealisasi = document.getElementById('volume_realisasi');
+    
+    if (volumeTarget) {
+        volumeTarget.addEventListener('input', function() {
+            hitungTotalBiaya();
+            hitungPersentase();
+        });
+    }
+    
+    if (biayaSatuan) {
+        biayaSatuan.addEventListener('input', hitungTotalBiaya);
+    }
+    
+    if (volumeRealisasi) {
+        volumeRealisasi.addEventListener('input', hitungPersentase);
+    }
+    
+    // Event untuk tombol tambah foto
+    const btnTambah = document.getElementById('btn-tambah-foto');
+    if (btnTambah) {
+        console.log('Tombol tambah foto ditemukan');
+        btnTambah.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('Tombol diklik!');
+            tambahFotoItem();
+        });
+    } else {
+        console.error('Tombol tidak ditemukan!');
+    }
+    
+    // Event form submit
+    const form = document.getElementById('formUpdateProgress');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            console.log('Form submitting...');
+            
+            // Validasi
+            const volumeTargetVal = parseFloat(document.getElementById('volume_target').value);
+            const volumeRealisasiVal = parseFloat(document.getElementById('volume_realisasi').value);
+            
+            if (volumeRealisasiVal > volumeTargetVal) {
+                alert('Volume realisasi tidak boleh melebihi volume target!');
+                return false;
+            }
+            
+            // Cleanup
+            cleanupEmptyFotoInputs();
+            
+            // Submit
+            console.log('Submitting...');
+            this.submit();
+        });
+    }
+    
+    // Init
+    hitungPersentase();
+    console.log('Inisialisasi selesai');
+});
 </script>
 @endpush
 @endsection

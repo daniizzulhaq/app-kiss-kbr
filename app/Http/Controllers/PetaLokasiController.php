@@ -11,8 +11,27 @@ use Illuminate\Support\Facades\DB;
 
 class PetaLokasiController extends Controller
 {
+    /**
+     * Cek apakah user memiliki kelompok
+     */
+    private function checkKelompok()
+    {
+        $user = auth()->user();
+        
+        if (!$user->kelompok) {
+            return redirect()->route('kelompok.data-kelompok.create')
+                ->with('warning', 'Anda belum tergabung dalam kelompok. Silakan buat atau bergabung dengan kelompok terlebih dahulu.');
+        }
+        
+        return null;
+    }
+
     public function index()
     {
+        // Cek kelompok
+        $checkResult = $this->checkKelompok();
+        if ($checkResult) return $checkResult;
+
         // Ambil kelompok dari user yang login
         $kelompok = auth()->user()->kelompok;
         
@@ -26,110 +45,117 @@ class PetaLokasiController extends Controller
 
     public function create()
     {
-        $kelompok = Kelompok::where('user_id', auth()->id())->first();
-        
-        if (!$kelompok) {
-            return redirect()->route('kelompok.dashboard')
-                ->with('error', 'Data kelompok tidak ditemukan.');
-        }
+        // Cek kelompok
+        $checkResult = $this->checkKelompok();
+        if ($checkResult) return $checkResult;
+
+        $kelompok = auth()->user()->kelompok;
 
         return view('kelompok.peta-lokasi.create', compact('kelompok'));
     }
 
     public function store(Request $request)
-{
-    // Validasi
-    $request->validate([
-        'judul' => 'required|string|max:255',
-        'files' => 'required|array|min:1|max:5',
-        'files.*' => 'required|file|mimes:pdf|max:20480',
-        'keterangan' => 'nullable|string|max:1000',
-    ], [
-        'files.required' => 'File PDF wajib diupload',
-        'files.min' => 'Minimal 1 file PDF harus diupload',
-        'files.max' => 'Maksimal 5 file PDF',
-        'files.*.mimes' => 'File harus berupa PDF',
-        'files.*.max' => 'Maksimal size per file 20MB',
-    ]);
+    {
+        // Cek kelompok
+        $checkResult = $this->checkKelompok();
+        if ($checkResult) return $checkResult;
 
-    try {
-        DB::beginTransaction();
-
-        $kelompok = auth()->user()->kelompok;
-        $uploadedFiles = [];
-        $totalSize = 0;
-
-        // Validasi total size
-        foreach ($request->file('files') as $file) {
-            $totalSize += $file->getSize();
-        }
-
-        // Maksimal total 20MB
-        if ($totalSize > 20 * 1024 * 1024) {
-            return redirect()->back()
-                ->with('error', 'Total ukuran file tidak boleh melebihi 20MB')
-                ->withInput();
-        }
-
-        // Process each file
-        foreach ($request->file('files') as $file) {
-            $filename = time() . '_' . uniqid() . '_' . $file->getClientOriginalName();
-            $path = $file->storeAs('peta-lokasi', $filename, 'public');
-            
-            $uploadedFiles[] = [
-                'name' => $file->getClientOriginalName(),
-                'path' => $path,
-                'size' => $file->getSize(),
-                'mime_type' => $file->getMimeType(),
-            ];
-        }
-
-        // Create single record with all files
-        $petaLokasi = PetaLokasi::create([
-            'kelompok_id' => $kelompok->id,
-            'user_id' => auth()->id(),
-            'judul' => $request->judul,
-            'keterangan' => $request->keterangan,
-            'files' => $uploadedFiles,
-            'file_count' => count($uploadedFiles),
-            'status' => 'pending',
+        // Validasi
+        $request->validate([
+            'judul' => 'required|string|max:255',
+            'files' => 'required|array|min:1|max:5',
+            'files.*' => 'required|file|mimes:pdf|max:20480',
+            'keterangan' => 'nullable|string|max:1000',
+        ], [
+            'files.required' => 'File PDF wajib diupload',
+            'files.min' => 'Minimal 1 file PDF harus diupload',
+            'files.max' => 'Maksimal 5 file PDF',
+            'files.*.mimes' => 'File harus berupa PDF',
+            'files.*.max' => 'Maksimal size per file 20MB',
         ]);
 
-        DB::commit();
+        try {
+            DB::beginTransaction();
 
-        $fileCount = count($uploadedFiles);
-        
-        // Pesan sukses berdasarkan jumlah file
-        if ($fileCount === 1) {
-            $message = "Peta lokasi berhasil diupload dengan 1 file PDF. Menunggu verifikasi BPDAS.";
-        } else {
-            $message = "Peta lokasi berhasil diupload dengan {$fileCount} file PDF. Menunggu verifikasi BPDAS.";
-        }
+            $kelompok = auth()->user()->kelompok;
+            $uploadedFiles = [];
+            $totalSize = 0;
 
-        return redirect()->route('kelompok.peta-lokasi.index')
-            ->with('success', $message);
-
-    } catch (\Exception $e) {
-        DB::rollBack();
-        
-        // Delete any uploaded files if error occurs
-        foreach ($uploadedFiles as $file) {
-            if (isset($file['path']) && Storage::disk('public')->exists($file['path'])) {
-                Storage::disk('public')->delete($file['path']);
+            // Validasi total size
+            foreach ($request->file('files') as $file) {
+                $totalSize += $file->getSize();
             }
-        }
 
-        return redirect()->back()
-            ->with('error', 'Terjadi kesalahan saat upload: ' . $e->getMessage())
-            ->withInput();
+            // Maksimal total 20MB
+            if ($totalSize > 20 * 1024 * 1024) {
+                return redirect()->back()
+                    ->with('error', 'Total ukuran file tidak boleh melebihi 20MB')
+                    ->withInput();
+            }
+
+            // Process each file
+            foreach ($request->file('files') as $file) {
+                $filename = time() . '_' . uniqid() . '_' . $file->getClientOriginalName();
+                $path = $file->storeAs('peta-lokasi', $filename, 'public');
+                
+                $uploadedFiles[] = [
+                    'name' => $file->getClientOriginalName(),
+                    'path' => $path,
+                    'size' => $file->getSize(),
+                    'mime_type' => $file->getMimeType(),
+                ];
+            }
+
+            // Create single record with all files
+            $petaLokasi = PetaLokasi::create([
+                'kelompok_id' => $kelompok->id,
+                'user_id' => auth()->id(),
+                'judul' => $request->judul,
+                'keterangan' => $request->keterangan,
+                'files' => $uploadedFiles,
+                'file_count' => count($uploadedFiles),
+                'status' => 'pending',
+            ]);
+
+            DB::commit();
+
+            $fileCount = count($uploadedFiles);
+            
+            // Pesan sukses berdasarkan jumlah file
+            if ($fileCount === 1) {
+                $message = "Peta lokasi berhasil diupload dengan 1 file PDF. Menunggu verifikasi BPDAS.";
+            } else {
+                $message = "Peta lokasi berhasil diupload dengan {$fileCount} file PDF. Menunggu verifikasi BPDAS.";
+            }
+
+            return redirect()->route('kelompok.peta-lokasi.index')
+                ->with('success', $message);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            // Delete any uploaded files if error occurs
+            foreach ($uploadedFiles as $file) {
+                if (isset($file['path']) && Storage::disk('public')->exists($file['path'])) {
+                    Storage::disk('public')->delete($file['path']);
+                }
+            }
+
+            return redirect()->back()
+                ->with('error', 'Terjadi kesalahan saat upload: ' . $e->getMessage())
+                ->withInput();
+        }
     }
-}
 
     public function show(PetaLokasi $petaLokasi)
     {
-        // Pastikan user hanya bisa lihat peta lokasi miliknya
-        if ($petaLokasi->user_id !== auth()->id()) {
-            abort(403);
+        // Cek kelompok
+        $checkResult = $this->checkKelompok();
+        if ($checkResult) return $checkResult;
+
+        // Pastikan user hanya bisa lihat peta lokasi milik kelompoknya
+        if ($petaLokasi->kelompok_id !== auth()->user()->kelompok->id) {
+            abort(403, 'Anda tidak memiliki akses untuk melihat data ini.');
         }
 
         return view('kelompok.peta-lokasi.show', compact('petaLokasi'));
@@ -137,9 +163,18 @@ class PetaLokasiController extends Controller
 
     public function edit(PetaLokasi $petaLokasi)
     {
-        // Hanya bisa edit jika status pending atau ditolak
-        if ($petaLokasi->user_id !== auth()->id() || $petaLokasi->status === 'diterima') {
-            abort(403);
+        // Cek kelompok
+        $checkResult = $this->checkKelompok();
+        if ($checkResult) return $checkResult;
+
+        // Hanya bisa edit jika status pending atau ditolak dan milik kelompoknya
+        if ($petaLokasi->kelompok_id !== auth()->user()->kelompok->id) {
+            abort(403, 'Anda tidak memiliki akses untuk mengedit data ini.');
+        }
+
+        if ($petaLokasi->status === 'diterima') {
+            return redirect()->route('kelompok.peta-lokasi.index')
+                ->with('error', 'Tidak dapat mengubah peta lokasi yang sudah diterima.');
         }
 
         $kelompok = $petaLokasi->kelompok;
@@ -148,8 +183,17 @@ class PetaLokasiController extends Controller
 
     public function update(Request $request, PetaLokasi $petaLokasi)
     {
-        if ($petaLokasi->user_id !== auth()->id() || $petaLokasi->status === 'diterima') {
-            abort(403);
+        // Cek kelompok
+        $checkResult = $this->checkKelompok();
+        if ($checkResult) return $checkResult;
+
+        if ($petaLokasi->kelompok_id !== auth()->user()->kelompok->id) {
+            abort(403, 'Anda tidak memiliki akses untuk mengupdate data ini.');
+        }
+
+        if ($petaLokasi->status === 'diterima') {
+            return redirect()->route('kelompok.peta-lokasi.index')
+                ->with('error', 'Tidak dapat mengubah peta lokasi yang sudah diterima.');
         }
 
         $request->validate([
@@ -227,10 +271,15 @@ class PetaLokasiController extends Controller
 
     public function destroy(PetaLokasi $petaLokasi)
     {
+        // Cek kelompok
+        $checkResult = $this->checkKelompok();
+        if ($checkResult) return $checkResult;
+
         try {
             // Pastikan user hanya bisa menghapus data kelompoknya sendiri
             if ($petaLokasi->kelompok_id !== auth()->user()->kelompok->id) {
-                return redirect()->back()->with('error', 'Anda tidak memiliki akses untuk menghapus data ini.');
+                return redirect()->back()
+                    ->with('error', 'Anda tidak memiliki akses untuk menghapus data ini.');
             }
 
             $fileCount = $petaLokasi->file_count;
@@ -246,7 +295,8 @@ class PetaLokasiController extends Controller
                 ->with('success', "Peta lokasi berhasil dihapus beserta {$fileCount} {$fileText}.");
 
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Terjadi kesalahan saat menghapus peta lokasi: ' . $e->getMessage());
+            return redirect()->back()
+                ->with('error', 'Terjadi kesalahan saat menghapus peta lokasi: ' . $e->getMessage());
         }
     }
 }

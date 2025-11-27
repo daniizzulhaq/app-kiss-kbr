@@ -79,7 +79,7 @@
     <!-- Form Card -->
     <div class="bg-white rounded-lg sm:rounded-xl shadow-lg overflow-hidden">
         <div class="p-4 sm:p-8">
-            <form action="{{ route('kelompok.progress-fisik.store') }}" method="POST">
+            <form action="{{ route('kelompok.progress-fisik.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
 
                 <!-- Pilih Kegiatan per Kategori -->
@@ -129,13 +129,15 @@
                                         </p>
                                         <div class="space-y-2">
                                             @foreach($kegiatanTersedia as $kegiatan)
-                                                <div class="bg-white p-3 sm:p-4 rounded-lg shadow-sm hover:shadow-md transition-all cursor-pointer border-2 border-transparent hover:border-green-400">
+                                                <div class="bg-white p-3 sm:p-4 rounded-lg shadow-sm hover:shadow-md transition-all cursor-pointer border-2 border-transparent hover:border-green-400 kegiatan-item"
+                                                     data-kegiatan-id="{{ $kegiatan->id }}"
+                                                     data-kegiatan-nama="{{ $kegiatan->nama_kegiatan }}">
                                                     <label class="flex items-start gap-2 sm:gap-4 cursor-pointer">
                                                         <input type="radio" 
                                                                name="master_kegiatan_id" 
                                                                value="{{ $kegiatan->id }}" 
                                                                id="kegiatan_{{ $kegiatan->id }}"
-                                                               class="mt-0.5 sm:mt-1 text-green-600 focus:ring-green-500 w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0"
+                                                               class="mt-0.5 sm:mt-1 text-green-600 focus:ring-green-500 w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 kegiatan-radio"
                                                                {{ old('master_kegiatan_id') == $kegiatan->id ? 'checked' : '' }}>
                                                         
                                                         <div class="flex-1 min-w-0">
@@ -183,7 +185,7 @@
                                                                 <span class="px-2 py-0.5 sm:py-1 text-xs font-semibold rounded-full bg-gray-200 text-gray-600">
                                                                     📏 {{ $kegiatan->satuan }}
                                                                 </span>
-                                                                <span class="px-2 py-0.5 sm:py-1 text-xs font-semibold rounded-full bg-red-100 text-red-700">
+                                                                <span class="px-2 py-0-5 sm:py-1 text-xs font-semibold rounded-full bg-red-100 text-red-700">
                                                                     ✅ Sudah Ditambahkan
                                                                 </span>
                                                             </div>
@@ -215,11 +217,46 @@
                     </div>
                 @enderror
 
-                <!-- Detail Kegiatan -->
+                <!-- Nama Detail Kegiatan -->
                 <div class="border-t pt-6 sm:pt-8">
                     <h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center gap-2">
                         <span>📝</span>
-                        Detail Kegiatan
+                        Detail Spesifik Kegiatan
+                    </h3>
+
+                    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 sm:p-6 rounded-lg mb-4 sm:mb-6">
+                        <div class="flex items-start gap-3">
+                            <span class="text-xl">💡</span>
+                            <div class="text-sm text-yellow-800">
+                                <p class="font-semibold mb-1">Keterangan:</p>
+                                <p>Gunakan field ini untuk memberikan detail spesifik dari kegiatan yang dipilih. 
+                                   Contoh: Untuk "Pengadaan Benih", bisa diisi "Pengadaan Benih Mahoni" atau "Pengadaan Benih Jati".</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="nama_detail" class="block text-xs sm:text-sm font-bold text-gray-700 mb-2">
+                            Nama Detail Kegiatan
+                        </label>
+                        <input type="text" 
+                               name="nama_detail" 
+                               id="nama_detail"
+                               value="{{ old('nama_detail') }}"
+                               class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 text-base sm:text-lg px-3 py-2"
+                               placeholder="Contoh: Pengadaan Benih Mahoni, Pembuatan Jalan Usaha Tani, dll.">
+                        <p class="text-xs text-gray-500 mt-1">Opsional - Kosongkan jika tidak perlu detail tambahan</p>
+                        @error('nama_detail')
+                            <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
+                <!-- Detail Kegiatan -->
+                <div class="border-t pt-6 sm:pt-8">
+                    <h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center gap-2">
+                        <span>📊</span>
+                        Rincian Kegiatan
                     </h3>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
@@ -297,7 +334,7 @@
                     <!-- Keterangan -->
                     <div class="mt-4 sm:mt-6">
                         <label for="keterangan" class="block text-xs sm:text-sm font-bold text-gray-700 mb-2">
-                            📄 Keterangan
+                            📄 Keterangan Tambahan
                         </label>
                         <textarea name="keterangan" 
                                   id="keterangan" 
@@ -308,6 +345,68 @@
                             <p class="text-red-500 text-xs sm:text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </div>
+                </div>
+
+                <!-- Upload Dokumentasi -->
+                <div class="border-t pt-6 sm:pt-8 mt-6 sm:mt-8">
+                    <h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center gap-2">
+                        <span>📸</span>
+                        Dokumentasi Kegiatan (Opsional)
+                    </h3>
+                    
+                    <div class="mb-4 bg-blue-50 border-l-4 border-blue-400 p-3 sm:p-4 rounded-lg">
+                        <div class="flex items-start gap-2">
+                            <span class="text-lg sm:text-xl">ℹ️</span>
+                            <div class="text-xs sm:text-sm text-blue-800">
+                                <p class="font-semibold mb-1">Tips Upload Dokumentasi:</p>
+                                <ul class="list-disc list-inside space-y-1">
+                                    <li>Format: JPG, JPEG, PNG (Max 2MB per file)</li>
+                                    <li>Tambahkan keterangan untuk setiap foto</li>
+                                    <li>Anda bisa menambahkan beberapa foto sekaligus</li>
+                                    <li>Dokumentasi bisa ditambahkan/diedit setelah kegiatan dibuat</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="foto-container" class="space-y-3 sm:space-y-4">
+                        <div class="foto-item bg-gray-50 p-3 sm:p-4 rounded-lg border-2 border-dashed border-gray-300 hover:border-green-400 transition-colors">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+                                <div>
+                                    <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
+                                        📷 Pilih Foto
+                                    </label>
+                                    <input type="file" 
+                                           name="foto[]" 
+                                           accept="image/jpeg,image/jpg,image/png"
+                                           class="w-full text-sm border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100">
+                                    <p class="text-xs text-gray-500 mt-1">Max 2MB - JPG, JPEG, PNG</p>
+                                </div>
+                                <div>
+                                    <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
+                                        📝 Keterangan Foto
+                                    </label>
+                                    <input type="text" 
+                                           name="keterangan_foto[]" 
+                                           placeholder="Contoh: Kondisi awal lahan sebelum kegiatan"
+                                           class="w-full text-sm border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="button" 
+                            id="tambah-foto" 
+                            class="mt-3 sm:mt-4 px-4 sm:px-6 py-2 sm:py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm sm:text-base font-medium rounded-lg shadow-md hover:shadow-lg transition-all flex items-center gap-2">
+                        <span class="text-lg">➕</span>
+                        Tambah Foto Lainnya
+                    </button>
+
+                    @error('foto.*')
+                        <div class="mt-3 bg-red-50 border-l-4 border-red-500 p-3 rounded">
+                            <p class="text-red-700 text-xs sm:text-sm font-medium">{{ $message }}</p>
+                        </div>
+                    @enderror
                 </div>
 
                 <!-- Tombol Action -->
@@ -334,6 +433,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const biayaInput = document.getElementById('biaya_satuan');
     const totalBiayaDisplay = document.getElementById('total_biaya_display');
     const sisaAnggaranDisplay = document.getElementById('sisa_anggaran_display');
+    const namaDetailInput = document.getElementById('nama_detail');
 
     // Fungsi untuk format rupiah
     function formatRupiah(angka) {
@@ -386,6 +486,177 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Hitung sekali saat load jika ada nilai old
     hitungTotalBiaya();
+
+    // ==========================================
+    // SCRIPT UNTUK AUTO-SUGGEST NAMA DETAIL
+    // ==========================================
+    const kegiatanRadios = document.querySelectorAll('.kegiatan-radio');
+    
+    // Data contoh untuk auto-suggest berdasarkan nama kegiatan
+    const autoCompleteData = {
+        'Pengadaan Benih': ['Mahoni', 'Jati', 'Sengon', 'Akasia', 'Jabon', 'Gmelina'],
+        'Pupuk': ['Pupuk Kandang', 'Pupuk NPK', 'Pupuk Organik', 'Pupuk Urea', 'Pupuk SP-36'],
+        'Pestisida': ['Insektisida', 'Fungisida', 'Herbisida', 'Rodentisida'],
+        'Peralatan': ['Cangkul', 'Sabit', 'Gergaji', 'Parang', 'Ember', 'Sprayer'],
+        'Pembibitan': ['Pembibitan Mahoni', 'Pembibitan Jati', 'Pembibitan Sengon'],
+        'Penanaman': ['Penanaman Mahoni', 'Penanaman Jati', 'Penanaman Sengon'],
+        'Pemeliharaan': ['Penyulaman', 'Penyiangan', 'Pemupukan', 'Penyemprotan']
+    };
+
+    kegiatanRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            const kegiatanId = this.value;
+            const kegiatanItem = this.closest('.kegiatan-item');
+            const kegiatanNama = kegiatanItem.getAttribute('data-kegiatan-nama');
+            
+            // Reset nama detail
+            namaDetailInput.value = '';
+            namaDetailInput.placeholder = 'Contoh: Detail spesifik kegiatan...';
+            
+            // Cari kata kunci untuk auto-suggest
+            let keyword = '';
+            for (const [key, values] of Object.entries(autoCompleteData)) {
+                if (kegiatanNama.includes(key)) {
+                    keyword = key;
+                    break;
+                }
+            }
+            
+            // Jika ditemukan keyword, update placeholder dengan contoh
+            if (keyword && autoCompleteData[keyword]) {
+                const examples = autoCompleteData[keyword].slice(0, 3).join(', ');
+                namaDetailInput.placeholder = `Contoh: ${kegiatanNama} ${examples}, dll.`;
+                
+                // Tambahkan datalist untuk auto-complete
+                let datalist = document.getElementById('nama_detail_suggestions');
+                if (!datalist) {
+                    datalist = document.createElement('datalist');
+                    datalist.id = 'nama_detail_suggestions';
+                    document.body.appendChild(datalist);
+                }
+                
+                // Kosongkan dan isi ulang datalist
+                datalist.innerHTML = '';
+                autoCompleteData[keyword].forEach(item => {
+                    const option = document.createElement('option');
+                    option.value = `${kegiatanNama} ${item}`;
+                    datalist.appendChild(option);
+                });
+                
+                namaDetailInput.setAttribute('list', 'nama_detail_suggestions');
+            } else {
+                namaDetailInput.removeAttribute('list');
+            }
+        });
+    });
+
+    // Trigger change event untuk radio yang sudah terpilih
+    const selectedRadio = document.querySelector('.kegiatan-radio:checked');
+    if (selectedRadio) {
+        selectedRadio.dispatchEvent(new Event('change'));
+    }
+
+    // ==========================================
+    // SCRIPT UNTUK MULTIPLE FOTO UPLOAD
+    // ==========================================
+    let fotoCounter = 1;
+    const maxFoto = 10;
+
+    document.getElementById('tambah-foto').addEventListener('click', function() {
+        if (fotoCounter >= maxFoto) {
+            alert('⚠️ Maksimal ' + maxFoto + ' foto per kegiatan');
+            return;
+        }
+
+        const container = document.getElementById('foto-container');
+        const newItem = document.querySelector('.foto-item').cloneNode(true);
+        
+        // Reset value input
+        newItem.querySelectorAll('input').forEach(input => {
+            input.value = '';
+        });
+        
+        // Hapus preview jika ada
+        const oldPreview = newItem.querySelector('.image-preview');
+        if (oldPreview) oldPreview.remove();
+        
+        // Tambahkan tombol hapus untuk foto tambahan
+        const deleteBtn = document.createElement('button');
+        deleteBtn.type = 'button';
+        deleteBtn.className = 'mt-2 w-full sm:w-auto px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded-lg transition-all flex items-center justify-center gap-2';
+        deleteBtn.innerHTML = '<span class="text-lg">🗑️</span> Hapus Foto Ini';
+        deleteBtn.onclick = function() {
+            newItem.remove();
+            fotoCounter--;
+            updateTambahFotoButton();
+        };
+        
+        newItem.appendChild(deleteBtn);
+        container.appendChild(newItem);
+        fotoCounter++;
+        updateTambahFotoButton();
+    });
+
+    function updateTambahFotoButton() {
+        const btn = document.getElementById('tambah-foto');
+        if (fotoCounter >= maxFoto) {
+            btn.disabled = true;
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
+            btn.innerHTML = '<span class="text-lg">⚠️</span> Maksimal ' + maxFoto + ' Foto';
+        } else {
+            btn.disabled = false;
+            btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            btn.innerHTML = '<span class="text-lg">➕</span> Tambah Foto Lainnya';
+        }
+    }
+
+    // Preview image saat dipilih
+    document.addEventListener('change', function(e) {
+        if (e.target.type === 'file' && e.target.accept.includes('image')) {
+            const file = e.target.files[0];
+            if (file) {
+                // Validasi ukuran
+                if (file.size > 2048000) { // 2MB
+                    alert('⚠️ Ukuran file terlalu besar! Maksimal 2MB');
+                    e.target.value = '';
+                    return;
+                }
+
+                // Validasi tipe file
+                const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+                if (!allowedTypes.includes(file.type)) {
+                    alert('⚠️ Format file tidak didukung! Gunakan JPG, JPEG, atau PNG');
+                    e.target.value = '';
+                    return;
+                }
+
+                // Tampilkan preview
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    // Cari container parent
+                    const container = e.target.closest('.foto-item');
+                    
+                    // Hapus preview lama jika ada
+                    const oldPreview = container.querySelector('.image-preview');
+                    if (oldPreview) oldPreview.remove();
+                    
+                    // Buat preview baru
+                    const preview = document.createElement('div');
+                    preview.className = 'image-preview mt-3 relative';
+                    preview.innerHTML = `
+                        <img src="${event.target.result}" 
+                             class="w-full h-40 object-cover rounded-lg shadow-md border-2 border-green-400" 
+                             alt="Preview">
+                        <div class="absolute top-2 right-2 bg-green-500 text-white px-2 py-1 rounded text-xs font-bold">
+                            ✓ Siap Upload
+                        </div>
+                    `;
+                    container.appendChild(preview);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+    });
 });
 </script>
 @endsection

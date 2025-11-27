@@ -150,50 +150,49 @@ Route::put('/peta-lokasi/{petaLokasi}/verifikasi', [PetaLokasiBpdasController::c
     |--------------------------------------------------------------------------
     */
     Route::middleware(['role:kelompok'])->prefix('kelompok')->name('kelompok.')->group(function () {
-        Route::get('/dashboard', [KelompokDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [KelompokDashboardController::class, 'index'])->name('dashboard');
 
-        // Permasalahan Kelompok
-        Route::resource('permasalahan', PermasalahanKelompokController::class);
+    // Permasalahan Kelompok
+    Route::resource('permasalahan', PermasalahanKelompokController::class);
+    
+    // Tanggapan tambahan
+    Route::get('/permasalahan/{permasalahan}/tanggapan', [PermasalahanKelompokController::class, 'tanggapan'])
+        ->name('permasalahan.tanggapan');
+    Route::post('/permasalahan/{permasalahan}/tanggapan', [PermasalahanKelompokController::class, 'storeTanggapan'])
+        ->name('permasalahan.tanggapan.store');
 
-        // Tanggapan tambahan
-        Route::get('/permasalahan/{permasalahan}/tanggapan', [PermasalahanKelompokController::class, 'tanggapan'])
-            ->name('permasalahan.tanggapan');
-        Route::post('/permasalahan/{permasalahan}/tanggapan', [PermasalahanKelompokController::class, 'storeTanggapan'])
-            ->name('permasalahan.tanggapan.store');
+    // Data Kelompok
+    Route::get('/data-kelompok', [KelompokController::class, 'index'])->name('data-kelompok.index');
+    Route::get('/data-kelompok/create', [KelompokController::class, 'create'])->name('data-kelompok.create');
+    Route::post('/data-kelompok', [KelompokController::class, 'store'])->name('data-kelompok.store');
+    Route::get('/data-kelompok/{kelompok}/edit', [KelompokController::class, 'edit'])->name('data-kelompok.edit');
+    Route::put('/data-kelompok/{kelompok}', [KelompokController::class, 'update'])->name('data-kelompok.update');
+    Route::delete('/data-kelompok/{kelompok}', [KelompokController::class, 'destroy'])->name('data-kelompok.destroy');
+    Route::post('/data-kelompok/{kelompok}/delete-photo', [KelompokController::class, 'deletePhoto'])
+        ->name('data-kelompok.delete-photo');
 
-       Route::get('/data-kelompok', [KelompokController::class, 'index'])->name('data-kelompok.index');
-Route::get('/data-kelompok/create', [KelompokController::class, 'create'])->name('data-kelompok.create');
-Route::post('/data-kelompok', [KelompokController::class, 'store'])->name('data-kelompok.store');
-Route::get('/data-kelompok/{kelompok}/edit', [KelompokController::class, 'edit'])->name('data-kelompok.edit');
-Route::put('/data-kelompok/{kelompok}', [KelompokController::class, 'update'])->name('data-kelompok.update');
-Route::delete('/data-kelompok/{kelompok}', [KelompokController::class, 'destroy'])->name('data-kelompok.destroy');
-
-// Route untuk delete foto - TARUH DI SINI, BUKAN DI LUAR GRUP
-Route::post('/data-kelompok/{kelompok}/delete-photo', [KelompokController::class, 'deletePhoto'])
-    ->name('data-kelompok.delete-photo');
-
-    Route::resource('progress-fisik', ProgressFisikController::class);
-Route::delete('/progress-fisik/{dokumentasi}/foto', [ProgressFisikController::class, 'deleteFoto'])
-    ->name('progress-fisik.delete-foto');
-
- Route::get('/anggaran/setup', [ProgressFisikController::class, 'setupAnggaran'])
+    // Anggaran - HARUS SEBELUM progress-fisik resource
+    Route::get('/anggaran/setup', [ProgressFisikController::class, 'setupAnggaran'])
         ->name('anggaran.setup');
     Route::post('/anggaran/setup', [ProgressFisikController::class, 'storeAnggaran'])
         ->name('anggaran.store');
 
-        Route::resource('peta-lokasi', PetaLokasiController::class);
+    // Progress Fisik - Route khusus HARUS SEBELUM resource
+    Route::delete('/progress-fisik/{dokumentasi}/foto', [ProgressFisikController::class, 'deleteFoto'])
+        ->name('progress-fisik.delete-foto');
+    Route::resource('progress-fisik', ProgressFisikController::class);
 
-  Route::resource('peta-geotagging', PetaGeotaggingController::class);
+    // Peta
+    Route::resource('peta-lokasi', PetaLokasiController::class);
+    Route::resource('peta-geotagging', PetaGeotaggingController::class);
 
-        // Calon Lokasi
-        Route::resource('calon-lokasi', CalonLokasiKelompokController::class);
+    // Calon Lokasi
+    Route::resource('calon-lokasi', CalonLokasiKelompokController::class);
 
-        Route::resource('rencana-bibit', RencanaBibitController::class);
-
-        Route::resource('realisasi-bibit', RealisasiBibitController::class);
-
-        
-    });
+    // Bibit
+    Route::resource('rencana-bibit', RencanaBibitController::class);
+    Route::resource('realisasi-bibit', RealisasiBibitController::class);
+});
 
     /*
     |--------------------------------------------------------------------------

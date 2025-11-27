@@ -192,6 +192,12 @@
                             <div class="flex-1">
                                 <div class="text-sm font-semibold text-gray-900 mb-1">
                                     {{ $progress->masterKegiatan->nama_kegiatan }}
+                                    {{-- ✅ TAMBAHAN: Tampilkan nama_detail di mobile --}}
+                                    @if($progress->nama_detail)
+                                        <span class="block text-purple-600 text-xs mt-1 font-medium">
+                                            📌 {{ $progress->nama_detail }}
+                                        </span>
+                                    @endif
                                 </div>
                                 @if($progress->keterangan)
                                     <div class="text-xs text-gray-500">{{ Str::limit($progress->keterangan, 50) }}</div>
@@ -306,7 +312,16 @@
                                     {{ $loop->iteration }}
                                 </td>
                                 <td class="px-6 py-4">
-                                    <div class="text-sm font-semibold text-gray-900">{{ $progress->masterKegiatan->nama_kegiatan }}</div>
+                                    <div class="text-sm font-semibold text-gray-900">
+                                        {{ $progress->masterKegiatan->nama_kegiatan }}
+                                    </div>
+                                    {{-- ✅ TAMBAHAN: Tampilkan nama_detail di desktop --}}
+                                    @if($progress->nama_detail)
+                                        <div class="text-xs text-purple-600 font-medium mt-1 flex items-center gap-1">
+                                            <span>📌</span>
+                                            <span>{{ $progress->nama_detail }}</span>
+                                        </div>
+                                    @endif
                                     @if($progress->keterangan)
                                         <div class="text-xs text-gray-500 mt-1">{{ Str::limit($progress->keterangan, 50) }}</div>
                                     @endif

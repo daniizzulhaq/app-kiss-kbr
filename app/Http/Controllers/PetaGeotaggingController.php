@@ -10,8 +10,27 @@ use Illuminate\Support\Facades\DB;
 
 class PetaGeotaggingController extends Controller
 {
+    /**
+     * Cek apakah user memiliki kelompok
+     */
+    private function checkKelompok()
+    {
+        $user = auth()->user();
+        
+        if (!$user->kelompok) {
+            return redirect()->route('kelompok.data-kelompok.create')
+                ->with('warning', 'Anda belum tergabung dalam kelompok. Silakan buat atau bergabung dengan kelompok terlebih dahulu.');
+        }
+        
+        return null;
+    }
+
     public function index()
     {
+        // Cek kelompok
+        $checkResult = $this->checkKelompok();
+        if ($checkResult) return $checkResult;
+
         // Ambil kelompok dari user yang login
         $kelompok = auth()->user()->kelompok;
         
@@ -25,18 +44,21 @@ class PetaGeotaggingController extends Controller
 
     public function create()
     {
-        $kelompok = Kelompok::where('user_id', auth()->id())->first();
-        
-        if (!$kelompok) {
-            return redirect()->route('kelompok.dashboard')
-                ->with('error', 'Data kelompok tidak ditemukan.');
-        }
+        // Cek kelompok
+        $checkResult = $this->checkKelompok();
+        if ($checkResult) return $checkResult;
+
+        $kelompok = auth()->user()->kelompok;
 
         return view('kelompok.peta-geotagging.create', compact('kelompok'));
     }
 
     public function store(Request $request)
     {
+        // Cek kelompok
+        $checkResult = $this->checkKelompok();
+        if ($checkResult) return $checkResult;
+
         // Validasi
         $request->validate([
             'judul' => 'required|string|max:255',
@@ -126,9 +148,13 @@ class PetaGeotaggingController extends Controller
 
     public function show(PetaGeotagging $petaGeotagging)
     {
-        // Pastikan user hanya bisa lihat peta geotagging miliknya
-        if ($petaGeotagging->user_id !== auth()->id()) {
-            abort(403);
+        // Cek kelompok
+        $checkResult = $this->checkKelompok();
+        if ($checkResult) return $checkResult;
+
+        // Pastikan user hanya bisa lihat peta geotagging milik kelompoknya
+        if ($petaGeotagging->kelompok_id !== auth()->user()->kelompok->id) {
+            abort(403, 'Anda tidak memiliki akses untuk melihat data ini.');
         }
 
         return view('kelompok.peta-geotagging.show', compact('petaGeotagging'));
@@ -136,9 +162,18 @@ class PetaGeotaggingController extends Controller
 
     public function edit(PetaGeotagging $petaGeotagging)
     {
-        // Hanya bisa edit jika status pending atau ditolak
-        if ($petaGeotagging->user_id !== auth()->id() || $petaGeotagging->status === 'diterima') {
-            abort(403);
+        // Cek kelompok
+        $checkResult = $this->checkKelompok();
+        if ($checkResult) return $checkResult;
+
+        // Hanya bisa edit jika status pending atau ditolak dan milik kelompoknya
+        if ($petaGeotagging->kelompok_id !== auth()->user()->kelompok->id) {
+            abort(403, 'Anda tidak memiliki akses untuk mengedit data ini.');
+        }
+
+        if ($petaGeotagging->status === 'diterima') {
+            return redirect()->route('kelompok.peta-geotagging.index')
+                ->with('error', 'Tidak dapat mengubah peta geotagging yang sudah diterima.');
         }
 
         $kelompok = $petaGeotagging->kelompok;
@@ -147,8 +182,17 @@ class PetaGeotaggingController extends Controller
 
     public function update(Request $request, PetaGeotagging $petaGeotagging)
     {
-        if ($petaGeotagging->user_id !== auth()->id() || $petaGeotagging->status === 'diterima') {
-            abort(403);
+        // Cek kelompok
+        $checkResult = $this->checkKelompok();
+        if ($checkResult) return $checkResult;
+
+        if ($petaGeotagging->kelompok_id !== auth()->user()->kelompok->id) {
+            abort(403, 'Anda tidak memiliki akses untuk mengupdate data ini.');
+        }
+
+        if ($petaGeotagging->status === 'diterima') {
+            return redirect()->route('kelompok.peta-geotagging.index')
+                ->with('error', 'Tidak dapat mengubah peta geotagging yang sudah diterima.');
         }
 
         $request->validate([
@@ -226,10 +270,15 @@ class PetaGeotaggingController extends Controller
 
     public function destroy(PetaGeotagging $petaGeotagging)
     {
+        // Cek kelompok
+        $checkResult = $this->checkKelompok();
+        if ($checkResult) return $checkResult;
+
         try {
             // Pastikan user hanya bisa menghapus data kelompoknya sendiri
             if ($petaGeotagging->kelompok_id !== auth()->user()->kelompok->id) {
-                return redirect()->back()->with('error', 'Anda tidak memiliki akses untuk menghapus data ini.');
+                return redirect()->back()
+                    ->with('error', 'Anda tidak memiliki akses untuk menghapus data ini.');
             }
 
             $fileCount = $petaGeotagging->file_count;
@@ -245,7 +294,8 @@ class PetaGeotaggingController extends Controller
                 ->with('success', "Peta geotagging berhasil dihapus beserta {$fileCount} {$fileText}.");
 
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Terjadi kesalahan saat menghapus peta geotagging: ' . $e->getMessage());
+            return redirect()->back()
+                ->with('error', 'Terjadi kesalahan saat menghapus peta geotagging: ' . $e->getMessage());
         }
     }
 }

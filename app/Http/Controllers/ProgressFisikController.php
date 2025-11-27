@@ -10,6 +10,7 @@ use App\Models\DokumentasiProgress;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class ProgressFisikController extends Controller
 {
@@ -25,7 +26,7 @@ class ProgressFisikController extends Controller
                 ->with('warning', 'Anda belum tergabung dalam kelompok. Silakan buat atau bergabung dengan kelompok terlebih dahulu.');
         }
         
-        return null; // Return null jika kelompok sudah ada
+        return null;
     }
 
     /**
@@ -33,54 +34,46 @@ class ProgressFisikController extends Controller
      */
     public function index()
     {
-        // Cek kelompok terlebih dahulu
         $checkResult = $this->checkKelompok();
         if ($checkResult) return $checkResult;
 
         $kelompok = auth()->user()->kelompok;
         
-        // Get atau create anggaran kelompok
         $anggaran = AnggaranKelompok::firstOrCreate(
             [
                 'kelompok_id' => $kelompok->id,
                 'tahun' => date('Y')
             ],
             [
-                'total_anggaran' => 0, // Default 0, user harus input
+                'total_anggaran' => 0,
                 'anggaran_dialokasikan' => 0,
                 'realisasi_anggaran' => 0,
                 'sisa_anggaran' => 0,
             ]
         );
 
-        // Jika anggaran masih 0 atau belum di-set, redirect ke setup
         if ($anggaran->total_anggaran == 0) {
             return redirect()->route('kelompok.anggaran.setup')
                 ->with('info', 'Silakan input total anggaran kelompok Anda terlebih dahulu');
         }
 
-        // Update realisasi
         $anggaran->updateRealisasi();
         $anggaran->refresh();
 
-        // Get progress fisik dengan relasi
         $progressList = ProgressFisik::with(['masterKegiatan.kategori', 'dokumentasi', 'verifier'])
             ->where('kelompok_id', $kelompok->id)
             ->orderBy('master_kegiatan_id')
             ->get();
 
-        // Hitung total persentase HANYA dari yang disetujui
         $approvedProgress = $progressList->where('status_verifikasi', 'disetujui');
         $totalProgress = $approvedProgress->count() > 0 
             ? round($approvedProgress->avg('persentase_fisik'), 2)
             : 0;
 
-        // Group by kategori
         $progressByKategori = $progressList->groupBy(function($item) {
             return $item->masterKegiatan->kategori->nama ?? 'Tanpa Kategori';
         });
 
-        // Get daftar kegiatan yang sudah ditambahkan
         $addedKegiatanIds = $progressList->pluck('master_kegiatan_id')->toArray();
         $addedKegiatanList = MasterKegiatan::with('kategori')
             ->whereIn('id', $addedKegiatanIds)
@@ -100,7 +93,6 @@ class ProgressFisikController extends Controller
 
     public function setupAnggaran()
     {
-        // Cek kelompok terlebih dahulu
         $checkResult = $this->checkKelompok();
         if ($checkResult) return $checkResult;
 
@@ -124,12 +116,11 @@ class ProgressFisikController extends Controller
 
     public function storeAnggaran(Request $request)
     {
-        // Cek kelompok terlebih dahulu
         $checkResult = $this->checkKelompok();
         if ($checkResult) return $checkResult;
 
         $request->validate([
-            'total_anggaran' => 'required|numeric|min:1000000|max:1000000000', // Min 1 juta, max 1 miliar
+            'total_anggaran' => 'required|numeric|min:1000000|max:1000000000',
         ], [
             'total_anggaran.required' => 'Total anggaran harus diisi',
             'total_anggaran.numeric' => 'Total anggaran harus berupa angka',
@@ -147,7 +138,6 @@ class ProgressFisikController extends Controller
             return back()->with('error', 'Data anggaran tidak ditemukan')->withInput();
         }
 
-        // VALIDASI: Jika sudah ada kegiatan yang diajukan, tidak boleh ubah anggaran
         $hasProgress = ProgressFisik::where('kelompok_id', $kelompok->id)->exists();
         
         if ($hasProgress && $anggaran->total_anggaran > 0) {
@@ -157,7 +147,6 @@ class ProgressFisikController extends Controller
             )->withInput();
         }
 
-        // VALIDASI: Total anggaran baru harus >= anggaran yang sudah dialokasikan
         if ($request->total_anggaran < $anggaran->anggaran_dialokasikan) {
             return back()->with('error', 
                 'Total anggaran baru (Rp ' . number_format($request->total_anggaran, 0, ',', '.') . ') ' .
@@ -196,13 +185,11 @@ class ProgressFisikController extends Controller
      */
     public function create()
     {
-        // Cek kelompok terlebih dahulu
         $checkResult = $this->checkKelompok();
         if ($checkResult) return $checkResult;
 
         $kelompok = auth()->user()->kelompok;
         
-        // Get anggaran
         $anggaran = AnggaranKelompok::where('kelompok_id', $kelompok->id)
             ->where('tahun', date('Y'))
             ->first();
@@ -212,17 +199,14 @@ class ProgressFisikController extends Controller
                 ->with('error', 'Silakan input total anggaran terlebih dahulu');
         }
 
-        // Get kategori dengan master kegiatan
         $kategoriList = KategoriKegiatan::with('masterKegiatan')
             ->orderBy('kode')
             ->get();
 
-        // Get kegiatan yang sudah ada
         $existingKegiatan = ProgressFisik::where('kelompok_id', $kelompok->id)
             ->pluck('master_kegiatan_id')
             ->toArray();
 
-        // Hitung jumlah kegiatan
         $totalKegiatan = MasterKegiatan::count();
         $totalTambahkan = count($existingKegiatan);
         $sisaKegiatan = $totalKegiatan - $totalTambahkan;
@@ -242,21 +226,28 @@ class ProgressFisikController extends Controller
      */
     public function store(Request $request)
     {
-        // Cek kelompok terlebih dahulu
         $checkResult = $this->checkKelompok();
         if ($checkResult) return $checkResult;
 
         $request->validate([
             'master_kegiatan_id' => 'required|exists:master_kegiatan,id',
             'volume_target' => 'required|numeric|min:0',
+            'nama_detail' => 'nullable|string|max:255',
             'biaya_satuan' => 'required|numeric|min:0',
             'tanggal_mulai' => 'nullable|date',
             'keterangan' => 'nullable|string',
+            'foto' => 'nullable|array',
+            'foto.*' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
+            'keterangan_foto' => 'nullable|array',
+            'keterangan_foto.*' => 'nullable|string|max:255',
+        ], [
+            'foto.*.image' => 'File harus berupa gambar',
+            'foto.*.mimes' => 'Format gambar harus JPG, JPEG, atau PNG',
+            'foto.*.max' => 'Ukuran gambar maksimal 2MB',
         ]);
 
         $kelompok = auth()->user()->kelompok;
         
-        // VALIDASI DUPLIKASI - Cek apakah kegiatan sudah ditambahkan
         $exists = ProgressFisik::where('kelompok_id', $kelompok->id)
             ->where('master_kegiatan_id', $request->master_kegiatan_id)
             ->exists();
@@ -269,10 +260,8 @@ class ProgressFisikController extends Controller
             )->withInput();
         }
 
-        // Hitung total biaya
         $totalBiaya = $request->volume_target * $request->biaya_satuan;
 
-        // Cek sisa anggaran
         $anggaran = AnggaranKelompok::where('kelompok_id', $kelompok->id)
             ->where('tahun', date('Y'))
             ->first();
@@ -281,7 +270,6 @@ class ProgressFisikController extends Controller
             return back()->with('error', 'Anggaran belum tersedia')->withInput();
         }
 
-        // VALIDASI: Cek apakah sisa anggaran cukup
         if ($anggaran->sisa_anggaran < $totalBiaya) {
             return back()->with('error', 
                 'Anggaran tidak mencukupi! ' .
@@ -292,11 +280,11 @@ class ProgressFisikController extends Controller
 
         DB::beginTransaction();
         try {
-            // Simpan progress
             $progress = ProgressFisik::create([
                 'kelompok_id' => $kelompok->id,
                 'master_kegiatan_id' => $request->master_kegiatan_id,
                 'volume_target' => $request->volume_target,
+                'nama_detail' => $request->nama_detail,
                 'volume_realisasi' => 0,
                 'biaya_satuan' => $request->biaya_satuan,
                 'tanggal_mulai' => $request->tanggal_mulai,
@@ -304,21 +292,51 @@ class ProgressFisikController extends Controller
                 'status_verifikasi' => 'pending',
             ]);
 
-            // Refresh anggaran
+            $jumlahFoto = 0;
+            if ($request->hasFile('foto')) {
+                foreach ($request->file('foto') as $index => $file) {
+                    if ($file && $file->isValid()) {
+                        try {
+                            $filename = 'dok_' . $progress->id . '_' . time() . '_' . $index . '.' . $file->extension();
+                            $path = $file->storeAs('dokumentasi-progress', $filename, 'public');
+                            
+                            DokumentasiProgress::create([
+                                'progress_fisik_id' => $progress->id,
+                                'foto' => $path,
+                                'keterangan' => $request->keterangan_foto[$index] ?? null,
+                                'tanggal_foto' => now(),
+                            ]);
+                            
+                            $jumlahFoto++;
+                        } catch (\Exception $e) {
+                            Log::error('Error upload foto: ' . $e->getMessage());
+                            continue;
+                        }
+                    }
+                }
+            }
+
             $anggaran->refresh();
 
             DB::commit();
 
             $kegiatan = MasterKegiatan::find($request->master_kegiatan_id);
+            
+            $message = 'Kegiatan "' . $kegiatan->nama_kegiatan . '" berhasil ditambahkan! ';
+            
+            if ($jumlahFoto > 0) {
+                $message .= $jumlahFoto . ' foto dokumentasi berhasil diupload. ';
+            }
+            
+            $message .= 'Anggaran dialokasikan: Rp ' . number_format($totalBiaya, 0, ',', '.') . ' | ' .
+                        'Sisa anggaran: Rp ' . number_format($anggaran->sisa_anggaran, 0, ',', '.');
+
             return redirect()->route('kelompok.progress-fisik.index')
-                ->with('success', 
-                    'Kegiatan "' . $kegiatan->nama_kegiatan . '" berhasil ditambahkan! ' .
-                    'Anggaran dialokasikan: Rp ' . number_format($totalBiaya, 0, ',', '.') . ' | ' .
-                    'Sisa anggaran: Rp ' . number_format($anggaran->sisa_anggaran, 0, ',', '.')
-                );
+                ->with('success', $message);
 
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Error saat menyimpan progress fisik: ' . $e->getMessage());
             return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage())->withInput();
         }
     }
@@ -328,19 +346,23 @@ class ProgressFisikController extends Controller
      */
     public function show(ProgressFisik $progressFisik)
     {
-        // Cek kelompok terlebih dahulu untuk user non-admin
-        if (!auth()->user()->hasRole(['admin', 'verifikator'])) {
-            $checkResult = $this->checkKelompok();
-            if ($checkResult) return $checkResult;
+        $user = auth()->user();
+        
+        if (!$user->kelompok) {
+            return redirect()->route('kelompok.data-kelompok.create')
+                ->with('warning', 'Anda belum tergabung dalam kelompok. Silakan buat atau bergabung dengan kelompok terlebih dahulu.');
+        }
+        
+        if ($progressFisik->kelompok_id != $user->kelompok->id) {
+            abort(403, 'Anda tidak memiliki akses untuk melihat data ini.');
         }
 
-        // Pastikan progress ini milik kelompok user atau user adalah admin
-        if ($progressFisik->kelompok_id != auth()->user()->kelompok?->id 
-            && !auth()->user()->hasRole(['admin', 'verifikator'])) {
-            abort(403);
-        }
-
-        $progressFisik->load(['masterKegiatan.kategori', 'dokumentasi', 'verifier', 'kelompok']);
+        $progressFisik->load([
+            'masterKegiatan.kategori', 
+            'dokumentasi', 
+            'verifier', 
+            'kelompok'
+        ]);
 
         return view('kelompok.progress-fisik.show', compact('progressFisik'));
     }
@@ -350,16 +372,13 @@ class ProgressFisikController extends Controller
      */
     public function edit(ProgressFisik $progressFisik)
     {
-        // Cek kelompok terlebih dahulu
         $checkResult = $this->checkKelompok();
         if ($checkResult) return $checkResult;
 
-        // Pastikan progress ini milik kelompok user
         if ($progressFisik->kelompok_id != auth()->user()->kelompok->id) {
             abort(403);
         }
 
-        // Tidak bisa edit jika sudah diverifikasi
         if ($progressFisik->status_verifikasi == 'disetujui') {
             return redirect()->route('kelompok.progress-fisik.index')
                 ->with('error', 'Tidak dapat mengubah kegiatan yang sudah diverifikasi');
@@ -375,114 +394,173 @@ class ProgressFisikController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, ProgressFisik $progressFisik)
-    {
-        // Cek kelompok terlebih dahulu
-        $checkResult = $this->checkKelompok();
-        if ($checkResult) return $checkResult;
+   public function update(Request $request, ProgressFisik $progressFisik)
+{
+    // Log untuk debugging
+    Log::info('Update Progress - Request Data:', [
+        'has_foto' => $request->hasFile('foto'),
+        'foto_count' => $request->hasFile('foto') ? count($request->file('foto')) : 0,
+        'all_data' => $request->except(['foto'])
+    ]);
 
-        // Pastikan progress ini milik kelompok user
-        if ($progressFisik->kelompok_id != auth()->user()->kelompok->id) {
-            abort(403);
-        }
+    $checkResult = $this->checkKelompok();
+    if ($checkResult) return $checkResult;
 
-        // Tidak bisa edit jika sudah diverifikasi
-        if ($progressFisik->status_verifikasi == 'disetujui') {
-            return redirect()->route('kelompok.progress-fisik.index')
-                ->with('error', 'Tidak dapat mengubah kegiatan yang sudah diverifikasi');
-        }
+    if ($progressFisik->kelompok_id != auth()->user()->kelompok->id) {
+        abort(403);
+    }
 
-        $request->validate([
-            'volume_target' => 'required|numeric|min:0',
-            'biaya_satuan' => 'required|numeric|min:0',
-            'volume_realisasi' => 'required|numeric|min:0|max:' . $request->volume_target,
-            'tanggal_mulai' => 'nullable|date',
-            'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal_mulai',
-            'keterangan' => 'nullable|string',
-            'foto.*' => 'nullable|image|max:2048',
-            'keterangan_foto.*' => 'nullable|string',
+    if ($progressFisik->status_verifikasi == 'disetujui') {
+        return redirect()->route('kelompok.progress-fisik.index')
+            ->with('error', 'Tidak dapat mengubah kegiatan yang sudah diverifikasi');
+    }
+
+    // Validasi dasar tanpa foto
+    $rules = [
+        'nama_detail' => 'nullable|string|max:255',
+        'volume_target' => 'required|numeric|min:0',
+        'biaya_satuan' => 'required|numeric|min:0',
+        'volume_realisasi' => 'required|numeric|min:0|max:' . ($request->volume_target ?: 0),
+        'tanggal_mulai' => 'nullable|date',
+        'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal_mulai',
+        'keterangan' => 'nullable|string',
+    ];
+
+    // Validasi foto HANYA jika ada file
+    if ($request->hasFile('foto') && is_array($request->file('foto')) && count($request->file('foto')) > 0) {
+        $rules['foto'] = 'array|max:10'; // Maksimal 10 foto
+        $rules['foto.*'] = 'nullable|image|mimes:jpeg,jpg,png|max:2048';
+        $rules['keterangan_foto'] = 'nullable|array';
+        $rules['keterangan_foto.*'] = 'nullable|string|max:255';
+    }
+
+    try {
+        $validated = $request->validate($rules, [
+            'foto.*.image' => 'File harus berupa gambar',
+            'foto.*.mimes' => 'Format gambar harus JPG, JPEG, atau PNG',
+            'foto.*.max' => 'Ukuran gambar maksimal 2MB',
+            'volume_realisasi.max' => 'Volume realisasi tidak boleh melebihi volume target',
         ]);
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        Log::error('Validation failed:', $e->errors());
+        throw $e;
+    }
 
-        DB::beginTransaction();
-        try {
-            // Hitung total biaya baru
-            $totalBiayaBaru = $request->volume_target * $request->biaya_satuan;
-            $totalBiayaLama = $progressFisik->total_biaya;
-            $selisihBiaya = $totalBiayaBaru - $totalBiayaLama;
+    DB::beginTransaction();
+    try {
+        $totalBiayaBaru = $request->volume_target * $request->biaya_satuan;
+        $totalBiayaLama = $progressFisik->total_biaya;
+        $selisihBiaya = $totalBiayaBaru - $totalBiayaLama;
 
-            // Jika ada penambahan biaya, validasi sisa anggaran
-            if ($selisihBiaya > 0) {
-                $anggaran = AnggaranKelompok::where('kelompok_id', $progressFisik->kelompok_id)
-                    ->where('tahun', date('Y'))
-                    ->first();
+        if ($selisihBiaya > 0) {
+            $anggaran = AnggaranKelompok::where('kelompok_id', $progressFisik->kelompok_id)
+                ->where('tahun', date('Y'))
+                ->first();
 
-                if ($anggaran && $anggaran->sisa_anggaran < $selisihBiaya) {
-                    return back()->with('error', 
-                        'Anggaran tidak mencukupi untuk perubahan ini! ' .
-                        'Tambahan biaya: Rp ' . number_format($selisihBiaya, 0, ',', '.') . ' | ' .
-                        'Sisa anggaran: Rp ' . number_format($anggaran->sisa_anggaran, 0, ',', '.')
-                    )->withInput();
-                }
+            if ($anggaran && $anggaran->sisa_anggaran < $selisihBiaya) {
+                DB::rollBack();
+                return back()->with('error', 
+                    'Anggaran tidak mencukupi! Tambahan: Rp ' . number_format($selisihBiaya, 0, ',', '.') . 
+                    ' | Sisa: Rp ' . number_format($anggaran->sisa_anggaran, 0, ',', '.')
+                )->withInput();
             }
+        }
 
-            // Update progress
-            $progressFisik->update([
-                'volume_target' => $request->volume_target,
-                'biaya_satuan' => $request->biaya_satuan,
-                'volume_realisasi' => $request->volume_realisasi,
-                'tanggal_mulai' => $request->tanggal_mulai,
-                'tanggal_selesai' => $request->tanggal_selesai,
-                'keterangan' => $request->keterangan,
-                'status_verifikasi' => 'pending', // Reset ke pending setelah update
-            ]);
+        // Update data progress
+        $updateData = [
+            'nama_detail' => $request->nama_detail,
+            'volume_target' => $request->volume_target,
+            'biaya_satuan' => $request->biaya_satuan,
+            'volume_realisasi' => $request->volume_realisasi,
+            'tanggal_mulai' => $request->tanggal_mulai,
+            'tanggal_selesai' => $request->tanggal_selesai,
+            'keterangan' => $request->keterangan,
+            'status_verifikasi' => 'pending',
+        ];
 
-            // Upload foto dokumentasi
-            if ($request->hasFile('foto')) {
-                foreach ($request->file('foto') as $index => $file) {
-                    $path = $file->store('dokumentasi-progress', 'public');
+        Log::info('Updating progress with data:', $updateData);
+        $progressFisik->update($updateData);
+
+        // Upload foto baru HANYA jika benar-benar ada
+        $jumlahFotoBaru = 0;
+        if ($request->hasFile('foto')) {
+            $files = $request->file('foto');
+            
+            Log::info('Processing ' . count($files) . ' foto files');
+            
+            foreach ($files as $index => $file) {
+                if (!$file || !$file->isValid()) {
+                    Log::warning('Skipping invalid file at index ' . $index);
+                    continue;
+                }
+                
+                try {
+                    $filename = 'dok_' . $progressFisik->id . '_' . time() . '_' . uniqid() . '.' . $file->extension();
+                    $path = $file->storeAs('dokumentasi-progress', $filename, 'public');
+                    
+                    $keteranganFoto = null;
+                    if ($request->has('keterangan_foto') && isset($request->keterangan_foto[$index])) {
+                        $keteranganFoto = $request->keterangan_foto[$index];
+                    }
                     
                     DokumentasiProgress::create([
                         'progress_fisik_id' => $progressFisik->id,
                         'foto' => $path,
-                        'keterangan' => $request->keterangan_foto[$index] ?? null,
+                        'keterangan' => $keteranganFoto,
                         'tanggal_foto' => now(),
                     ]);
+                    
+                    $jumlahFotoBaru++;
+                    Log::info('Successfully uploaded foto: ' . $filename);
+                    
+                } catch (\Exception $e) {
+                    Log::error('Error upload foto at index ' . $index . ': ' . $e->getMessage());
+                    continue;
                 }
             }
-
-            DB::commit();
-
-            $message = 'Progress berhasil diperbarui';
-            if ($selisihBiaya > 0) {
-                $message .= ' dengan penambahan biaya Rp ' . number_format($selisihBiaya, 0, ',', '.');
-            } elseif ($selisihBiaya < 0) {
-                $message .= ' dengan pengurangan biaya Rp ' . number_format(abs($selisihBiaya), 0, ',', '.');
-            }
-
-            return redirect()->route('kelompok.progress-fisik.index')
-                ->with('success', $message);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage())->withInput();
         }
-    }
 
+        DB::commit();
+
+        $message = 'Progress berhasil diperbarui';
+        
+        if ($selisihBiaya > 0) {
+            $message .= ' dengan penambahan biaya Rp ' . number_format($selisihBiaya, 0, ',', '.') . '.';
+        } elseif ($selisihBiaya < 0) {
+            $message .= ' dengan pengurangan biaya Rp ' . number_format(abs($selisihBiaya), 0, ',', '.') . '.';
+        } else {
+            $message .= '.';
+        }
+
+        if ($jumlahFotoBaru > 0) {
+            $message .= ' ' . $jumlahFotoBaru . ' foto baru ditambahkan.';
+        }
+
+        Log::info('Update success: ' . $message);
+
+        return redirect()->route('kelompok.progress-fisik.index')
+            ->with('success', $message);
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        Log::error('Error update progress fisik: ' . $e->getMessage());
+        Log::error('Stack trace: ' . $e->getTraceAsString());
+        
+        return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage())->withInput();
+    }
+}
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(ProgressFisik $progressFisik)
     {
-        // Cek kelompok terlebih dahulu
         $checkResult = $this->checkKelompok();
         if ($checkResult) return $checkResult;
 
-        // Pastikan progress ini milik kelompok user
         if ($progressFisik->kelompok_id != auth()->user()->kelompok->id) {
             abort(403);
         }
 
-        // Tidak bisa hapus jika sudah diverifikasi
         if ($progressFisik->status_verifikasi == 'disetujui') {
             return redirect()->route('kelompok.progress-fisik.index')
                 ->with('error', 'Tidak dapat menghapus kegiatan yang sudah diverifikasi');
@@ -493,14 +571,12 @@ class ProgressFisikController extends Controller
             $totalBiaya = $progressFisik->total_biaya;
             $namaKegiatan = $progressFisik->masterKegiatan->nama_kegiatan;
 
-            // Hapus dokumentasi foto dari storage
             foreach ($progressFisik->dokumentasi as $dok) {
                 if (Storage::disk('public')->exists($dok->foto)) {
                     Storage::disk('public')->delete($dok->foto);
                 }
             }
 
-            // Hapus progress (dokumentasi akan terhapus otomatis via cascade)
             $progressFisik->delete();
 
             DB::commit();
@@ -523,22 +599,18 @@ class ProgressFisikController extends Controller
      */
     public function deleteFoto(DokumentasiProgress $dokumentasi)
     {
-        // Cek kelompok terlebih dahulu
         $checkResult = $this->checkKelompok();
         if ($checkResult) return $checkResult;
 
-        // Pastikan dokumentasi ini milik kelompok user
         if ($dokumentasi->progressFisik->kelompok_id != auth()->user()->kelompok->id) {
             abort(403);
         }
 
         try {
-            // Hapus file dari storage
             if (Storage::disk('public')->exists($dokumentasi->foto)) {
                 Storage::disk('public')->delete($dokumentasi->foto);
             }
 
-            // Hapus record dari database
             $dokumentasi->delete();
 
             return back()->with('success', 'Foto berhasil dihapus');
@@ -553,7 +625,6 @@ class ProgressFisikController extends Controller
      */
     public function approve(Request $request, ProgressFisik $progressFisik)
     {
-        // Pastikan user adalah admin atau verifikator
         if (!auth()->user()->hasRole('admin') && !auth()->user()->hasRole('verifikator')) {
             abort(403, 'Anda tidak memiliki akses untuk menyetujui progress');
         }
@@ -571,7 +642,6 @@ class ProgressFisikController extends Controller
                 'verified_at' => now(),
             ]);
 
-            // Anggaran akan terupdate otomatis via observer di model
             $anggaran = AnggaranKelompok::where('kelompok_id', $progressFisik->kelompok_id)
                 ->where('tahun', date('Y'))
                 ->first();
@@ -595,7 +665,6 @@ class ProgressFisikController extends Controller
      */
     public function reject(Request $request, ProgressFisik $progressFisik)
     {
-        // Pastikan user adalah admin atau verifikator
         if (!auth()->user()->hasRole('admin') && !auth()->user()->hasRole('verifikator')) {
             abort(403, 'Anda tidak memiliki akses untuk menolak progress');
         }
@@ -626,11 +695,10 @@ class ProgressFisikController extends Controller
     }
 
     /**
-     * Admin reset verifikasi (untuk kembalikan ke pending)
+     * Admin reset verifikasi
      */
     public function resetVerifikasi(ProgressFisik $progressFisik)
     {
-        // Pastikan user adalah admin
         if (!auth()->user()->hasRole('admin')) {
             abort(403, 'Hanya admin yang dapat mereset verifikasi');
         }

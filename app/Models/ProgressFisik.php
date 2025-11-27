@@ -14,6 +14,7 @@ class ProgressFisik extends Model
         'kelompok_id',
         'master_kegiatan_id',
         'volume_target',
+        'nama_detail',
         'biaya_satuan',
         'total_biaya',
         'volume_realisasi',

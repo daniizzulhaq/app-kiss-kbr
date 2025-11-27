@@ -127,6 +127,11 @@
                                 <div class="flex-1">
                                     <h5 class="font-semibold text-sm sm:text-base text-gray-900">
                                         {{ $progress->masterKegiatan->nama_kegiatan }}
+                                        @if($progress->nama_detail)
+                                            <span class="text-blue-600 text-xs sm:text-sm block sm:inline mt-1 sm:mt-0">
+                                                - {{ $progress->nama_detail }}
+                                            </span>
+                                        @endif
                                     </h5>
                                     <p class="text-xs sm:text-sm text-gray-600 mt-1">
                                         Satuan: {{ $progress->masterKegiatan->satuan }}
@@ -148,6 +153,26 @@
                                     @endif
                                 </div>
                             </div>
+
+                            <!-- Info Detail Kegiatan -->
+                            @if($progress->nama_detail || $progress->tanggal_mulai)
+                                <div class="mb-3 p-2 sm:p-3 bg-blue-50 rounded-lg border border-blue-200">
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm">
+                                        @if($progress->nama_detail)
+                                            <div class="flex items-start gap-2">
+                                                <span class="text-blue-600 font-semibold">📝 Detail:</span>
+                                                <span class="text-blue-800 font-medium break-words">{{ $progress->nama_detail }}</span>
+                                            </div>
+                                        @endif
+                                        @if($progress->tanggal_mulai)
+                                            <div class="flex items-start gap-2">
+                                                <span class="text-blue-600 font-semibold">📅 Mulai:</span>
+                                                <span class="text-blue-800 font-medium">{{ \Carbon\Carbon::parse($progress->tanggal_mulai)->format('d M Y') }}</span>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endif
 
                             <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 mb-3 text-xs sm:text-sm">
                                 <div>
@@ -351,6 +376,7 @@
                                         
                                         if (confirm('✅ KONFIRMASI PERSETUJUAN\n\n' +
                                             'Kegiatan: {{ $progress->masterKegiatan->nama_kegiatan }}\n' +
+                                            'Detail: {{ $progress->nama_detail ?? "-" }}\n' +
                                             'Volume Realisasi: ' + volumeRealisasi.toFixed(2) + ' {{ $progress->masterKegiatan->satuan }}\n' +
                                             'Biaya Realisasi: Rp ' + biayaRealisasi.toLocaleString('id-ID') + '\n' +
                                             'Progress: ' + persentase.toFixed(1) + '%\n\n' +
@@ -381,6 +407,7 @@
                                     
                                     if (!confirm('⚠️ KONFIRMASI PENOLAKAN\n\n' +
                                         'Kegiatan: {{ $progress->masterKegiatan->nama_kegiatan }}\n' +
+                                        'Detail: {{ $progress->nama_detail ?? "-" }}\n' +
                                         'Catatan: ' + catatan + '\n\n' +
                                         'Yakin ingin MENOLAK kegiatan ini?')) {
                                         return false;

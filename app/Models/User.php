@@ -45,4 +45,5 @@ class User extends Authenticatable
 {
     return $this->hasOne(Kelompok::class, 'user_id');
 }
+
 }

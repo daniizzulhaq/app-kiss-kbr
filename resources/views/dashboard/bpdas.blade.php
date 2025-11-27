@@ -29,7 +29,7 @@
     </div>
 
     <!-- Menu Fitur Utama -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
         <!-- Dashboard -->
         <a href="{{ route('bpdas.dashboard') }}" 
             class="group bg-red-50 hover:bg-red-100 p-6 rounded-xl border border-red-200 transition-all hover:shadow-lg hover:-translate-y-1">
@@ -42,73 +42,97 @@
             </div>
         </a>
 
-        <!-- Terima Permasalahan -->
+        <!-- Permasalahan -->
         <a href="{{ route('bpdas.permasalahan.index') }}" 
             class="group bg-yellow-50 hover:bg-yellow-100 p-6 rounded-xl border border-yellow-200 transition-all hover:shadow-lg hover:-translate-y-1">
             <div class="flex items-start space-x-4">
                 <div class="text-4xl">⚠️</div>
                 <div>
-                    <h4 class="font-bold text-lg text-gray-800 mb-2">Terima Permasalahan</h4>
+                    <h4 class="font-bold text-lg text-gray-800 mb-2">Permasalahan</h4>
                     <p class="text-sm text-gray-600">Lihat dan tindaklanjuti laporan dari kelompok tani</p>
                 </div>
             </div>
         </a>
 
-        <!-- Data Kelompok -->
-        <a href="{{ route('bpdas.kelompok.index') }}" 
-            class="group bg-purple-50 hover:bg-purple-100 p-6 rounded-xl border border-purple-200 transition-all hover:shadow-lg hover:-translate-y-1">
-            <div class="flex items-start space-x-4">
-                <div class="text-4xl">👥</div>
-                <div>
-                    <h4 class="font-bold text-lg text-gray-800 mb-2">Data Kelompok</h4>
-                    <p class="text-sm text-gray-600">Kelola data kelompok tani KBR</p>
-                </div>
-            </div>
-        </a>
-
-        <!-- Geotagging -->
+        <!-- Calon Lokasi Persemaian -->
         <a href="{{ route('bpdas.geotagging.index') }}" 
             class="group bg-pink-50 hover:bg-pink-100 p-6 rounded-xl border border-pink-200 transition-all hover:shadow-lg hover:-translate-y-1">
             <div class="flex items-start space-x-4">
                 <div class="text-4xl">📍</div>
                 <div>
-                    <h4 class="font-bold text-lg text-gray-800 mb-2">Geotagging</h4>
-                    <p class="text-sm text-gray-600">Lihat peta lokasi dan koordinat kegiatan</p>
+                    <h4 class="font-bold text-lg text-gray-800 mb-2">Calon Lokasi Persemaian</h4>
+                    <p class="text-sm text-gray-600">Kelola data calon lokasi persemaian</p>
                 </div>
             </div>
         </a>
 
-        <!-- Rencana Bibit Kelompok -->
+        <!-- Data Peta Geotagging -->
+        <a href="{{ route('bpdas.peta-geotagging.index') }}" 
+            class="group bg-blue-50 hover:bg-blue-100 p-6 rounded-xl border border-blue-200 transition-all hover:shadow-lg hover:-translate-y-1">
+            <div class="flex items-start space-x-4">
+                <div class="text-4xl">🗺️</div>
+                <div>
+                    <h4 class="font-bold text-lg text-gray-800 mb-2">Data Peta Geotagging</h4>
+                    <p class="text-sm text-gray-600">Visualisasi peta lokasi geotagging</p>
+                </div>
+            </div>
+        </a>
+
+        <!-- Peta Lokasi Tanam -->
+        <a href="{{ route('bpdas.peta-lokasi.index') }}" 
+            class="group bg-teal-50 hover:bg-teal-100 p-6 rounded-xl border border-teal-200 transition-all hover:shadow-lg hover:-translate-y-1">
+            <div class="flex items-start space-x-4">
+                <div class="text-4xl">🌳</div>
+                <div>
+                    <h4 class="font-bold text-lg text-gray-800 mb-2">Peta Lokasi Tanam</h4>
+                    <p class="text-sm text-gray-600">Peta lokasi tanam dan monitoring</p>
+                </div>
+            </div>
+        </a>
+
+        <!-- Kelompok -->
+        <a href="{{ route('bpdas.kelompok.index') }}" 
+            class="group bg-purple-50 hover:bg-purple-100 p-6 rounded-xl border border-purple-200 transition-all hover:shadow-lg hover:-translate-y-1">
+            <div class="flex items-start space-x-4">
+                <div class="text-4xl">👥</div>
+                <div>
+                    <h4 class="font-bold text-lg text-gray-800 mb-2">Kelompok</h4>
+                    <p class="text-sm text-gray-600">Kelola data kelompok tani KBR</p>
+                </div>
+            </div>
+        </a>
+
+        <!-- Rencana Bibit -->
         <a href="{{ route('bpdas.rencana-bibit.index') }}" 
-            class="group bg-green-50 hover:bg-green-100 p-6 rounded-xl border border-green-200 transition-all hover:shadow-lg hover:-translate-y-1">
+            class="group bg-lime-50 hover:bg-lime-100 p-6 rounded-xl border border-lime-200 transition-all hover:shadow-lg hover:-translate-y-1">
             <div class="flex items-start space-x-4">
                 <div class="text-4xl">🌱</div>
                 <div>
-                    <h4 class="font-bold text-lg text-gray-800 mb-2">Rencana Bibit Kelompok</h4>
+                    <h4 class="font-bold text-lg text-gray-800 mb-2">Rencana Bibit</h4>
                     <p class="text-sm text-gray-600">Monitoring rencana pengadaan bibit kelompok</p>
                 </div>
             </div>
         </a>
 
-        <!-- Realisasi Bibit Kelompok -->
+        <!-- Realisasi Bibit -->
         <a href="{{ route('bpdas.realisasi-bibit.index') }}" 
             class="group bg-emerald-50 hover:bg-emerald-100 p-6 rounded-xl border border-emerald-200 transition-all hover:shadow-lg hover:-translate-y-1">
             <div class="flex items-start space-x-4">
                 <div class="text-4xl">🌳</div>
                 <div>
-                    <h4 class="font-bold text-lg text-gray-800 mb-2">Realisasi Bibit Kelompok</h4>
+                    <h4 class="font-bold text-lg text-gray-800 mb-2">Realisasi Bibit</h4>
                     <p class="text-sm text-gray-600">Monitor realisasi distribusi bibit</p>
                 </div>
             </div>
         </a>
 
-        <!-- Progress Fisik Kelompok -->
-        <a href="{{ route('bpdas.progress-fisik.index') }}" 
-            class="group bg-blue-50 hover:bg-blue-100 p-6 rounded-xl border border-blue-200 transition-all hover:shadow-lg hover:-translate-y-1">
+        <!-- Progress Fisik Kegiatan -->
+        <a href="{{ route('bpdas.progress-fisik.monitoring') }}" 
+            class="group bg-indigo-50 hover:bg-indigo-100 p-6 rounded-xl border border-indigo-200 transition-all hover:shadow-lg hover:-translate-y-1">
             <div class="flex items-start space-x-4">
                 <div class="text-4xl">📊</div>
                 <div>
-                    <h4 class="font-bold text-lg text-gray-800 mb-2">Progress Fisik Kelompok</h4>
+                    <h4 class="font-bold text-lg text-gray-800 mb-2">Progress Fisik Kegiatan</h4>
                     <p class="text-sm text-gray-600">Monitoring progress dan verifikasi kegiatan</p>
                 </div>
             </div>
@@ -116,9 +140,9 @@
     </div>
 
     <!-- Statistik Ringkas -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <!-- Total Kelompok -->
-        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-purple-500">
+        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-purple-500 hover:shadow-lg transition-shadow">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Total Kelompok</p>
@@ -129,7 +153,7 @@
         </div>
 
         <!-- Permasalahan Pending -->
-        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-yellow-500">
+        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-yellow-500 hover:shadow-lg transition-shadow">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Permasalahan Pending</p>
@@ -140,7 +164,7 @@
         </div>
 
         <!-- Progress Menunggu Verifikasi -->
-        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500">
+        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500 hover:shadow-lg transition-shadow">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Menunggu Verifikasi</p>
@@ -151,7 +175,7 @@
         </div>
 
         <!-- Total Geotagging -->
-        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-pink-500">
+        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-pink-500 hover:shadow-lg transition-shadow">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-600 mb-1">Total Geotagging</p>

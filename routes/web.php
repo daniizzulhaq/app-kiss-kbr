@@ -42,7 +42,7 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::middleware(['role:bpdas'])->prefix('bpdas')->name('bpdas.')->group(function () {
-        Route::get('/dashboard', [BpdasDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/dashboard', [App\Http\Controllers\Bpdas\DashboardController::class, 'index'])->name('dashboard');
 
         // Permasalahan BPDAS
         Route::get('/permasalahan', [PermasalahanBpdasController::class, 'index'])->name('permasalahan.index');
@@ -150,7 +150,7 @@ Route::put('/peta-lokasi/{petaLokasi}/verifikasi', [PetaLokasiBpdasController::c
     |--------------------------------------------------------------------------
     */
     Route::middleware(['role:kelompok'])->prefix('kelompok')->name('kelompok.')->group(function () {
-    Route::get('/dashboard', [KelompokDashboardController::class, 'index'])->name('dashboard');
+      Route::get('/dashboard', [App\Http\Controllers\Kelompok\DashboardController::class, 'index'])->name('dashboard');
 
     // Permasalahan Kelompok
     Route::resource('permasalahan', PermasalahanKelompokController::class);

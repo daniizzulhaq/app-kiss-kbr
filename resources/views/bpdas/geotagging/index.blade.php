@@ -6,7 +6,7 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <!-- Header -->
     <div class="mb-6 sm:mb-8 slide-in">
-        <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 mb-2">🗺️ Geotagging Data Lokasi</h1>
+        <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 mb-2">🗺️ Calon Lokasi Persemaian</h1>
         <p class="text-sm sm:text-base text-gray-600">Kelola dan verifikasi data lokasi dari kelompok tani</p>
     </div>
 

@@ -21,22 +21,26 @@ class RencanaBibitController extends Controller
             $kelompok = Kelompok::where('user_id', $user->id)->first();
             
             if (!$kelompok) {
-                return redirect()->route('kelompok.data-kelompok.index')
+                return redirect()->route('kelompok.data-kelompok.create')
                     ->with('error', 'Anda belum memiliki data kelompok. Silakan buat data kelompok terlebih dahulu.');
             }
             
-            $rencanaBibits = RencanaBibit::with('kelompok')
-                ->where('id_kelompok', $kelompok->id)
+            // Ambil semua kelompok dengan nama yang sama
+            $kelompokIds = Kelompok::where('nama_kelompok', $kelompok->nama_kelompok)
+                ->pluck('id')
+                ->toArray();
+            
+            // Ambil rencana bibit dari semua kelompok dengan nama yang sama
+            $rencanaBibits = RencanaBibit::with('kelompok.user')
+                ->whereIn('id_kelompok', $kelompokIds)
                 ->latest()
                 ->paginate(10);
 
             return view('kelompok.rencana-bibit.index', compact('rencanaBibits', 'kelompok'));
         } catch (\Exception $e) {
             Log::error('Error on rencana bibit index: ' . $e->getMessage());
-            return view('kelompok.rencana-bibit.index', [
-                'rencanaBibits' => collect()->paginate(10),
-                'kelompok' => null
-            ])->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            return redirect()->route('kelompok.dashboard')
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 
@@ -52,7 +56,7 @@ class RencanaBibitController extends Controller
             $kelompok = Kelompok::where('user_id', $user->id)->first();
             
             if (!$kelompok) {
-                return redirect()->route('kelompok.data-kelompok.index')
+                return redirect()->route('kelompok.data-kelompok.create')
                     ->with('error', 'Anda belum memiliki data kelompok. Silakan buat data kelompok terlebih dahulu.');
             }
             
@@ -102,10 +106,6 @@ class RencanaBibitController extends Controller
             return redirect()
                 ->route('kelompok.rencana-bibit.index')
                 ->with('success', 'Rencana bibit berhasil ditambahkan!');
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return redirect()->back()
-                ->withInput()
-                ->withErrors($e->validator);
         } catch (\Exception $e) {
             Log::error('Error on rencana bibit store: ' . $e->getMessage());
             return redirect()->back()
@@ -131,12 +131,15 @@ class RencanaBibitController extends Controller
             $kelompok = Kelompok::where('user_id', $user->id)->first();
             
             if (!$kelompok) {
-                return redirect()->route('kelompok.data-kelompok.index')
-                    ->with('error', 'Anda belum memiliki data kelompok.');
+                return redirect()->route('kelompok.data-kelompok.create')
+                    ->with('error', 'Anda belum memiliki kelompok.');
             }
             
-            if ($rencanaBibit->id_kelompok !== $kelompok->id) {
-                Log::warning("User {$user->id} mencoba akses rencana bibit ID {$id} milik kelompok {$rencanaBibit->id_kelompok}, bukan kelompok {$kelompok->id}");
+            // Cek apakah bibit ini dari kelompok dengan nama yang sama
+            $kelompokBibit = Kelompok::find($rencanaBibit->id_kelompok);
+            
+            if (!$kelompokBibit || $kelompokBibit->nama_kelompok !== $kelompok->nama_kelompok) {
+                Log::warning("User {$user->id} mencoba akses rencana bibit dari kelompok berbeda");
                 return redirect()->route('kelompok.rencana-bibit.index')
                     ->with('error', 'Anda tidak memiliki akses ke data ini.');
             }
@@ -166,14 +169,21 @@ class RencanaBibitController extends Controller
             $kelompok = Kelompok::where('user_id', $user->id)->first();
             
             if (!$kelompok) {
-                return redirect()->route('kelompok.data-kelompok.index')
+                return redirect()->route('kelompok.data-kelompok.create')
                     ->with('error', 'Anda belum memiliki data kelompok.');
             }
             
-            if ($rencanaBibit->id_kelompok !== $kelompok->id) {
-                Log::warning("User {$user->id} mencoba edit rencana bibit ID {$id} milik kelompok {$rencanaBibit->id_kelompok}, bukan kelompok {$kelompok->id}");
+            // Cek berdasarkan nama kelompok yang sama (bukan hanya id_kelompok)
+            $kelompokBibit = Kelompok::find($rencanaBibit->id_kelompok);
+            
+            // Izinkan edit jika bibit dari kelompok dengan nama yang sama
+            $canEdit = ($rencanaBibit->id_kelompok === $kelompok->id) || 
+                       ($kelompokBibit && $kelompokBibit->nama_kelompok === $kelompok->nama_kelompok);
+            
+            if (!$canEdit) {
+                Log::warning("User {$user->id} mencoba edit rencana bibit milik kelompok lain");
                 return redirect()->route('kelompok.rencana-bibit.index')
-                    ->with('error', 'Anda tidak memiliki akses ke data ini.');
+                    ->with('error', 'Anda hanya dapat mengedit data milik kelompok Anda.');
             }
 
             return view('kelompok.rencana-bibit.edit', compact('rencanaBibit'));
@@ -201,14 +211,20 @@ class RencanaBibitController extends Controller
             $kelompok = Kelompok::where('user_id', $user->id)->first();
             
             if (!$kelompok) {
-                return redirect()->route('kelompok.data-kelompok.index')
+                return redirect()->route('kelompok.data-kelompok.create')
                     ->with('error', 'Anda belum memiliki data kelompok.');
             }
             
-            if ($rencanaBibit->id_kelompok !== $kelompok->id) {
-                Log::warning("User {$user->id} mencoba update rencana bibit ID {$id} milik kelompok {$rencanaBibit->id_kelompok}, bukan kelompok {$kelompok->id}");
+            // Cek berdasarkan nama kelompok yang sama
+            $kelompokBibit = Kelompok::find($rencanaBibit->id_kelompok);
+            
+            $canUpdate = ($rencanaBibit->id_kelompok === $kelompok->id) || 
+                         ($kelompokBibit && $kelompokBibit->nama_kelompok === $kelompok->nama_kelompok);
+            
+            if (!$canUpdate) {
+                Log::warning("User {$user->id} mencoba update rencana bibit milik kelompok lain");
                 return redirect()->route('kelompok.rencana-bibit.index')
-                    ->with('error', 'Anda tidak memiliki akses ke data ini.');
+                    ->with('error', 'Anda hanya dapat mengupdate data milik kelompok Anda.');
             }
 
             $validated = $request->validate([
@@ -224,10 +240,6 @@ class RencanaBibitController extends Controller
             return redirect()
                 ->route('kelompok.rencana-bibit.index')
                 ->with('success', 'Rencana bibit berhasil diperbarui!');
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return redirect()->back()
-                ->withInput()
-                ->withErrors($e->validator);
         } catch (\Exception $e) {
             Log::error('Error on rencana bibit update: ' . $e->getMessage());
             return redirect()->back()
@@ -253,14 +265,20 @@ class RencanaBibitController extends Controller
             $kelompok = Kelompok::where('user_id', $user->id)->first();
             
             if (!$kelompok) {
-                return redirect()->route('kelompok.data-kelompok.index')
+                return redirect()->route('kelompok.data-kelompok.create')
                     ->with('error', 'Anda belum memiliki data kelompok.');
             }
             
-            if ($rencanaBibit->id_kelompok !== $kelompok->id) {
-                Log::warning("User {$user->id} mencoba hapus rencana bibit ID {$id} milik kelompok {$rencanaBibit->id_kelompok}, bukan kelompok {$kelompok->id}");
+            // Cek berdasarkan nama kelompok yang sama
+            $kelompokBibit = Kelompok::find($rencanaBibit->id_kelompok);
+            
+            $canDelete = ($rencanaBibit->id_kelompok === $kelompok->id) || 
+                         ($kelompokBibit && $kelompokBibit->nama_kelompok === $kelompok->nama_kelompok);
+            
+            if (!$canDelete) {
+                Log::warning("User {$user->id} mencoba hapus rencana bibit milik kelompok lain");
                 return redirect()->route('kelompok.rencana-bibit.index')
-                    ->with('error', 'Anda tidak memiliki akses ke data ini.');
+                    ->with('error', 'Anda hanya dapat menghapus data milik kelompok Anda.');
             }
 
             $rencanaBibit->delete();

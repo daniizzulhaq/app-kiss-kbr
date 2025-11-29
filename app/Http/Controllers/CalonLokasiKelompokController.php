@@ -40,16 +40,13 @@ class CalonLokasiKelompokController extends Controller
         ]);
 
         $validated['user_id'] = auth()->id();
-
-        // Decode polygon_coordinates JSON menjadi array
         $validated['polygon_coordinates'] = json_decode($request->polygon_coordinates, true);
 
         // Upload PDF
         for ($i = 1; $i <= 5; $i++) {
             $fieldName = "pdf_dokumen_{$i}";
             if ($request->hasFile($fieldName)) {
-                $path = $request->file($fieldName)->store('dokumen-lokasi', 'public');
-                $validated[$fieldName] = $path;
+                $validated[$fieldName] = $request->file($fieldName)->store('dokumen-lokasi', 'public');
             }
         }
 
@@ -61,7 +58,7 @@ class CalonLokasiKelompokController extends Controller
 
     public function edit(CalonLokasi $calonLokasi)
     {
-        if ($calonLokasi->user_id !== auth()->id() || $calonLokasi->status_verifikasi !== 'pending') {
+        if ($calonLokasi->user_id !== auth()->id()) {
             abort(403);
         }
 
@@ -70,7 +67,7 @@ class CalonLokasiKelompokController extends Controller
 
     public function update(Request $request, CalonLokasi $calonLokasi)
     {
-        if ($calonLokasi->user_id !== auth()->id() || $calonLokasi->status_verifikasi !== 'pending') {
+        if ($calonLokasi->user_id !== auth()->id()) {
             abort(403);
         }
 
@@ -89,18 +86,20 @@ class CalonLokasiKelompokController extends Controller
             'deskripsi' => 'nullable|string',
         ]);
 
-        // Decode polygon_coordinates
         $validated['polygon_coordinates'] = json_decode($request->polygon_coordinates, true);
 
-        // Upload PDF baru
+        // Update PDF
         for ($i = 1; $i <= 5; $i++) {
             $fieldName = "pdf_dokumen_{$i}";
             if ($request->hasFile($fieldName)) {
+
+                // Hapus file lama
                 if ($calonLokasi->$fieldName) {
                     Storage::disk('public')->delete($calonLokasi->$fieldName);
                 }
-                $path = $request->file($fieldName)->store('dokumen-lokasi', 'public');
-                $validated[$fieldName] = $path;
+
+                // Upload baru
+                $validated[$fieldName] = $request->file($fieldName)->store('dokumen-lokasi', 'public');
             }
         }
 
@@ -111,14 +110,13 @@ class CalonLokasiKelompokController extends Controller
     }
 
     public function show(CalonLokasi $calonLokasi)
-{
-    // Pastikan user hanya bisa melihat miliknya sendiri
-    if ($calonLokasi->user_id !== auth()->id()) {
-        abort(403);
-    }
+    {
+        if ($calonLokasi->user_id !== auth()->id()) {
+            abort(403);
+        }
 
-    return view('kelompok.calon-lokasi.show', compact('calonLokasi'));
-}
+        return view('kelompok.calon-lokasi.show', compact('calonLokasi'));
+    }
 
     public function destroy(CalonLokasi $calonLokasi)
     {

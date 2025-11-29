@@ -11,11 +11,30 @@ class CalonLokasiKelompokController extends Controller
 {
     public function index()
     {
-        $calonLokasis = CalonLokasi::where('user_id', auth()->id())
-            ->latest()
-            ->paginate(10);
+        try {
+            $calonLokasis = CalonLokasi::where('user_id', auth()->id())
+                ->latest()
+                ->paginate(10);
 
-        return view('kelompok.calon-lokasi.index', compact('calonLokasis'));
+            // Debug log untuk melihat data
+            Log::info('Calon Lokasi Data:', [
+                'count' => $calonLokasis->count(),
+                'user_id' => auth()->id(),
+                'items' => $calonLokasis->map(function($item) {
+                    return [
+                        'id' => $item->id,
+                        'nama' => $item->nama_kelompok_desa,
+                        'user_id' => $item->user_id
+                    ];
+                })
+            ]);
+
+            return view('kelompok.calon-lokasi.index', compact('calonLokasis'));
+        } catch (\Exception $e) {
+            Log::error('Error on calon lokasi index: ' . $e->getMessage());
+            return redirect()->route('kelompok.dashboard')
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 
     public function create()
@@ -61,7 +80,9 @@ class CalonLokasiKelompokController extends Controller
                 }
             }
 
-            CalonLokasi::create($validated);
+            $calonLokasi = CalonLokasi::create($validated);
+
+            Log::info('Calon Lokasi Created:', ['id' => $calonLokasi->id]);
 
             return redirect()->route('kelompok.calon-lokasi.index')
                 ->with('success', 'Calon lokasi berhasil ditambahkan!');
@@ -76,6 +97,12 @@ class CalonLokasiKelompokController extends Controller
     public function edit($id)
     {
         try {
+            Log::info('Edit Request:', [
+                'id' => $id,
+                'user_id' => auth()->id(),
+                'request_url' => request()->url()
+            ]);
+
             // Cari calon lokasi berdasarkan ID
             $calonLokasi = CalonLokasi::find($id);
             
@@ -86,6 +113,13 @@ class CalonLokasiKelompokController extends Controller
                     ->with('error', 'Data calon lokasi tidak ditemukan');
             }
             
+            Log::info('Calon Lokasi Found:', [
+                'id' => $calonLokasi->id,
+                'user_id' => $calonLokasi->user_id,
+                'auth_user_id' => auth()->id(),
+                'status' => $calonLokasi->status_verifikasi
+            ]);
+
             // Jika bukan milik user yang login
             if ($calonLokasi->user_id !== auth()->id()) {
                 Log::warning("User " . auth()->id() . " mencoba akses calon lokasi milik user {$calonLokasi->user_id}");
@@ -101,7 +135,7 @@ class CalonLokasiKelompokController extends Controller
 
             return view('kelompok.calon-lokasi.edit', compact('calonLokasi'));
         } catch (\Exception $e) {
-            Log::error('Error on edit page: ' . $e->getMessage());
+            Log::error('Error on edit page: ' . $e->getMessage() . ' | Line: ' . $e->getLine());
             return redirect()->route('kelompok.calon-lokasi.index')
                 ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
@@ -110,14 +144,21 @@ class CalonLokasiKelompokController extends Controller
     public function update(Request $request, $id)
     {
         try {
+            Log::info('Update Request:', [
+                'id' => $id,
+                'user_id' => auth()->id()
+            ]);
+
             $calonLokasi = CalonLokasi::find($id);
             
             if (!$calonLokasi) {
+                Log::warning("Update: Calon Lokasi ID {$id} tidak ditemukan");
                 return redirect()->route('kelompok.calon-lokasi.index')
                     ->with('error', 'Data calon lokasi tidak ditemukan');
             }
             
             if ($calonLokasi->user_id !== auth()->id()) {
+                Log::warning("Update: User " . auth()->id() . " mencoba update calon lokasi milik user {$calonLokasi->user_id}");
                 return redirect()->route('kelompok.calon-lokasi.index')
                     ->with('error', 'Anda tidak memiliki akses ke data ini');
             }
@@ -159,10 +200,12 @@ class CalonLokasiKelompokController extends Controller
 
             $calonLokasi->update($validated);
 
+            Log::info('Calon Lokasi Updated:', ['id' => $calonLokasi->id]);
+
             return redirect()->route('kelompok.calon-lokasi.index')
                 ->with('success', 'Calon lokasi berhasil diperbarui!');
         } catch (\Exception $e) {
-            Log::error('Error on update: ' . $e->getMessage());
+            Log::error('Error on update: ' . $e->getMessage() . ' | Line: ' . $e->getLine());
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
@@ -172,26 +215,31 @@ class CalonLokasiKelompokController extends Controller
     public function show($id)
     {
         try {
+            Log::info('Show Request:', [
+                'id' => $id,
+                'user_id' => auth()->id()
+            ]);
+
             // Cari calon lokasi berdasarkan ID
             $calonLokasi = CalonLokasi::find($id);
             
             // Jika tidak ditemukan
             if (!$calonLokasi) {
-                Log::warning("Calon Lokasi ID {$id} tidak ditemukan");
+                Log::warning("Show: Calon Lokasi ID {$id} tidak ditemukan");
                 return redirect()->route('kelompok.calon-lokasi.index')
                     ->with('error', 'Data calon lokasi tidak ditemukan');
             }
             
             // Jika bukan milik user yang login
             if ($calonLokasi->user_id !== auth()->id()) {
-                Log::warning("User " . auth()->id() . " mencoba akses calon lokasi milik user {$calonLokasi->user_id}");
+                Log::warning("Show: User " . auth()->id() . " mencoba akses calon lokasi milik user {$calonLokasi->user_id}");
                 return redirect()->route('kelompok.calon-lokasi.index')
                     ->with('error', 'Anda tidak memiliki akses ke data ini');
             }
 
             return view('kelompok.calon-lokasi.show', compact('calonLokasi'));
         } catch (\Exception $e) {
-            Log::error('Error on show page: ' . $e->getMessage());
+            Log::error('Error on show page: ' . $e->getMessage() . ' | Line: ' . $e->getLine());
             return redirect()->route('kelompok.calon-lokasi.index')
                 ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
@@ -200,14 +248,21 @@ class CalonLokasiKelompokController extends Controller
     public function destroy($id)
     {
         try {
+            Log::info('Delete Request:', [
+                'id' => $id,
+                'user_id' => auth()->id()
+            ]);
+
             $calonLokasi = CalonLokasi::find($id);
             
             if (!$calonLokasi) {
+                Log::warning("Delete: Calon Lokasi ID {$id} tidak ditemukan");
                 return redirect()->route('kelompok.calon-lokasi.index')
                     ->with('error', 'Data calon lokasi tidak ditemukan');
             }
             
             if ($calonLokasi->user_id !== auth()->id()) {
+                Log::warning("Delete: User " . auth()->id() . " mencoba hapus calon lokasi milik user {$calonLokasi->user_id}");
                 return redirect()->route('kelompok.calon-lokasi.index')
                     ->with('error', 'Anda tidak memiliki akses ke data ini');
             }
@@ -221,10 +276,12 @@ class CalonLokasiKelompokController extends Controller
 
             $calonLokasi->delete();
 
+            Log::info('Calon Lokasi Deleted:', ['id' => $id]);
+
             return redirect()->route('kelompok.calon-lokasi.index')
                 ->with('success', 'Calon lokasi berhasil dihapus!');
         } catch (\Exception $e) {
-            Log::error('Error on destroy: ' . $e->getMessage());
+            Log::error('Error on destroy: ' . $e->getMessage() . ' | Line: ' . $e->getLine());
             return redirect()->route('kelompok.calon-lokasi.index')
                 ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }

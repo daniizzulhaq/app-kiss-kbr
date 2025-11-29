@@ -87,48 +87,32 @@ class PermasalahanKelompokController extends Controller
             ->with('success', 'Laporan permasalahan berhasil dikirim dan menunggu ditangani oleh BPDAS!');
     }
 
-    public function show($id)
+    public function show(Permasalahan $permasalahan)
     {
         // Cek kelompok
         $checkResult = $this->checkKelompok();
         if ($checkResult) return $checkResult;
-
-        $permasalahan = Permasalahan::find($id);
-        
-        if (!$permasalahan) {
-            return redirect()->route('kelompok.permasalahan.index')
-                ->with('error', 'Data permasalahan tidak ditemukan');
-        }
 
         $kelompok = auth()->user()->kelompok;
 
         // Pastikan kelompok hanya bisa melihat permasalahan mereka sendiri
         if ($permasalahan->kelompok_id !== $kelompok->id) {
-            return redirect()->route('kelompok.permasalahan.index')
-                ->with('error', 'Anda tidak memiliki akses untuk melihat data ini');
+            abort(403, 'Anda tidak memiliki akses untuk melihat data ini.');
         }
 
         return view('kelompok.permasalahan.show', compact('permasalahan'));
     }
 
-    public function edit($id)
+    public function edit(Permasalahan $permasalahan)
     {
         // Cek kelompok
         $checkResult = $this->checkKelompok();
         if ($checkResult) return $checkResult;
 
-        $permasalahan = Permasalahan::find($id);
-        
-        if (!$permasalahan) {
-            return redirect()->route('kelompok.permasalahan.index')
-                ->with('error', 'Data permasalahan tidak ditemukan');
-        }
-
         $kelompok = auth()->user()->kelompok;
 
         if ($permasalahan->kelompok_id !== $kelompok->id) {
-            return redirect()->route('kelompok.permasalahan.index')
-                ->with('error', 'Anda tidak memiliki akses untuk mengedit data ini');
+            abort(403, 'Anda tidak memiliki akses untuk mengedit data ini.');
         }
 
         if ($permasalahan->status !== 'pending') {
@@ -139,24 +123,16 @@ class PermasalahanKelompokController extends Controller
         return view('kelompok.permasalahan.edit', compact('permasalahan'));
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, Permasalahan $permasalahan)
     {
         // Cek kelompok
         $checkResult = $this->checkKelompok();
         if ($checkResult) return $checkResult;
 
-        $permasalahan = Permasalahan::find($id);
-        
-        if (!$permasalahan) {
-            return redirect()->route('kelompok.permasalahan.index')
-                ->with('error', 'Data permasalahan tidak ditemukan');
-        }
-
         $kelompok = auth()->user()->kelompok;
 
         if ($permasalahan->kelompok_id !== $kelompok->id) {
-            return redirect()->route('kelompok.permasalahan.index')
-                ->with('error', 'Anda tidak memiliki akses untuk mengupdate data ini');
+            abort(403, 'Anda tidak memiliki akses untuk mengupdate data ini.');
         }
 
         if ($permasalahan->status !== 'pending') {
@@ -182,28 +158,20 @@ class PermasalahanKelompokController extends Controller
 
         $permasalahan->update($validated);
 
-        return redirect()->route('kelompok.permasalahan.show', $id)
+        return redirect()->route('kelompok.permasalahan.show', $permasalahan)
             ->with('success', 'Laporan permasalahan berhasil diupdate!');
     }
 
-    public function destroy($id)
+    public function destroy(Permasalahan $permasalahan)
     {
         // Cek kelompok
         $checkResult = $this->checkKelompok();
         if ($checkResult) return $checkResult;
 
-        $permasalahan = Permasalahan::find($id);
-        
-        if (!$permasalahan) {
-            return redirect()->route('kelompok.permasalahan.index')
-                ->with('error', 'Data permasalahan tidak ditemukan');
-        }
-
         $kelompok = auth()->user()->kelompok;
 
         if ($permasalahan->kelompok_id !== $kelompok->id) {
-            return redirect()->route('kelompok.permasalahan.index')
-                ->with('error', 'Anda tidak memiliki akses untuk menghapus data ini');
+            abort(403, 'Anda tidak memiliki akses untuk menghapus data ini.');
         }
 
         // Hanya bisa dihapus jika masih pending
@@ -221,37 +189,29 @@ class PermasalahanKelompokController extends Controller
     /**
      * Store tanggapan kelompok terhadap solusi BPDAS
      */
-    public function storeTanggapan(Request $request, $id)
+    public function storeTanggapan(Request $request, Permasalahan $permasalahan)
     {
         // Cek kelompok
         $checkResult = $this->checkKelompok();
         if ($checkResult) return $checkResult;
 
-        $permasalahan = Permasalahan::find($id);
-        
-        if (!$permasalahan) {
-            return redirect()->route('kelompok.permasalahan.index')
-                ->with('error', 'Data permasalahan tidak ditemukan');
-        }
-
         $kelompok = auth()->user()->kelompok;
 
         // Validasi akses
         if ($permasalahan->kelompok_id !== $kelompok->id) {
-            return redirect()->back()
-                ->with('error', 'Anda tidak memiliki akses untuk memberikan tanggapan pada data ini');
+            abort(403, 'Anda tidak memiliki akses untuk memberikan tanggapan pada data ini.');
         }
 
         // Validasi status - hanya bisa memberikan tanggapan jika status selesai
         if ($permasalahan->status !== 'selesai') {
             return redirect()->back()
-                ->with('error', 'Tanggapan hanya dapat diberikan pada permasalahan yang sudah selesai ditangani');
+                ->with('error', 'Tanggapan hanya dapat diberikan pada permasalahan yang sudah selesai ditangani.');
         }
 
         // Validasi jika sudah ada tanggapan
         if ($permasalahan->tanggapan_kelompok) {
             return redirect()->back()
-                ->with('error', 'Tanggapan sudah pernah diberikan sebelumnya');
+                ->with('error', 'Tanggapan sudah pernah diberikan sebelumnya.');
         }
 
         // Validasi input
@@ -268,7 +228,7 @@ class PermasalahanKelompokController extends Controller
             'tanggapan_kelompok' => $validated['tanggapan_kelompok'],
         ]);
 
-        return redirect()->route('kelompok.permasalahan.show', $id)
-            ->with('success', 'Terima kasih! Tanggapan Anda telah berhasil disimpan');
+        return redirect()->route('kelompok.permasalahan.show', $permasalahan)
+            ->with('success', 'Terima kasih! Tanggapan Anda telah berhasil disimpan.');
     }
 }

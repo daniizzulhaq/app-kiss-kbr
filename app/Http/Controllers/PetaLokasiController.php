@@ -6,78 +6,103 @@ use App\Models\PetaLokasi;
 use App\Models\Kelompok;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class PetaLokasiController extends Controller
 {
     /**
-     * Cek apakah user memiliki kelompok
+     * Display a listing of the resource.
      */
-    private function checkKelompok()
-    {
-        $user = auth()->user();
-        
-        if (!$user->kelompok) {
-            return redirect()->route('kelompok.data-kelompok.create')
-                ->with('warning', 'Anda belum tergabung dalam kelompok. Silakan buat atau bergabung dengan kelompok terlebih dahulu.');
-        }
-        
-        return null;
-    }
-
     public function index()
     {
-        // Cek kelompok
-        $checkResult = $this->checkKelompok();
-        if ($checkResult) return $checkResult;
+        try {
+            $user = auth()->user();
+            
+            // Ambil kelompok berdasarkan user_id
+            $kelompok = Kelompok::where('user_id', $user->id)->first();
+            
+            if (!$kelompok) {
+                return redirect()->route('kelompok.data-kelompok.create')
+                    ->with('error', 'Anda belum memiliki data kelompok. Silakan buat data kelompok terlebih dahulu.');
+            }
+            
+            // Ambil semua kelompok dengan nama yang sama
+            $kelompokIds = Kelompok::where('nama_kelompok', $kelompok->nama_kelompok)
+                ->pluck('id')
+                ->toArray();
+            
+            // Ambil peta lokasi dari semua kelompok dengan nama yang sama
+            $petaLokasi = PetaLokasi::with('kelompok.user')
+                ->whereIn('kelompok_id', $kelompokIds)
+                ->orderBy('created_at', 'desc')
+                ->paginate(10);
 
-        // Ambil kelompok dari user yang login
-        $kelompok = auth()->user()->kelompok;
-        
-        // Ambil data peta lokasi dengan pagination
-        $petaLokasi = PetaLokasi::where('kelompok_id', $kelompok->id)
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
-
-        return view('kelompok.peta-lokasi.index', compact('kelompok', 'petaLokasi'));
+            return view('kelompok.peta-lokasi.index', compact('petaLokasi', 'kelompok'));
+        } catch (\Exception $e) {
+            Log::error('Error on peta lokasi index: ' . $e->getMessage());
+            return redirect()->route('kelompok.dashboard')
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 
+    /**
+     * Show the form for creating a new resource.
+     */
     public function create()
     {
-        // Cek kelompok
-        $checkResult = $this->checkKelompok();
-        if ($checkResult) return $checkResult;
-
-        $kelompok = auth()->user()->kelompok;
-
-        return view('kelompok.peta-lokasi.create', compact('kelompok'));
+        try {
+            $user = auth()->user();
+            
+            // Ambil kelompok berdasarkan user_id
+            $kelompok = Kelompok::where('user_id', $user->id)->first();
+            
+            if (!$kelompok) {
+                return redirect()->route('kelompok.data-kelompok.create')
+                    ->with('error', 'Anda belum memiliki data kelompok. Silakan buat data kelompok terlebih dahulu.');
+            }
+            
+            return view('kelompok.peta-lokasi.create', compact('kelompok'));
+        } catch (\Exception $e) {
+            Log::error('Error on peta lokasi create page: ' . $e->getMessage());
+            return redirect()->route('kelompok.peta-lokasi.index')
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 
+    /**
+     * Store a newly created resource in storage.
+     */
     public function store(Request $request)
     {
-        // Cek kelompok
-        $checkResult = $this->checkKelompok();
-        if ($checkResult) return $checkResult;
-
-        // Validasi
-        $request->validate([
-            'judul' => 'required|string|max:255',
-            'files' => 'required|array|min:1|max:5',
-            'files.*' => 'required|file|mimes:pdf|max:20480',
-            'keterangan' => 'nullable|string|max:1000',
-        ], [
-            'files.required' => 'File PDF wajib diupload',
-            'files.min' => 'Minimal 1 file PDF harus diupload',
-            'files.max' => 'Maksimal 5 file PDF',
-            'files.*.mimes' => 'File harus berupa PDF',
-            'files.*.max' => 'Maksimal size per file 20MB',
-        ]);
-
         try {
+            $user = auth()->user();
+            
+            // Ambil kelompok berdasarkan user_id
+            $kelompok = Kelompok::where('user_id', $user->id)->first();
+            
+            if (!$kelompok) {
+                return back()
+                    ->withInput()
+                    ->with('error', 'Data kelompok tidak ditemukan. Silakan buat data kelompok terlebih dahulu.');
+            }
+            
+            // Validasi
+            $request->validate([
+                'judul' => 'required|string|max:255',
+                'files' => 'required|array|min:1|max:5',
+                'files.*' => 'required|file|mimes:pdf|max:20480',
+                'keterangan' => 'nullable|string|max:1000',
+            ], [
+                'files.required' => 'File PDF wajib diupload',
+                'files.min' => 'Minimal 1 file PDF harus diupload',
+                'files.max' => 'Maksimal 5 file PDF',
+                'files.*.mimes' => 'File harus berupa PDF',
+                'files.*.max' => 'Maksimal size per file 20MB',
+            ]);
+
             DB::beginTransaction();
 
-            $kelompok = auth()->user()->kelompok;
             $uploadedFiles = [];
             $totalSize = 0;
 
@@ -107,7 +132,7 @@ class PetaLokasiController extends Controller
             }
 
             // Create single record with all files
-            $petaLokasi = PetaLokasi::create([
+            PetaLokasi::create([
                 'kelompok_id' => $kelompok->id,
                 'user_id' => auth()->id(),
                 'judul' => $request->judul,
@@ -120,13 +145,9 @@ class PetaLokasiController extends Controller
             DB::commit();
 
             $fileCount = count($uploadedFiles);
-            
-            // Pesan sukses berdasarkan jumlah file
-            if ($fileCount === 1) {
-                $message = "Peta lokasi berhasil diupload dengan 1 file PDF. Menunggu verifikasi BPDAS.";
-            } else {
-                $message = "Peta lokasi berhasil diupload dengan {$fileCount} file PDF. Menunggu verifikasi BPDAS.";
-            }
+            $message = $fileCount === 1 
+                ? "Peta lokasi berhasil diupload dengan 1 file PDF. Menunggu verifikasi BPDAS."
+                : "Peta lokasi berhasil diupload dengan {$fileCount} file PDF. Menunggu verifikasi BPDAS.";
 
             return redirect()->route('kelompok.peta-lokasi.index')
                 ->with('success', $message);
@@ -135,86 +156,164 @@ class PetaLokasiController extends Controller
             DB::rollBack();
             
             // Delete any uploaded files if error occurs
-            foreach ($uploadedFiles as $file) {
-                if (isset($file['path']) && Storage::disk('public')->exists($file['path'])) {
-                    Storage::disk('public')->delete($file['path']);
+            if (isset($uploadedFiles)) {
+                foreach ($uploadedFiles as $file) {
+                    if (isset($file['path']) && Storage::disk('public')->exists($file['path'])) {
+                        Storage::disk('public')->delete($file['path']);
+                    }
                 }
             }
 
+            Log::error('Error on peta lokasi store: ' . $e->getMessage());
             return redirect()->back()
                 ->with('error', 'Terjadi kesalahan saat upload: ' . $e->getMessage())
                 ->withInput();
         }
     }
 
-    public function show(PetaLokasi $petaLokasi)
+    /**
+     * Display the specified resource.
+     */
+    public function show($id)
     {
-        // Cek kelompok
-        $checkResult = $this->checkKelompok();
-        if ($checkResult) return $checkResult;
-
-        // Pastikan user hanya bisa lihat peta lokasi milik kelompoknya
-        if ($petaLokasi->kelompok_id !== auth()->user()->kelompok->id) {
-            abort(403, 'Anda tidak memiliki akses untuk melihat data ini.');
-        }
-
-        return view('kelompok.peta-lokasi.show', compact('petaLokasi'));
-    }
-
-    public function edit(PetaLokasi $petaLokasi)
-    {
-        // Cek kelompok
-        $checkResult = $this->checkKelompok();
-        if ($checkResult) return $checkResult;
-
-        // Hanya bisa edit jika status pending atau ditolak dan milik kelompoknya
-        if ($petaLokasi->kelompok_id !== auth()->user()->kelompok->id) {
-            abort(403, 'Anda tidak memiliki akses untuk mengedit data ini.');
-        }
-
-        if ($petaLokasi->status === 'diterima') {
-            return redirect()->route('kelompok.peta-lokasi.index')
-                ->with('error', 'Tidak dapat mengubah peta lokasi yang sudah diterima.');
-        }
-
-        $kelompok = $petaLokasi->kelompok;
-        return view('kelompok.peta-lokasi.edit', compact('petaLokasi', 'kelompok'));
-    }
-
-    public function update(Request $request, PetaLokasi $petaLokasi)
-    {
-        // Cek kelompok
-        $checkResult = $this->checkKelompok();
-        if ($checkResult) return $checkResult;
-
-        if ($petaLokasi->kelompok_id !== auth()->user()->kelompok->id) {
-            abort(403, 'Anda tidak memiliki akses untuk mengupdate data ini.');
-        }
-
-        if ($petaLokasi->status === 'diterima') {
-            return redirect()->route('kelompok.peta-lokasi.index')
-                ->with('error', 'Tidak dapat mengubah peta lokasi yang sudah diterima.');
-        }
-
-        $request->validate([
-            'judul' => 'required|string|max:255',
-            'keterangan' => 'nullable|string|max:1000',
-            'files' => 'nullable|array|min:1|max:5',
-            'files.*' => 'nullable|file|mimes:pdf|max:20480',
-        ], [
-            'files.min' => 'Minimal 1 file PDF harus diupload',
-            'files.max' => 'Maksimal 5 file PDF',
-            'files.*.mimes' => 'File harus berupa PDF',
-            'files.*.max' => 'Maksimal size per file 20MB',
-        ]);
-
         try {
+            $petaLokasi = PetaLokasi::find($id);
+            
+            if (!$petaLokasi) {
+                return redirect()->route('kelompok.peta-lokasi.index')
+                    ->with('error', 'Data peta lokasi tidak ditemukan.');
+            }
+            
+            $user = auth()->user();
+            $kelompok = Kelompok::where('user_id', $user->id)->first();
+            
+            if (!$kelompok) {
+                return redirect()->route('kelompok.data-kelompok.create')
+                    ->with('error', 'Anda belum memiliki kelompok.');
+            }
+            
+            // Cek apakah peta lokasi ini dari kelompok dengan nama yang sama
+            $kelompokPeta = Kelompok::find($petaLokasi->kelompok_id);
+            
+            if (!$kelompokPeta || $kelompokPeta->nama_kelompok !== $kelompok->nama_kelompok) {
+                Log::warning("User {$user->id} mencoba akses peta lokasi dari kelompok berbeda");
+                return redirect()->route('kelompok.peta-lokasi.index')
+                    ->with('error', 'Anda tidak memiliki akses ke data ini.');
+            }
+
+            return view('kelompok.peta-lokasi.show', compact('petaLokasi'));
+        } catch (\Exception $e) {
+            Log::error('Error on peta lokasi show: ' . $e->getMessage());
+            return redirect()->route('kelompok.peta-lokasi.index')
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit($id)
+    {
+        try {
+            $petaLokasi = PetaLokasi::find($id);
+            
+            if (!$petaLokasi) {
+                return redirect()->route('kelompok.peta-lokasi.index')
+                    ->with('error', 'Data peta lokasi tidak ditemukan.');
+            }
+            
+            $user = auth()->user();
+            $kelompok = Kelompok::where('user_id', $user->id)->first();
+            
+            if (!$kelompok) {
+                return redirect()->route('kelompok.data-kelompok.create')
+                    ->with('error', 'Anda belum memiliki data kelompok.');
+            }
+            
+            // Cek berdasarkan nama kelompok yang sama
+            $kelompokPeta = Kelompok::find($petaLokasi->kelompok_id);
+            
+            // Izinkan edit jika peta lokasi dari kelompok dengan nama yang sama
+            $canEdit = ($petaLokasi->kelompok_id === $kelompok->id) || 
+                       ($kelompokPeta && $kelompokPeta->nama_kelompok === $kelompok->nama_kelompok);
+            
+            if (!$canEdit) {
+                Log::warning("User {$user->id} mencoba edit peta lokasi milik kelompok lain");
+                return redirect()->route('kelompok.peta-lokasi.index')
+                    ->with('error', 'Anda hanya dapat mengedit data milik kelompok Anda.');
+            }
+
+            // Cek status - tidak bisa edit jika sudah diterima
+            if ($petaLokasi->status === 'diterima') {
+                return redirect()->route('kelompok.peta-lokasi.index')
+                    ->with('error', 'Tidak dapat mengubah peta lokasi yang sudah diterima.');
+            }
+
+            return view('kelompok.peta-lokasi.edit', compact('petaLokasi', 'kelompok'));
+        } catch (\Exception $e) {
+            Log::error('Error on peta lokasi edit page: ' . $e->getMessage());
+            return redirect()->route('kelompok.peta-lokasi.index')
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, $id)
+    {
+        try {
+            $petaLokasi = PetaLokasi::find($id);
+            
+            if (!$petaLokasi) {
+                return redirect()->route('kelompok.peta-lokasi.index')
+                    ->with('error', 'Data peta lokasi tidak ditemukan.');
+            }
+            
+            $user = auth()->user();
+            $kelompok = Kelompok::where('user_id', $user->id)->first();
+            
+            if (!$kelompok) {
+                return redirect()->route('kelompok.data-kelompok.create')
+                    ->with('error', 'Anda belum memiliki data kelompok.');
+            }
+            
+            // Cek berdasarkan nama kelompok yang sama
+            $kelompokPeta = Kelompok::find($petaLokasi->kelompok_id);
+            
+            $canUpdate = ($petaLokasi->kelompok_id === $kelompok->id) || 
+                         ($kelompokPeta && $kelompokPeta->nama_kelompok === $kelompok->nama_kelompok);
+            
+            if (!$canUpdate) {
+                Log::warning("User {$user->id} mencoba update peta lokasi milik kelompok lain");
+                return redirect()->route('kelompok.peta-lokasi.index')
+                    ->with('error', 'Anda hanya dapat mengupdate data milik kelompok Anda.');
+            }
+
+            // Cek status
+            if ($petaLokasi->status === 'diterima') {
+                return redirect()->route('kelompok.peta-lokasi.index')
+                    ->with('error', 'Tidak dapat mengubah peta lokasi yang sudah diterima.');
+            }
+
+            $request->validate([
+                'judul' => 'required|string|max:255',
+                'keterangan' => 'nullable|string|max:1000',
+                'files' => 'nullable|array|min:1|max:5',
+                'files.*' => 'nullable|file|mimes:pdf|max:20480',
+            ], [
+                'files.min' => 'Minimal 1 file PDF harus diupload',
+                'files.max' => 'Maksimal 5 file PDF',
+                'files.*.mimes' => 'File harus berupa PDF',
+                'files.*.max' => 'Maksimal size per file 20MB',
+            ]);
+
             DB::beginTransaction();
 
             $data = [
                 'judul' => $request->judul,
                 'keterangan' => $request->keterangan,
-                'status' => 'pending', // Reset ke pending saat diupdate
+                'status' => 'pending',
                 'verified_at' => null,
                 'verified_by' => null,
                 'catatan_bpdas' => null,
@@ -265,21 +364,44 @@ class PetaLokasiController extends Controller
                 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Gagal mengupdate peta lokasi: ' . $e->getMessage());
+            Log::error('Error on peta lokasi update: ' . $e->getMessage());
+            return redirect()->back()
+                ->with('error', 'Gagal mengupdate peta lokasi: ' . $e->getMessage())
+                ->withInput();
         }
     }
 
-    public function destroy(PetaLokasi $petaLokasi)
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy($id)
     {
-        // Cek kelompok
-        $checkResult = $this->checkKelompok();
-        if ($checkResult) return $checkResult;
-
         try {
-            // Pastikan user hanya bisa menghapus data kelompoknya sendiri
-            if ($petaLokasi->kelompok_id !== auth()->user()->kelompok->id) {
-                return redirect()->back()
-                    ->with('error', 'Anda tidak memiliki akses untuk menghapus data ini.');
+            $petaLokasi = PetaLokasi::find($id);
+            
+            if (!$petaLokasi) {
+                return redirect()->route('kelompok.peta-lokasi.index')
+                    ->with('error', 'Data peta lokasi tidak ditemukan.');
+            }
+            
+            $user = auth()->user();
+            $kelompok = Kelompok::where('user_id', $user->id)->first();
+            
+            if (!$kelompok) {
+                return redirect()->route('kelompok.data-kelompok.create')
+                    ->with('error', 'Anda belum memiliki data kelompok.');
+            }
+            
+            // Cek berdasarkan nama kelompok yang sama
+            $kelompokPeta = Kelompok::find($petaLokasi->kelompok_id);
+            
+            $canDelete = ($petaLokasi->kelompok_id === $kelompok->id) || 
+                         ($kelompokPeta && $kelompokPeta->nama_kelompok === $kelompok->nama_kelompok);
+            
+            if (!$canDelete) {
+                Log::warning("User {$user->id} mencoba hapus peta lokasi milik kelompok lain");
+                return redirect()->route('kelompok.peta-lokasi.index')
+                    ->with('error', 'Anda hanya dapat menghapus data milik kelompok Anda.');
             }
 
             $fileCount = $petaLokasi->file_count;
@@ -295,7 +417,8 @@ class PetaLokasiController extends Controller
                 ->with('success', "Peta lokasi berhasil dihapus beserta {$fileCount} {$fileText}.");
 
         } catch (\Exception $e) {
-            return redirect()->back()
+            Log::error('Error on peta lokasi destroy: ' . $e->getMessage());
+            return redirect()->route('kelompok.peta-lokasi.index')
                 ->with('error', 'Terjadi kesalahan saat menghapus peta lokasi: ' . $e->getMessage());
         }
     }

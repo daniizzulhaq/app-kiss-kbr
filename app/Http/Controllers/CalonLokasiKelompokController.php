@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\CalonLokasi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class CalonLokasiKelompokController extends Controller
 {
@@ -59,19 +60,63 @@ class CalonLokasiKelompokController extends Controller
             ->with('success', 'Calon lokasi berhasil ditambahkan!');
     }
 
-    public function edit(CalonLokasi $calonLokasi)
+    public function show($id)
     {
-        if ($calonLokasi->user_id !== auth()->id() || $calonLokasi->status_verifikasi !== 'pending') {
-            abort(403);
+        $calonLokasi = CalonLokasi::find($id);
+        
+        if (!$calonLokasi) {
+            return redirect()->route('kelompok.calon-lokasi.index')
+                ->with('error', 'Data calon lokasi tidak ditemukan');
+        }
+        
+        // Pastikan user hanya bisa melihat miliknya sendiri
+        if ($calonLokasi->user_id !== auth()->id()) {
+            return redirect()->route('kelompok.calon-lokasi.index')
+                ->with('error', 'Anda tidak memiliki akses ke data ini');
+        }
+
+        return view('kelompok.calon-lokasi.show', compact('calonLokasi'));
+    }
+
+    public function edit($id)
+    {
+        $calonLokasi = CalonLokasi::find($id);
+        
+        if (!$calonLokasi) {
+            return redirect()->route('kelompok.calon-lokasi.index')
+                ->with('error', 'Data calon lokasi tidak ditemukan');
+        }
+        
+        if ($calonLokasi->user_id !== auth()->id()) {
+            return redirect()->route('kelompok.calon-lokasi.index')
+                ->with('error', 'Anda tidak memiliki akses ke data ini');
+        }
+        
+        if ($calonLokasi->status_verifikasi !== 'pending') {
+            return redirect()->route('kelompok.calon-lokasi.index')
+                ->with('error', 'Tidak dapat mengubah calon lokasi yang sudah diverifikasi');
         }
 
         return view('kelompok.calon-lokasi.edit', compact('calonLokasi'));
     }
 
-    public function update(Request $request, CalonLokasi $calonLokasi)
+    public function update(Request $request, $id)
     {
-        if ($calonLokasi->user_id !== auth()->id() || $calonLokasi->status_verifikasi !== 'pending') {
-            abort(403);
+        $calonLokasi = CalonLokasi::find($id);
+        
+        if (!$calonLokasi) {
+            return redirect()->route('kelompok.calon-lokasi.index')
+                ->with('error', 'Data calon lokasi tidak ditemukan');
+        }
+        
+        if ($calonLokasi->user_id !== auth()->id()) {
+            return redirect()->route('kelompok.calon-lokasi.index')
+                ->with('error', 'Anda tidak memiliki akses ke data ini');
+        }
+        
+        if ($calonLokasi->status_verifikasi !== 'pending') {
+            return redirect()->route('kelompok.calon-lokasi.index')
+                ->with('error', 'Tidak dapat mengubah calon lokasi yang sudah diverifikasi');
         }
 
         $validated = $request->validate([
@@ -110,20 +155,18 @@ class CalonLokasiKelompokController extends Controller
             ->with('success', 'Calon lokasi berhasil diperbarui!');
     }
 
-    public function show(CalonLokasi $calonLokasi)
-{
-    // Pastikan user hanya bisa melihat miliknya sendiri
-    if ($calonLokasi->user_id !== auth()->id()) {
-        abort(403);
-    }
-
-    return view('kelompok.calon-lokasi.show', compact('calonLokasi'));
-}
-
-    public function destroy(CalonLokasi $calonLokasi)
+    public function destroy($id)
     {
+        $calonLokasi = CalonLokasi::find($id);
+        
+        if (!$calonLokasi) {
+            return redirect()->route('kelompok.calon-lokasi.index')
+                ->with('error', 'Data calon lokasi tidak ditemukan');
+        }
+        
         if ($calonLokasi->user_id !== auth()->id()) {
-            abort(403);
+            return redirect()->route('kelompok.calon-lokasi.index')
+                ->with('error', 'Anda tidak memiliki akses ke data ini');
         }
 
         for ($i = 1; $i <= 5; $i++) {

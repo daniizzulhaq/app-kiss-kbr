@@ -74,24 +74,17 @@ class KelompokController extends Controller
         }
     }
 
-    public function edit($id)
+    public function edit($id = null)
     {
         try {
-            // Cari kelompok berdasarkan ID
-            $kelompok = Kelompok::find($id);
+            // Ambil kelompok milik user yang login (abaikan ID dari URL)
+            $kelompok = Kelompok::where('user_id', auth()->id())->first();
             
             // Jika tidak ditemukan
             if (!$kelompok) {
-                Log::warning("Kelompok ID {$id} tidak ditemukan");
+                Log::warning("User " . auth()->id() . " tidak memiliki data kelompok");
                 return redirect()->route('kelompok.data-kelompok.index')
-                    ->with('error', 'Data kelompok tidak ditemukan');
-            }
-            
-            // Jika bukan milik user yang login
-            if ($kelompok->user_id !== auth()->id()) {
-                Log::warning("User " . auth()->id() . " mencoba akses kelompok milik user {$kelompok->user_id}");
-                return redirect()->route('kelompok.data-kelompok.index')
-                    ->with('error', 'Anda tidak memiliki akses ke data ini');
+                    ->with('error', 'Anda belum memiliki data kelompok. Silakan buat terlebih dahulu.');
             }
 
             return view('kelompok.data-kelompok.edit', compact('kelompok'));
@@ -102,19 +95,15 @@ class KelompokController extends Controller
         }
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, $id = null)
     {
         try {
-            $kelompok = Kelompok::find($id);
+            // Ambil kelompok milik user yang login (abaikan ID dari URL)
+            $kelompok = Kelompok::where('user_id', auth()->id())->first();
             
             if (!$kelompok) {
                 return redirect()->route('kelompok.data-kelompok.index')
                     ->with('error', 'Data kelompok tidak ditemukan');
-            }
-            
-            if ($kelompok->user_id !== auth()->id()) {
-                return redirect()->route('kelompok.data-kelompok.index')
-                    ->with('error', 'Anda tidak memiliki akses ke data ini');
             }
 
             $validated = $request->validate([
@@ -164,23 +153,17 @@ class KelompokController extends Controller
         }
     }
 
-    public function deletePhoto(Request $request, $id)
+    public function deletePhoto(Request $request, $id = null)
     {
         try {
-            $kelompok = Kelompok::find($id);
+            // Ambil kelompok milik user yang login
+            $kelompok = Kelompok::where('user_id', auth()->id())->first();
             
             if (!$kelompok) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Data tidak ditemukan'
                 ], 404);
-            }
-            
-            if ($kelompok->user_id !== auth()->id()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Unauthorized'
-                ], 403);
             }
 
             $request->validate([
@@ -222,19 +205,15 @@ class KelompokController extends Controller
         }
     }
 
-    public function destroy($id)
+    public function destroy($id = null)
     {
         try {
-            $kelompok = Kelompok::find($id);
+            // Ambil kelompok milik user yang login
+            $kelompok = Kelompok::where('user_id', auth()->id())->first();
             
             if (!$kelompok) {
                 return redirect()->route('kelompok.data-kelompok.index')
                     ->with('error', 'Data kelompok tidak ditemukan');
-            }
-            
-            if ($kelompok->user_id !== auth()->id()) {
-                return redirect()->route('kelompok.data-kelompok.index')
-                    ->with('error', 'Anda tidak memiliki akses ke data ini');
             }
 
             // Hapus dokumentasi dari storage

@@ -56,20 +56,20 @@ class CalonLokasiKelompokController extends Controller
             ->with('success', 'Calon lokasi berhasil ditambahkan!');
     }
 
-    public function edit(CalonLokasi $calonLokasi)
+    public function edit($id)
     {
-        if ($calonLokasi->user_id !== auth()->id()) {
-            abort(403);
-        }
+        $calonLokasi = CalonLokasi::where('id', $id)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
 
         return view('kelompok.calon-lokasi.edit', compact('calonLokasi'));
     }
 
-    public function update(Request $request, CalonLokasi $calonLokasi)
+    public function update(Request $request, $id)
     {
-        if ($calonLokasi->user_id !== auth()->id()) {
-            abort(403);
-        }
+        $calonLokasi = CalonLokasi::where('id', $id)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
 
         $validated = $request->validate([
             'nama_kelompok_desa' => 'required|string|max:255',
@@ -88,17 +88,13 @@ class CalonLokasiKelompokController extends Controller
 
         $validated['polygon_coordinates'] = json_decode($request->polygon_coordinates, true);
 
-        // Update PDF
         for ($i = 1; $i <= 5; $i++) {
             $fieldName = "pdf_dokumen_{$i}";
             if ($request->hasFile($fieldName)) {
-
-                // Hapus file lama
                 if ($calonLokasi->$fieldName) {
                     Storage::disk('public')->delete($calonLokasi->$fieldName);
                 }
 
-                // Upload baru
                 $validated[$fieldName] = $request->file($fieldName)->store('dokumen-lokasi', 'public');
             }
         }
@@ -109,20 +105,20 @@ class CalonLokasiKelompokController extends Controller
             ->with('success', 'Calon lokasi berhasil diperbarui!');
     }
 
-    public function show(CalonLokasi $calonLokasi)
+    public function show($id)
     {
-        if ($calonLokasi->user_id !== auth()->id()) {
-            abort(403);
-        }
+        $calonLokasi = CalonLokasi::where('id', $id)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
 
         return view('kelompok.calon-lokasi.show', compact('calonLokasi'));
     }
 
-    public function destroy(CalonLokasi $calonLokasi)
+    public function destroy($id)
     {
-        if ($calonLokasi->user_id !== auth()->id()) {
-            abort(403);
-        }
+        $calonLokasi = CalonLokasi::where('id', $id)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
 
         for ($i = 1; $i <= 5; $i++) {
             $fieldName = "pdf_dokumen_{$i}";

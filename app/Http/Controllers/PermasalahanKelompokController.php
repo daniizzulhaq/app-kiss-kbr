@@ -54,7 +54,6 @@ class PermasalahanKelompokController extends Controller
             'bibit' => 'required|string|max:255',
             'lokasi_tanam' => 'required|string|max:255',
             'permasalahan' => 'required|string',
-            'prioritas' => 'required|in:rendah,sedang,tinggi',
         ]);
 
         Permasalahan::create([
@@ -64,7 +63,6 @@ class PermasalahanKelompokController extends Controller
             'bibit' => $validated['bibit'],
             'lokasi_tanam' => $validated['lokasi_tanam'],
             'permasalahan' => $validated['permasalahan'],
-            'prioritas' => $validated['prioritas'],
             'status' => 'pending',
         ]);
 
@@ -127,7 +125,6 @@ class PermasalahanKelompokController extends Controller
             'bibit' => 'required|string|max:255',
             'lokasi_tanam' => 'required|string|max:255',
             'permasalahan' => 'required|string',
-            'prioritas' => 'required|in:rendah,sedang,tinggi',
         ]);
 
         $permasalahan->update($validated);

@@ -137,31 +137,6 @@
                     <p class="mt-1.5 text-xs text-gray-500">Min. 10 karakter</p>
                 </div>
 
-                <!-- Prioritas -->
-                <div>
-                    <label for="prioritas" class="block text-xs sm:text-sm font-semibold text-gray-700 mb-1.5 sm:mb-2">
-                        Prioritas <span class="text-red-500">*</span>
-                    </label>
-                    <select id="prioritas" 
-                            name="prioritas"
-                            class="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition @error('prioritas') border-red-500 @enderror appearance-none bg-white"
-                            required>
-                        <option value="">-- Pilih Prioritas --</option>
-                        <option value="rendah" {{ old('prioritas', $permasalahan->prioritas) == 'rendah' ? 'selected' : '' }}>
-                            🟢 Rendah
-                        </option>
-                        <option value="sedang" {{ old('prioritas', $permasalahan->prioritas) == 'sedang' ? 'selected' : '' }}>
-                            🟡 Sedang
-                        </option>
-                        <option value="tinggi" {{ old('prioritas', $permasalahan->prioritas) == 'tinggi' ? 'selected' : '' }}>
-                            🔴 Tinggi
-                        </option>
-                    </select>
-                    @error('prioritas')
-                        <p class="mt-1.5 text-xs sm:text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-
                 <!-- Action Buttons -->
                 <div class="flex flex-col gap-2.5 sm:gap-3 pt-3 sm:pt-4 border-t border-gray-200">
                     <button type="submit" 

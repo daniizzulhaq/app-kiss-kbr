@@ -43,7 +43,6 @@
                             <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bibit</th>
                             <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lokasi Tanam</th>
                             <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Permasalahan</th>
-                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prioritas</th>
                             <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                             <th class="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                         </tr>
@@ -59,7 +58,6 @@
                                 <td class="px-6 py-4 text-sm text-gray-900 max-w-xs truncate" title="{{ $item->permasalahan }}">
                                     {{ Str::limit($item->permasalahan, 50) }}
                                 </td>
-                                <td class="px-6 py-4 text-sm text-gray-900 capitalize">{{ $item->prioritas }}</td>
                                 <td class="px-6 py-4 text-sm">
                                     <span class="px-3 py-1 text-xs font-semibold rounded-full 
                                         @if($item->status == 'pending') bg-yellow-100 text-yellow-800
@@ -85,7 +83,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="9" class="px-6 py-12 text-center text-gray-500">
+                                <td colspan="8" class="px-6 py-12 text-center text-gray-500">
                                     <div class="flex flex-col items-center">
                                         <span class="text-6xl mb-4">📋</span>
                                         <p class="text-lg font-medium">Belum ada laporan permasalahan</p>
@@ -177,17 +175,6 @@
                             <p class="text-sm text-gray-900 break-words">
                                 {{ $item->permasalahan }}
                             </p>
-                        </div>
-
-                        <!-- Prioritas Badge -->
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs text-gray-600">Prioritas:</span>
-                            <span class="px-3 py-1 text-xs font-semibold rounded-full
-                                @if($item->prioritas == 'tinggi') bg-red-100 text-red-800
-                                @elseif($item->prioritas == 'sedang') bg-yellow-100 text-yellow-800
-                                @else bg-green-100 text-green-800 @endif capitalize">
-                                {{ $item->prioritas }}
-                            </span>
                         </div>
 
                         <!-- Action Buttons -->

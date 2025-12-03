@@ -33,64 +33,95 @@ class ProgressFisikController extends Controller
      * Display a listing of the resource.
      */
     public function index()
-    {
-        $checkResult = $this->checkKelompok();
-        if ($checkResult) return $checkResult;
+{
+    $checkResult = $this->checkKelompok();
+    if ($checkResult) return $checkResult;
 
-        $kelompok = auth()->user()->kelompok;
-        
-        $anggaran = AnggaranKelompok::firstOrCreate(
-            [
-                'kelompok_id' => $kelompok->id,
-                'tahun' => date('Y')
-            ],
-            [
-                'total_anggaran' => 0,
-                'anggaran_dialokasikan' => 0,
-                'realisasi_anggaran' => 0,
-                'sisa_anggaran' => 0,
-            ]
-        );
+    $kelompok = auth()->user()->kelompok;
+    
+    $anggaran = AnggaranKelompok::firstOrCreate(
+        [
+            'kelompok_id' => $kelompok->id,
+            'tahun' => date('Y')
+        ],
+        [
+            'total_anggaran' => 0,
+            'anggaran_dialokasikan' => 0,
+            'realisasi_anggaran' => 0,
+            'sisa_anggaran' => 0,
+        ]
+    );
 
-        if ($anggaran->total_anggaran == 0) {
-            return redirect()->route('kelompok.anggaran.setup')
-                ->with('info', 'Silakan input total anggaran kelompok Anda terlebih dahulu');
-        }
-
-        $anggaran->updateRealisasi();
-        $anggaran->refresh();
-
-        $progressList = ProgressFisik::with(['masterKegiatan.kategori', 'dokumentasi', 'verifier'])
-            ->where('kelompok_id', $kelompok->id)
-            ->orderBy('master_kegiatan_id')
-            ->get();
-
-        $approvedProgress = $progressList->where('status_verifikasi', 'disetujui');
-        $totalProgress = $approvedProgress->count() > 0 
-            ? round($approvedProgress->avg('persentase_fisik'), 2)
-            : 0;
-
-        $progressByKategori = $progressList->groupBy(function($item) {
-            return $item->masterKegiatan->kategori->nama ?? 'Tanpa Kategori';
-        });
-
-        $addedKegiatanIds = $progressList->pluck('master_kegiatan_id')->toArray();
-        $addedKegiatanList = MasterKegiatan::with('kategori')
-            ->whereIn('id', $addedKegiatanIds)
-            ->orderBy('kategori_id')
-            ->orderBy('nomor')
-            ->get()
-            ->groupBy('kategori.nama');
-
-        return view('kelompok.progress-fisik.index', compact(
-            'anggaran',
-            'progressList',
-            'totalProgress',
-            'progressByKategori',
-            'addedKegiatanList'
-        ));
+    if ($anggaran->total_anggaran == 0) {
+        return redirect()->route('kelompok.anggaran.setup')
+            ->with('info', 'Silakan input total anggaran kelompok Anda terlebih dahulu');
     }
 
+    $anggaran->updateRealisasi();
+    $anggaran->refresh();
+
+    $progressList = ProgressFisik::with(['masterKegiatan.kategori', 'dokumentasi', 'verifier'])
+        ->where('kelompok_id', $kelompok->id)
+        ->orderBy('master_kegiatan_id')
+        ->get();
+
+    $approvedProgress = $progressList->where('status_verifikasi', 'disetujui');
+    $totalProgress = $approvedProgress->count() > 0 
+        ? round($approvedProgress->avg('persentase_fisik'), 2)
+        : 0;
+
+    // PERBAIKAN: Group by kategori dengan format yang benar
+    $progressByKategori = $progressList->groupBy(function($item) {
+        if ($item->masterKegiatan && $item->masterKegiatan->kategori) {
+            return trim($item->masterKegiatan->kategori->nama);
+        }
+        return 'Tanpa Kategori';
+    });
+
+    // PERBAIKAN: Dapatkan semua kategori yang ada di sistem
+    $allKategori = KategoriKegiatan::withCount('masterKegiatan')
+        ->orderBy('kode')
+        ->get();
+
+    // PERBAIKAN: Hitung statistik per kategori
+    $kategoriStats = [];
+    foreach ($allKategori as $kategori) {
+        $kategoriItems = $progressList->filter(function($item) use ($kategori) {
+            return $item->masterKegiatan && 
+                   $item->masterKegiatan->kategori_id == $kategori->id;
+        });
+        
+        $disetujui = $kategoriItems->where('status_verifikasi', 'disetujui')->count();
+        
+        $kategoriStats[$kategori->nama] = [
+            'total_kegiatan' => $kategori->master_kegiatan_count,
+            'ditambahkan' => $kategoriItems->count(),
+            'disetujui' => $disetujui,
+            'persentase' => $kategori->master_kegiatan_count > 0 
+                ? round(($disetujui / $kategori->master_kegiatan_count) * 100, 2)
+                : 0,
+            'items' => $kategoriItems
+        ];
+    }
+
+    $addedKegiatanIds = $progressList->pluck('master_kegiatan_id')->toArray();
+    $addedKegiatanList = MasterKegiatan::with('kategori')
+        ->whereIn('id', $addedKegiatanIds)
+        ->orderBy('kategori_id')
+        ->orderBy('nomor')
+        ->get()
+        ->groupBy('kategori.nama');
+
+    return view('kelompok.progress-fisik.index', compact(
+        'anggaran',
+        'progressList',
+        'totalProgress',
+        'progressByKategori',
+        'addedKegiatanList',
+        'kategoriStats', // TAMBAHKAN INI
+        'allKategori'    // TAMBAHKAN INI
+    ));
+}
     public function setupAnggaran()
     {
         $checkResult = $this->checkKelompok();

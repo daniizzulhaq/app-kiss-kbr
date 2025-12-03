@@ -61,15 +61,7 @@
                                 {{ $permasalahan->lokasi_tanam ?? '-' }}
                             </p>
                         </div>
-                        <div class="bg-gray-50 p-3 rounded-lg border border-gray-200">
-                            <label class="text-xs sm:text-sm font-medium text-gray-500">Prioritas</label>
-                            <p class="mt-1">
-                                <span class="inline-block px-2 sm:px-3 py-1 rounded-full text-xs font-semibold {{ $permasalahan->getPrioritasBadgeClass() }}">
-                                    {{ ucfirst($permasalahan->prioritas ?? '-') }}
-                                </span>
-                            </p>
-                        </div>
-                        <div class="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                        <div class="bg-gray-50 p-3 rounded-lg border border-gray-200 sm:col-span-2">
                             <label class="text-xs sm:text-sm font-medium text-gray-500">Tanggal Laporan</label>
                             <p class="mt-1 text-sm sm:text-base text-gray-900">
                                 {{ $permasalahan->created_at->format('d F Y, H:i') }}

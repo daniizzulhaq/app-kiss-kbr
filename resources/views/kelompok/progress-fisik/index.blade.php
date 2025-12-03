@@ -131,6 +131,128 @@
             </div>
         </div>
 
+        <!-- Progress per Kategori - PERBAIKAN DITAMBAHKAN DI SINI -->
+        @php
+            // TAMBAHKAN: Data total kegiatan per kategori (sesuaikan dengan data Anda)
+            $totalKegiatanPerKategori = [
+                'A. PEMBUATAN SARANA PRASARANA' => 15,  // Dari gambar: 15 kegiatan
+                'B. PRODUKSI BIBIT' => 12,              // Dari teks: 12 kegiatan
+                'C. PERTEMUAN KELOMPOK DAN PENDAMPINGAN' => 2  // Dari teks: 2 kegiatan
+            ];
+            
+            // TAMBAHKAN: Hitung progress per kategori - LOGIKA BARU
+            $progressPerKategori = [];
+            
+            foreach ($progressByKategori as $kategoriNama => $progressItems) {
+                // Hitung berapa kegiatan yang sudah ditambahkan
+                $kegiatanDitambahkan = $progressItems->count();
+                
+                // Hitung berapa yang sudah disetujui
+                $disetujui = $progressItems->where('status_verifikasi', 'disetujui')->count();
+                
+                // Total kegiatan yang ada di master untuk kategori ini
+                $totalKegiatan = $totalKegiatanPerKategori[$kategoriNama] ?? 0;
+                
+                // Persentase = (kegiatan disetujui / total kegiatan) × 100%
+                $persentase = $totalKegiatan > 0 ? round(($disetujui / $totalKegiatan) * 100, 2) : 0;
+                
+                $progressPerKategori[$kategoriNama] = [
+                    'persentase' => $persentase,
+                    'ditambahkan' => $kegiatanDitambahkan,
+                    'disetujui' => $disetujui,
+                    'total_kegiatan' => $totalKegiatan,
+                    'sisa_tambahkan' => $totalKegiatan - $kegiatanDitambahkan
+                ];
+            }
+            
+            // TAMBAHKAN: Kategori yang belum ada progress
+            foreach ($totalKegiatanPerKategori as $kategoriNama => $totalKegiatan) {
+                if (!isset($progressPerKategori[$kategoriNama])) {
+                    $progressPerKategori[$kategoriNama] = [
+                        'persentase' => 0,
+                        'ditambahkan' => 0,
+                        'disetujui' => 0,
+                        'total_kegiatan' => $totalKegiatan,
+                        'sisa_tambahkan' => $totalKegiatan
+                    ];
+                }
+            }
+            
+            // Urutkan berdasarkan huruf kategori (A, B, C)
+            ksort($progressPerKategori);
+        @endphp
+
+       <!-- Progress per Kategori -->
+<div class="mt-6 bg-white p-4 sm:p-6 rounded-xl shadow-lg">
+    <div class="flex items-center gap-2 mb-4">
+        <span class="text-xl sm:text-2xl">📊</span>
+        <h3 class="text-lg sm:text-xl font-bold text-gray-800">Progress Kegiatan per Kategori</h3>
+    </div>
+    
+    @foreach($kategoriStats as $kategoriNama => $data)
+    <div class="mb-4 last:mb-0 border-b pb-4 last:border-b-0 last:pb-0">
+        <div class="flex justify-between items-center mb-2">
+            <div class="flex items-center gap-2">
+                <span class="text-sm sm:text-base font-semibold text-gray-700">
+                    {{ $kategoriNama }}
+                </span>
+                <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
+                    {{ $data['ditambahkan'] }}/{{ $data['total_kegiatan'] }} kegiatan
+                    @if($data['disetujui'] > 0)
+                        ({{ $data['disetujui'] }} disetujui)
+                    @endif
+                </span>
+            </div>
+            <span class="text-sm sm:text-base font-bold 
+                @if($data['persentase'] >= 80) text-green-600
+                @elseif($data['persentase'] >= 50) text-yellow-600
+                @else text-red-600
+                @endif">
+                {{ number_format($data['persentase'], 1) }}%
+            </span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-3 sm:h-4">
+            <div class="h-3 sm:h-4 rounded-full transition-all duration-500 
+                @if($data['persentase'] >= 80) bg-green-500
+                @elseif($data['persentase'] >= 50) bg-yellow-500
+                @else bg-red-500
+                @endif"
+                 style="width: {{ $data['persentase'] }}%">
+            </div>
+        </div>
+        
+        <div class="text-xs text-gray-500 mt-1 flex justify-between">
+            <div>
+                @if($data['total_kegiatan'] - $data['ditambahkan'] > 0)
+                    <span class="text-blue-600">📝</span> 
+                    {{ $data['total_kegiatan'] - $data['ditambahkan'] }} kegiatan belum ditambahkan
+                @elseif($data['ditambahkan'] > 0)
+                    <span class="text-green-600">✅</span> 
+                    Semua kegiatan sudah ditambahkan
+                @else
+                    <span class="text-gray-400">📋</span> 
+                    Belum ada kegiatan ditambahkan
+                @endif
+            </div>
+            <div>
+                @if($data['disetujui'] == 0 && $data['ditambahkan'] > 0)
+                    <span class="text-yellow-600">⚠️</span> Menunggu verifikasi
+                @elseif($data['disetujui'] > 0)
+                    <span class="text-green-600">✅</span> {{ $data['disetujui'] }} disetujui
+                @endif
+            </div>
+        </div>
+    </div>
+    @endforeach
+    
+    @if(empty($kategoriStats))
+    <div class="text-center py-8">
+        <span class="text-4xl mb-4 block">📊</span>
+        <p class="text-gray-500">Belum ada data progress per kategori</p>
+    </div>
+    @endif
+</div>
+
         <!-- Progress Bars -->
         <div class="mt-3 sm:mt-4 bg-white p-3 sm:p-4 rounded-lg shadow">
             <div class="flex justify-between items-center mb-2">
@@ -440,6 +562,7 @@
                     <li><strong>Status Pending:</strong> Menunggu verifikasi dari admin/verifikator</li>
                     <li><strong>Status Disetujui:</strong> Progress sudah diverifikasi dan realisasi anggaran sudah dihitung</li>
                     <li>Kegiatan yang sudah disetujui <strong>tidak dapat diedit atau dihapus</strong></li>
+                    <li><strong>Progress per Kategori:</strong> Menghitung persentase kegiatan yang sudah disetujui dari total kegiatan dalam kategori</li>
                 </ul>
             </div>
         </div>

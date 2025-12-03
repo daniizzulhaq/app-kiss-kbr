@@ -98,7 +98,7 @@
                 </div>
 
                 <!-- Permasalahan -->
-                <div class="mb-4 sm:mb-5">
+                <div class="mb-6 sm:mb-8">
                     <label class="block text-sm sm:text-base text-gray-700 font-medium mb-2 flex items-center gap-2">
                         <span class="text-base sm:text-lg">⚠️</span>
                         <span>Deskripsi Permasalahan</span>
@@ -116,33 +116,6 @@
                     <p class="text-xs sm:text-sm text-gray-500 mt-1">💡 Jelaskan dengan detail agar solusi yang diberikan lebih tepat</p>
                 </div>
 
-                <!-- Prioritas -->
-                <div class="mb-6 sm:mb-8">
-                    <label class="block text-sm sm:text-base text-gray-700 font-medium mb-2 flex items-center gap-2">
-                        <span class="text-base sm:text-lg">🎯</span>
-                        <span>Prioritas</span>
-                    </label>
-                    <select name="prioritas"
-                            class="w-full text-sm sm:text-base border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 px-3 sm:px-4 py-2 sm:py-2.5">
-                        <option value="">-- Pilih Prioritas --</option>
-                        <option value="rendah" {{ old('prioritas') == 'rendah' ? 'selected' : '' }}>
-                            🟢 Rendah - Tidak mendesak
-                        </option>
-                        <option value="sedang" {{ old('prioritas') == 'sedang' ? 'selected' : '' }}>
-                            🟡 Sedang - Perlu segera ditangani
-                        </option>
-                        <option value="tinggi" {{ old('prioritas') == 'tinggi' ? 'selected' : '' }}>
-                            🔴 Tinggi - Sangat mendesak
-                        </option>
-                    </select>
-                    @error('prioritas')
-                        <p class="text-red-600 text-xs sm:text-sm mt-1 flex items-center gap-1">
-                            <span>⚠️</span>
-                            <span>{{ $message }}</span>
-                        </p>
-                    @enderror
-                </div>
-
                 <!-- Info Box -->
                 <div class="mb-6 bg-blue-50 border-l-4 border-blue-400 p-3 sm:p-4 rounded-lg">
                     <div class="flex items-start gap-2">
@@ -152,7 +125,7 @@
                             <ul class="list-disc list-inside space-y-0.5">
                                 <li>Jelaskan permasalahan dengan detail dan jelas</li>
                                 <li>Sertakan informasi lokasi dan waktu kejadian</li>
-                                <li>Pilih prioritas sesuai dengan tingkat urgensi</li>
+                                <li>Pastikan semua informasi yang diberikan akurat</li>
                             </ul>
                         </div>
                     </div>

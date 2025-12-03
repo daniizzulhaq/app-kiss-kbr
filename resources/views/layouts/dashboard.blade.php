@@ -94,96 +94,112 @@
                 @if(Auth::user()->role === 'bpdas')
                     <!-- Menu BPDAS (sesuai urutan gambar) -->
                     <!-- 1. Dashboard -->
+                    
                     <a href="{{ route('bpdas.dashboard') }}" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('bpdas.dashboard') ? 'bg-green-700 shadow-lg' : '' }}">
                         <span class="text-2xl">🏠</span>
                         <span class="ml-3 font-medium text-sm md:text-base">Dashboard</span>
                     </a>
-                    
-                    <!-- 2. Permasalahan -->
-                    <a href="{{ route('bpdas.permasalahan.index') }}" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('bpdas.permasalahan.*') ? 'bg-green-700 shadow-lg' : '' }}">
-                        <span class="text-2xl">⚠️</span>
-                        <span class="ml-3 font-medium text-sm md:text-base">Permasalahan</span>
-                    </a>
-                    
-                    <!-- 3. Calon Lokasi Persemaian -->
-                    <a href="{{ route('bpdas.geotagging.index') }}" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('bpdas.geotagging.*') ? 'bg-green-700 shadow-lg' : '' }}">
-                        <span class="text-2xl">📍</span>
-                        <span class="ml-3 font-medium text-sm md:text-base">Calon Lokasi Persemaian</span>
-                    </a>
-                    
-                    <!-- 4. Data Peta Geotagging -->
-                    <a href="{{ route('bpdas.peta-geotagging.index') }}" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('bpdas.peta-geotagging.*') ? 'bg-green-700' : '' }}">
-                        <span class="text-2xl">🗺️</span>
-                        <span class="ml-3 font-medium text-sm md:text-base">Data Peta Geotagging</span>
-                    </a>
-                    
-                    <!-- 5. Peta Lokasi Tanam -->
-                    <a href="{{ route('bpdas.peta-lokasi.index') }}" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('bpdas.peta-lokasi.*') ? 'bg-green-700' : '' }}">
-                        <span class="text-2xl">🌳</span>
-                        <span class="ml-3 font-medium text-sm md:text-base">Peta Lokasi Tanam</span>
-                    </a>
-                    
-                    <!-- 6. Kelompok -->
+
+                    <!-- 2. Kelompok -->
                     <a href="{{ route('bpdas.kelompok.index') }}" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('bpdas.kelompok.*') ? 'bg-green-700' : '' }}">
                         <span class="text-2xl">👥</span>
                         <span class="ml-3 font-medium text-sm md:text-base">Kelompok</span>
                     </a>
-                    
-                    <!-- 7. Rencana Bibit -->
+
+                    <!-- 3. Rencana Bibit -->
                     <a href="{{ route('bpdas.rencana-bibit.index') }}" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300">
                         <span class="text-2xl">🌱</span>
                         <span class="ml-3 font-medium text-sm md:text-base">Rencana Bibit</span>
                     </a>
-                    
-                    <!-- 8. Realisasi Bibit -->
+
+                       <!-- 4. Realisasi Bibit -->
                     <a href="{{ route('bpdas.realisasi-bibit.index') }}" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300">
                         <span class="text-2xl">🌳</span>
                         <span class="ml-3 font-medium text-sm md:text-base">Realisasi Bibit</span>
                     </a>
+
                     
-                    <!-- 9. Progress Fisik Kegiatan -->
+                    <!-- 5. Permasalahan -->
+                    <a href="{{ route('bpdas.permasalahan.index') }}" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('bpdas.permasalahan.*') ? 'bg-green-700 shadow-lg' : '' }}">
+                        <span class="text-2xl">⚠️</span>
+                        <span class="ml-3 font-medium text-sm md:text-base">Permasalahan</span>
+                    </a>
+
+                      <!-- 6. Peta Lokasi Tanam -->
+                    <a href="{{ route('bpdas.peta-lokasi.index') }}" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('bpdas.peta-lokasi.*') ? 'bg-green-700' : '' }}">
+                        <span class="text-2xl">🌳</span>
+                        <span class="ml-3 font-medium text-sm md:text-base">Peta Lokasi Tanam</span>
+                    </a>
+
+                     <!-- 7. Data Peta Geotagging -->
+                    <a href="{{ route('bpdas.peta-geotagging.index') }}" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('bpdas.peta-geotagging.*') ? 'bg-green-700' : '' }}">
+                        <span class="text-2xl">🗺️</span>
+                        <span class="ml-3 font-medium text-sm md:text-base">Data Peta Geotagging</span>
+                    </a>
+                    <!-- 8. Progress Fisik Kegiatan -->
                     <a href="{{ route('bpdas.progress-fisik.monitoring') }}" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('bpdas.progress-fisik.*') ? 'bg-green-700' : '' }}">
                         <span class="text-2xl">📊</span>
                         <span class="ml-3 font-medium text-sm md:text-base">Progress Fisik Kegiatan</span>
                     </a>
+                    <!-- 3. Calon Lokasi Persemaian -->
+                    {{-- <a href="{{ route('bpdas.geotagging.index') }}" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('bpdas.geotagging.*') ? 'bg-green-700 shadow-lg' : '' }}">
+                        <span class="text-2xl">📍</span>
+                        <span class="ml-3 font-medium text-sm md:text-base">Calon Lokasi Persemaian</span>
+                    </a> --}}
+                    
+    
+                    
+                 
+                    
+                    
                 @else
                     <!-- Menu Kelompok -->
                     <a href="{{ route('kelompok.dashboard') }}" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('kelompok.dashboard') ? 'bg-green-700 shadow-lg' : '' }}">
                         <span class="text-2xl">🏠</span>
                         <span class="ml-3 font-medium text-sm md:text-base">Dashboard</span>
                     </a>
-                    <a href="{{ route('kelompok.permasalahan.index') }}" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('kelompok.permasalahan.*') ? 'bg-green-700 shadow-lg' : '' }}">
-                        <span class="text-2xl">⚠️</span>
-                        <span class="ml-3 font-medium text-sm md:text-base">Permasalahan</span>
-                    </a>
-                    <a href="{{ route('kelompok.calon-lokasi.index') }}" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('kelompok.calon-lokasi.*') ? 'bg-green-700 shadow-lg' : '' }}">
-                        <span class="text-2xl">📍</span>
-                        <span class="ml-3 font-medium text-sm md:text-base">Calon Lokasi Persemaian</span>
-                    </a>
-                    <a href="{{ route('kelompok.peta-geotagging.index') }}" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('kelompok.peta-geotagging.*') ? 'bg-green-700' : '' }}">
-                        <span class="text-2xl">🗺️</span>
-                        <span class="ml-3 font-medium text-sm md:text-base">Data Peta Geotagging</span>
-                    </a>
-                    <a href="{{ route('kelompok.peta-lokasi.index') }}" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('kelompok.peta-lokasi.*') ? 'bg-green-700' : '' }}">
-                        <span class="text-2xl">🌳</span>
-                        <span class="ml-3 font-medium text-sm md:text-base">Peta Lokasi Tanam</span>
-                    </a>
-                    <a href="{{ route('kelompok.data-kelompok.index') }}" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('kelompok.data-kelompok.*') ? 'bg-green-700' : '' }}">
+
+                     <a href="{{ route('kelompok.data-kelompok.index') }}" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('kelompok.data-kelompok.*') ? 'bg-green-700' : '' }}">
                         <span class="text-2xl">👥</span>
                         <span class="ml-3 font-medium text-sm md:text-base">Kelompok</span>
                     </a>
+
                     <a href="{{ route('kelompok.rencana-bibit.index') }}" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300">
                         <span class="text-2xl">🌱</span>
                         <span class="ml-3 font-medium text-sm md:text-base">Rencana Bibit</span>
                     </a>
-                    <a href="{{ route('kelompok.realisasi-bibit.index') }}" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300">
+                    
+                         <a href="{{ route('kelompok.realisasi-bibit.index') }}" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300">
                         <span class="text-2xl">🌳</span>
                         <span class="ml-3 font-medium text-sm md:text-base">Realisasi Bibit</span>
                     </a>
+                    
+                    <a href="{{ route('kelompok.permasalahan.index') }}" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('kelompok.permasalahan.*') ? 'bg-green-700 shadow-lg' : '' }}">
+                        <span class="text-2xl">⚠️</span>
+                        <span class="ml-3 font-medium text-sm md:text-base">Permasalahan</span>
+                    </a>
+
+                    <a href="{{ route('kelompok.peta-lokasi.index') }}" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('kelompok.peta-lokasi.*') ? 'bg-green-700' : '' }}">
+                        <span class="text-2xl">🌳</span>
+                        <span class="ml-3 font-medium text-sm md:text-base">Peta Lokasi Tanam</span>
+                    </a>
+
+                    <a href="{{ route('kelompok.peta-geotagging.index') }}" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('kelompok.peta-geotagging.*') ? 'bg-green-700' : '' }}">
+                        <span class="text-2xl">🗺️</span>
+                        <span class="ml-3 font-medium text-sm md:text-base">Data Peta Geotagging</span>
+                    </a>
+
                     <a href="{{ route('kelompok.progress-fisik.index') }}" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('kelompok.progress-fisik.*') ? 'bg-green-700' : '' }}">
                         <span class="text-2xl">📈</span>
                         <span class="ml-3 font-medium text-sm md:text-base">Progres Fisik</span>
                     </a>
+                    {{-- <a href="{{ route('kelompok.calon-lokasi.index') }}" class="group flex items-center px-4 py-3 rounded-xl hover:bg-green-700 transition-all duration-300 {{ request()->routeIs('kelompok.calon-lokasi.*') ? 'bg-green-700 shadow-lg' : '' }}">
+                        <span class="text-2xl">📍</span>
+                        <span class="ml-3 font-medium text-sm md:text-base">Calon Lokasi Persemaian</span>
+                    </a> --}}
+
+                 
+                    
                 @endif
             </nav>
 

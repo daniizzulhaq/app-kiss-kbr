@@ -409,6 +409,184 @@
                     @enderror
                 </div>
 
+                <!-- Tambahkan ini setelah section Upload Dokumentasi Foto -->
+
+<!-- Upload Dokumen PDF -->
+<div class="border-t pt-6 sm:pt-8 mt-6 sm:mt-8">
+    <h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center gap-2">
+        <span>📄</span>
+        Dokumen PDF Pendukung (Opsional)
+    </h3>
+    
+    <div class="mb-4 bg-purple-50 border-l-4 border-purple-400 p-3 sm:p-4 rounded-lg">
+        <div class="flex items-start gap-2">
+            <span class="text-lg sm:text-xl">ℹ️</span>
+            <div class="text-xs sm:text-sm text-purple-800">
+                <p class="font-semibold mb-1">Tips Upload Dokumen PDF:</p>
+                <ul class="list-disc list-inside space-y-1">
+                    <li>Format: PDF (Max 5MB per file)</li>
+                    <li>Dapat berupa: RAB, Proposal, Surat, Kontrak, dll</li>
+                    <li>Tambahkan keterangan untuk setiap dokumen</li>
+                    <li>Anda bisa menambahkan beberapa PDF sekaligus</li>
+                    <li>Dokumen dapat ditambahkan/dihapus setelah kegiatan dibuat</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="pdf-container" class="space-y-3 sm:space-y-4">
+        <div class="pdf-item bg-purple-50 p-3 sm:p-4 rounded-lg border-2 border-dashed border-purple-300 hover:border-purple-400 transition-colors">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+                <div>
+                    <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
+                        📄 Pilih Dokumen PDF
+                    </label>
+                    <input type="file" 
+                           name="dokumen_pdf[]" 
+                           accept="application/pdf"
+                           class="w-full text-sm border-gray-300 rounded-lg shadow-sm focus:ring-purple-500 focus:border-purple-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100">
+                    <p class="text-xs text-gray-500 mt-1">Max 5MB - Format PDF</p>
+                </div>
+                <div>
+                    <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
+                        📝 Keterangan Dokumen
+                    </label>
+                    <input type="text" 
+                           name="keterangan_pdf[]" 
+                           placeholder="Contoh: RAB Kegiatan, Proposal, Surat Permohonan"
+                           class="w-full text-sm border-gray-300 rounded-lg shadow-sm focus:ring-purple-500 focus:border-purple-500">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button type="button" 
+            id="tambah-pdf" 
+            class="mt-3 sm:mt-4 px-4 sm:px-6 py-2 sm:py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-sm sm:text-base font-medium rounded-lg shadow-md hover:shadow-lg transition-all flex items-center gap-2">
+        <span class="text-lg">➕</span>
+        Tambah Dokumen PDF Lainnya
+    </button>
+
+    @error('dokumen_pdf.*')
+        <div class="mt-3 bg-red-50 border-l-4 border-red-500 p-3 rounded">
+            <p class="text-red-700 text-xs sm:text-sm font-medium">{{ $message }}</p>
+        </div>
+    @enderror
+</div>
+
+<!-- Tambahkan JavaScript di bagian script (setelah script foto) -->
+<script>
+// ==========================================
+// SCRIPT UNTUK MULTIPLE PDF UPLOAD
+// ==========================================
+let pdfCounter = 1;
+const maxPdf = 10;
+
+document.getElementById('tambah-pdf').addEventListener('click', function() {
+    if (pdfCounter >= maxPdf) {
+        alert('⚠️ Maksimal ' + maxPdf + ' dokumen PDF per kegiatan');
+        return;
+    }
+
+    const container = document.getElementById('pdf-container');
+    const newItem = document.querySelector('.pdf-item').cloneNode(true);
+    
+    // Reset value input
+    newItem.querySelectorAll('input').forEach(input => {
+        input.value = '';
+    });
+    
+    // Hapus preview jika ada
+    const oldPreview = newItem.querySelector('.pdf-preview');
+    if (oldPreview) oldPreview.remove();
+    
+    // Tambahkan tombol hapus untuk PDF tambahan
+    const deleteBtn = document.createElement('button');
+    deleteBtn.type = 'button';
+    deleteBtn.className = 'mt-2 w-full sm:w-auto px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded-lg transition-all flex items-center justify-center gap-2';
+    deleteBtn.innerHTML = '<span class="text-lg">🗑️</span> Hapus Dokumen Ini';
+    deleteBtn.onclick = function() {
+        newItem.remove();
+        pdfCounter--;
+        updateTambahPdfButton();
+    };
+    
+    newItem.appendChild(deleteBtn);
+    container.appendChild(newItem);
+    pdfCounter++;
+    updateTambahPdfButton();
+});
+
+function updateTambahPdfButton() {
+    const btn = document.getElementById('tambah-pdf');
+    if (pdfCounter >= maxPdf) {
+        btn.disabled = true;
+        btn.classList.add('opacity-50', 'cursor-not-allowed');
+        btn.innerHTML = '<span class="text-lg">⚠️</span> Maksimal ' + maxPdf + ' Dokumen';
+    } else {
+        btn.disabled = false;
+        btn.classList.remove('opacity-50', 'cursor-not-allowed');
+        btn.innerHTML = '<span class="text-lg">➕</span> Tambah Dokumen PDF Lainnya';
+    }
+}
+
+// Preview PDF info saat dipilih
+document.addEventListener('change', function(e) {
+    if (e.target.type === 'file' && e.target.accept.includes('pdf')) {
+        const file = e.target.files[0];
+        if (file) {
+            // Validasi ukuran
+            if (file.size > 5242880) { // 5MB
+                alert('⚠️ Ukuran file terlalu besar! Maksimal 5MB');
+                e.target.value = '';
+                return;
+            }
+
+            // Validasi tipe file
+            if (file.type !== 'application/pdf') {
+                alert('⚠️ Format file tidak didukung! Hanya file PDF yang diperbolehkan');
+                e.target.value = '';
+                return;
+            }
+
+            // Tampilkan info PDF
+            const container = e.target.closest('.pdf-item');
+            
+            // Hapus preview lama jika ada
+            const oldPreview = container.querySelector('.pdf-preview');
+            if (oldPreview) oldPreview.remove();
+            
+            // Buat preview info PDF
+            const preview = document.createElement('div');
+            preview.className = 'pdf-preview mt-3 p-3 bg-white rounded-lg shadow-md border-2 border-purple-400';
+            
+            // Format ukuran file
+            const fileSize = (file.size / 1024 / 1024).toFixed(2);
+            
+            preview.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <div class="flex-shrink-0">
+                        <span class="text-4xl">📄</span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-semibold text-gray-900 truncate">${file.name}</p>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="text-xs px-2 py-1 bg-purple-100 text-purple-700 rounded-full font-medium">
+                                ${fileSize} MB
+                            </span>
+                            <span class="text-xs px-2 py-1 bg-green-100 text-green-700 rounded-full font-bold">
+                                ✓ Siap Upload
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(preview);
+        }
+    }
+});
+</script>
+
                 <!-- Tombol Action -->
                 <div class="flex flex-col sm:flex-row sm:justify-end gap-3 sm:gap-4 mt-6 sm:mt-8 pt-4 sm:pt-6 border-t">
                     <a href="{{ route('kelompok.progress-fisik.index') }}" 

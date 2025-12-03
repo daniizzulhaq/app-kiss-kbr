@@ -255,123 +255,162 @@ class ProgressFisikController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-        $checkResult = $this->checkKelompok();
-        if ($checkResult) return $checkResult;
+  public function store(Request $request)
+{
+    $checkResult = $this->checkKelompok();
+    if ($checkResult) return $checkResult;
 
-        $request->validate([
-            'master_kegiatan_id' => 'required|exists:master_kegiatan,id',
-            'volume_target' => 'required|numeric|min:0',
-            'nama_detail' => 'nullable|string|max:255',
-            'biaya_satuan' => 'required|numeric|min:0',
-            'tanggal_mulai' => 'nullable|date',
-            'keterangan' => 'nullable|string',
-            'foto' => 'nullable|array',
-            'foto.*' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
-            'keterangan_foto' => 'nullable|array',
-            'keterangan_foto.*' => 'nullable|string|max:255',
-        ], [
-            'foto.*.image' => 'File harus berupa gambar',
-            'foto.*.mimes' => 'Format gambar harus JPG, JPEG, atau PNG',
-            'foto.*.max' => 'Ukuran gambar maksimal 2MB',
+    $request->validate([
+        'master_kegiatan_id' => 'required|exists:master_kegiatan,id',
+        'volume_target' => 'required|numeric|min:0',
+        'nama_detail' => 'nullable|string|max:255',
+        'biaya_satuan' => 'required|numeric|min:0',
+        'tanggal_mulai' => 'nullable|date',
+        'keterangan' => 'nullable|string',
+        'foto' => 'nullable|array',
+        'foto.*' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
+        'keterangan_foto' => 'nullable|array',
+        'keterangan_foto.*' => 'nullable|string|max:255',
+        // TAMBAHAN UNTUK PDF
+        'dokumen_pdf' => 'nullable|array',
+        'dokumen_pdf.*' => 'nullable|file|mimes:pdf|max:5120', // max 5MB
+        'keterangan_pdf' => 'nullable|array',
+        'keterangan_pdf.*' => 'nullable|string|max:255',
+    ], [
+        'foto.*.image' => 'File harus berupa gambar',
+        'foto.*.mimes' => 'Format gambar harus JPG, JPEG, atau PNG',
+        'foto.*.max' => 'Ukuran gambar maksimal 2MB',
+        // TAMBAHAN PESAN ERROR PDF
+        'dokumen_pdf.*.file' => 'File harus berupa dokumen',
+        'dokumen_pdf.*.mimes' => 'Format dokumen harus PDF',
+        'dokumen_pdf.*.max' => 'Ukuran PDF maksimal 5MB',
+    ]);
+
+    $kelompok = auth()->user()->kelompok;
+    
+    $exists = ProgressFisik::where('kelompok_id', $kelompok->id)
+        ->where('master_kegiatan_id', $request->master_kegiatan_id)
+        ->exists();
+
+    if ($exists) {
+        $kegiatan = MasterKegiatan::find($request->master_kegiatan_id);
+        return back()->with('error', 
+            'Kegiatan "' . $kegiatan->nama_kegiatan . '" sudah ditambahkan sebelumnya. ' .
+            'Silakan pilih kegiatan lain atau edit kegiatan yang sudah ada.'
+        )->withInput();
+    }
+
+    $totalBiaya = $request->volume_target * $request->biaya_satuan;
+
+    $anggaran = AnggaranKelompok::where('kelompok_id', $kelompok->id)
+        ->where('tahun', date('Y'))
+        ->first();
+
+    if (!$anggaran) {
+        return back()->with('error', 'Anggaran belum tersedia')->withInput();
+    }
+
+    if ($anggaran->sisa_anggaran < $totalBiaya) {
+        return back()->with('error', 
+            'Anggaran tidak mencukupi! ' .
+            'Total biaya kegiatan: Rp ' . number_format($totalBiaya, 0, ',', '.') . ' | ' .
+            'Sisa anggaran: Rp ' . number_format($anggaran->sisa_anggaran, 0, ',', '.')
+        )->withInput();
+    }
+
+    DB::beginTransaction();
+    try {
+        $progress = ProgressFisik::create([
+            'kelompok_id' => $kelompok->id,
+            'master_kegiatan_id' => $request->master_kegiatan_id,
+            'volume_target' => $request->volume_target,
+            'nama_detail' => $request->nama_detail,
+            'volume_realisasi' => 0,
+            'biaya_satuan' => $request->biaya_satuan,
+            'tanggal_mulai' => $request->tanggal_mulai,
+            'keterangan' => $request->keterangan,
+            'status_verifikasi' => 'pending',
         ]);
 
-        $kelompok = auth()->user()->kelompok;
+        $jumlahFoto = 0;
+        $jumlahPdf = 0;
         
-        $exists = ProgressFisik::where('kelompok_id', $kelompok->id)
-            ->where('master_kegiatan_id', $request->master_kegiatan_id)
-            ->exists();
-
-        if ($exists) {
-            $kegiatan = MasterKegiatan::find($request->master_kegiatan_id);
-            return back()->with('error', 
-                'Kegiatan "' . $kegiatan->nama_kegiatan . '" sudah ditambahkan sebelumnya. ' .
-                'Silakan pilih kegiatan lain atau edit kegiatan yang sudah ada.'
-            )->withInput();
-        }
-
-        $totalBiaya = $request->volume_target * $request->biaya_satuan;
-
-        $anggaran = AnggaranKelompok::where('kelompok_id', $kelompok->id)
-            ->where('tahun', date('Y'))
-            ->first();
-
-        if (!$anggaran) {
-            return back()->with('error', 'Anggaran belum tersedia')->withInput();
-        }
-
-        if ($anggaran->sisa_anggaran < $totalBiaya) {
-            return back()->with('error', 
-                'Anggaran tidak mencukupi! ' .
-                'Total biaya kegiatan: Rp ' . number_format($totalBiaya, 0, ',', '.') . ' | ' .
-                'Sisa anggaran: Rp ' . number_format($anggaran->sisa_anggaran, 0, ',', '.')
-            )->withInput();
-        }
-
-        DB::beginTransaction();
-        try {
-            $progress = ProgressFisik::create([
-                'kelompok_id' => $kelompok->id,
-                'master_kegiatan_id' => $request->master_kegiatan_id,
-                'volume_target' => $request->volume_target,
-                'nama_detail' => $request->nama_detail,
-                'volume_realisasi' => 0,
-                'biaya_satuan' => $request->biaya_satuan,
-                'tanggal_mulai' => $request->tanggal_mulai,
-                'keterangan' => $request->keterangan,
-                'status_verifikasi' => 'pending',
-            ]);
-
-            $jumlahFoto = 0;
-            if ($request->hasFile('foto')) {
-                foreach ($request->file('foto') as $index => $file) {
-                    if ($file && $file->isValid()) {
-                        try {
-                            $filename = 'dok_' . $progress->id . '_' . time() . '_' . $index . '.' . $file->extension();
-                            $path = $file->storeAs('dokumentasi-progress', $filename, 'public');
-                            
-                            DokumentasiProgress::create([
-                                'progress_fisik_id' => $progress->id,
-                                'foto' => $path,
-                                'keterangan' => $request->keterangan_foto[$index] ?? null,
-                                'tanggal_foto' => now(),
-                            ]);
-                            
-                            $jumlahFoto++;
-                        } catch (\Exception $e) {
-                            Log::error('Error upload foto: ' . $e->getMessage());
-                            continue;
-                        }
+        // Upload foto
+        if ($request->hasFile('foto')) {
+            foreach ($request->file('foto') as $index => $file) {
+                if ($file && $file->isValid()) {
+                    try {
+                        $filename = 'dok_' . $progress->id . '_' . time() . '_' . $index . '.' . $file->extension();
+                        $path = $file->storeAs('dokumentasi-progress', $filename, 'public');
+                        
+                        DokumentasiProgress::create([
+                            'progress_fisik_id' => $progress->id,
+                            'foto' => $path,
+                            'keterangan' => $request->keterangan_foto[$index] ?? null,
+                            'tanggal_foto' => now(),
+                        ]);
+                        
+                        $jumlahFoto++;
+                    } catch (\Exception $e) {
+                        Log::error('Error upload foto: ' . $e->getMessage());
+                        continue;
                     }
                 }
             }
-
-            $anggaran->refresh();
-
-            DB::commit();
-
-            $kegiatan = MasterKegiatan::find($request->master_kegiatan_id);
-            
-            $message = 'Kegiatan "' . $kegiatan->nama_kegiatan . '" berhasil ditambahkan! ';
-            
-            if ($jumlahFoto > 0) {
-                $message .= $jumlahFoto . ' foto dokumentasi berhasil diupload. ';
-            }
-            
-            $message .= 'Anggaran dialokasikan: Rp ' . number_format($totalBiaya, 0, ',', '.') . ' | ' .
-                        'Sisa anggaran: Rp ' . number_format($anggaran->sisa_anggaran, 0, ',', '.');
-
-            return redirect()->route('kelompok.progress-fisik.index')
-                ->with('success', $message);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Error saat menyimpan progress fisik: ' . $e->getMessage());
-            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage())->withInput();
         }
-    }
 
+        // Upload PDF
+        if ($request->hasFile('dokumen_pdf')) {
+            foreach ($request->file('dokumen_pdf') as $index => $file) {
+                if ($file && $file->isValid()) {
+                    try {
+                        $filename = 'pdf_' . $progress->id . '_' . time() . '_' . $index . '.pdf';
+                        $path = $file->storeAs('dokumentasi-progress/pdf', $filename, 'public');
+                        
+                        DokumentasiProgress::create([
+                            'progress_fisik_id' => $progress->id,
+                            'foto' => $path,
+                            'keterangan' => $request->keterangan_pdf[$index] ?? null,
+                            'tanggal_foto' => now(),
+                        ]);
+                        
+                        $jumlahPdf++;
+                    } catch (\Exception $e) {
+                        Log::error('Error upload PDF: ' . $e->getMessage());
+                        continue;
+                    }
+                }
+            }
+        }
+
+        $anggaran->refresh();
+
+        DB::commit();
+
+        $kegiatan = MasterKegiatan::find($request->master_kegiatan_id);
+        
+        $message = 'Kegiatan "' . $kegiatan->nama_kegiatan . '" berhasil ditambahkan! ';
+        
+        if ($jumlahFoto > 0) {
+            $message .= $jumlahFoto . ' foto dokumentasi berhasil diupload. ';
+        }
+        
+        if ($jumlahPdf > 0) {
+            $message .= $jumlahPdf . ' dokumen PDF berhasil diupload. ';
+        }
+        
+        $message .= 'Anggaran dialokasikan: Rp ' . number_format($totalBiaya, 0, ',', '.') . ' | ' .
+                    'Sisa anggaran: Rp ' . number_format($anggaran->sisa_anggaran, 0, ',', '.');
+
+        return redirect()->route('kelompok.progress-fisik.index')
+            ->with('success', $message);
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        Log::error('Error saat menyimpan progress fisik: ' . $e->getMessage());
+        return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage())->withInput();
+    }
+}
     /**
      * Display the specified resource.
      */

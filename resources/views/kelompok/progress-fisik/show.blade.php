@@ -237,47 +237,126 @@
         @endif
     </div>
 
-    <!-- Dokumentasi Foto -->
-    @if($progressFisik->dokumentasi->count() > 0)
-    <div class="bg-white rounded-lg sm:rounded-xl shadow-lg p-4 sm:p-6 mt-4 sm:mt-6">
-        <h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-            <span>📸</span>
-            Dokumentasi Kegiatan
-            <span class="text-sm font-normal text-gray-500">({{ $progressFisik->dokumentasi->count() }} foto)</span>
-        </h3>
+    <!-- Dokumentasi Foto & PDF -->
+    @php
+        $fotos = $progressFisik->dokumentasi->filter(function($dok) {
+            return !str_contains($dok->foto, '/pdf/');
+        });
+        
+        $pdfs = $progressFisik->dokumentasi->filter(function($dok) {
+            return str_contains($dok->foto, '/pdf/');
+        });
+    @endphp
 
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
-            @foreach($progressFisik->dokumentasi as $dok)
-                <div class="group relative bg-white border-2 border-gray-200 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all cursor-pointer"
-                     onclick="openImageModal('{{ Storage::url($dok->foto) }}', '{{ $dok->keterangan }}', '{{ $dok->tanggal_foto->format('d M Y') }}')">
-                    <img src="{{ Storage::url($dok->foto) }}" 
-                         alt="Dokumentasi" 
-                         class="w-full h-40 sm:h-48 object-cover group-hover:scale-110 transition-transform duration-300">
-                    
-                    <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end">
-                        <div class="p-3 w-full">
-                            <p class="text-white text-xs font-semibold line-clamp-2">
-                                {{ $dok->keterangan ?? 'Dokumentasi Kegiatan' }}
-                            </p>
-                            <p class="text-gray-300 text-xs mt-1">
-                                📅 {{ $dok->tanggal_foto->format('d M Y') }}
-                            </p>
+    @if($progressFisik->dokumentasi->count() > 0)
+        <!-- Section Dokumentasi Foto -->
+        @if($fotos->count() > 0)
+        <div class="bg-white rounded-lg sm:rounded-xl shadow-lg p-4 sm:p-6 mt-4 sm:mt-6">
+            <h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <span>📸</span>
+                Dokumentasi Foto
+                <span class="text-sm font-normal text-gray-500">({{ $fotos->count() }} foto)</span>
+            </h3>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+                @foreach($fotos as $dok)
+                    <div class="group relative bg-white border-2 border-gray-200 rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all cursor-pointer"
+                         onclick="openImageModal('{{ Storage::url($dok->foto) }}', '{{ $dok->keterangan }}', '{{ $dok->tanggal_foto->format('d M Y') }}')">
+                        <img src="{{ Storage::url($dok->foto) }}" 
+                             alt="Dokumentasi" 
+                             class="w-full h-40 sm:h-48 object-cover group-hover:scale-110 transition-transform duration-300">
+                        
+                        <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end">
+                            <div class="p-3 w-full">
+                                <p class="text-white text-xs font-semibold line-clamp-2">
+                                    {{ $dok->keterangan ?? 'Dokumentasi Kegiatan' }}
+                                </p>
+                                <p class="text-gray-300 text-xs mt-1">
+                                    📅 {{ $dok->tanggal_foto->format('d M Y') }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="absolute top-2 right-2 bg-blue-500 text-white px-2 py-1 rounded text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity">
+                            🔍 Lihat
                         </div>
                     </div>
-
-                    <div class="absolute top-2 right-2 bg-blue-500 text-white px-2 py-1 rounded text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity">
-                        🔍 Lihat
-                    </div>
-                </div>
-            @endforeach
+                @endforeach
+            </div>
         </div>
-    </div>
+        @endif
+
+        <!-- Section Dokumen PDF -->
+        @if($pdfs->count() > 0)
+        <div class="bg-white rounded-lg sm:rounded-xl shadow-lg p-4 sm:p-6 mt-4 sm:mt-6">
+            <h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <span>📄</span>
+                Dokumen PDF BA HASIL PENAWASAN 
+                <span class="text-sm font-normal text-gray-500">({{ $pdfs->count() }} dokumen)</span>
+            </h3>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                @foreach($pdfs as $dok)
+                    <div class="group bg-gradient-to-br from-purple-50 to-indigo-50 border-2 border-purple-200 rounded-lg p-4 hover:shadow-xl transition-all">
+                        <div class="flex items-start gap-3">
+                            <div class="flex-shrink-0">
+                                <div class="w-12 h-12 bg-red-500 rounded-lg flex items-center justify-center text-white text-2xl group-hover:scale-110 transition-transform">
+                                    📄
+                                </div>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="text-sm font-bold text-gray-900 truncate mb-1">
+                                    {{ $dok->keterangan ?? 'Dokumen PDF' }}
+                                </h4>
+                                <p class="text-xs text-gray-600 mb-2">
+                                    📅 {{ $dok->tanggal_foto->format('d M Y') }}
+                                </p>
+                                <div class="flex gap-2">
+                                    <!-- Tombol View -->
+                                    <a href="{{ Storage::url($dok->foto) }}" 
+                                       target="_blank"
+                                       class="flex-1 px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-1">
+                                        <span>👁️</span>
+                                        <span>Lihat</span>
+                                    </a>
+                                    <!-- Tombol Download -->
+                                    <a href="{{ Storage::url($dok->foto) }}" 
+                                       download
+                                       class="flex-1 px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-1">
+                                        <span>⬇️</span>
+                                        <span>Download</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Info File Size (opsional) -->
+                        @php
+                            $filePath = storage_path('app/public/' . $dok->foto);
+                            $fileSize = file_exists($filePath) ? filesize($filePath) : 0;
+                            $fileSizeMB = number_format($fileSize / 1024 / 1024, 2);
+                        @endphp
+                        @if($fileSize > 0)
+                            <div class="mt-3 pt-3 border-t border-purple-200">
+                                <p class="text-xs text-gray-600 flex items-center gap-1">
+                                    <span>💾</span>
+                                    <span>Ukuran: {{ $fileSizeMB }} MB</span>
+                                </p>
+                            </div>
+                        @endif
+                    </div>
+                @endforeach
+            </div>
+        </div>
+        @endif
+
     @else
-    <div class="bg-gray-50 rounded-lg p-8 mt-4 sm:mt-6 text-center border-2 border-dashed border-gray-300">
-        <span class="text-5xl mb-3 block">📷</span>
-        <p class="text-gray-500 font-medium">Belum ada dokumentasi foto</p>
-        <p class="text-sm text-gray-400 mt-1">Upload foto dokumentasi saat mengedit progress</p>
-    </div>
+        <!-- Jika belum ada dokumentasi sama sekali -->
+        <div class="bg-gray-50 rounded-lg p-8 mt-4 sm:mt-6 text-center border-2 border-dashed border-gray-300">
+            <span class="text-5xl mb-3 block">📁</span>
+            <p class="text-gray-500 font-medium">Belum ada dokumentasi</p>
+            <p class="text-sm text-gray-400 mt-1">Upload foto atau dokumen PDF saat mengedit progress</p>
+        </div>
     @endif
 
     <!-- Info Tambahan -->
@@ -291,6 +370,7 @@
                     <li>Biaya realisasi dihitung berdasarkan: Volume Realisasi × Biaya per Satuan</li>
                     <li>Kegiatan dengan status "Disetujui" tidak dapat diedit atau dihapus</li>
                     <li>Klik foto dokumentasi untuk melihat dalam ukuran penuh</li>
+                    <li>Dokumen PDF dapat dilihat langsung di browser atau didownload</li>
                 </ul>
             </div>
         </div>

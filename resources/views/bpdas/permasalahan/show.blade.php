@@ -79,15 +79,7 @@
                             <label class="text-sm font-medium text-gray-500">Lokasi Tanam</label>
                             <p class="mt-1 text-gray-900">{{ $permasalahan->lokasi_tanam }}</p>
                         </div>
-                        <div>
-                            <label class="text-sm font-medium text-gray-500">Prioritas</label>
-                            <p class="mt-1">
-                                <span class="px-3 py-1 rounded-full text-xs font-semibold {{ $permasalahan->getPrioritasBadgeClass() }}">
-                                    {{ ucfirst($permasalahan->prioritas) }}
-                                </span>
-                            </p>
-                        </div>
-                        <div>
+                        <div class="md:col-span-2">
                             <label class="text-sm font-medium text-gray-500">Tanggal Laporan</label>
                             <p class="mt-1 text-gray-900">{{ $permasalahan->created_at->format('d M Y, H:i') }}</p>
                         </div>

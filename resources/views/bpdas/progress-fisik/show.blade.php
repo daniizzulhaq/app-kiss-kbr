@@ -230,6 +230,74 @@
                                 </div>
                             @endif
 
+                        <!-- Dokumentasi PDF -->
+@php
+    $pdfDocs = $progress->dokumentasi->filter(function($dok) {
+        return str_ends_with(strtolower($dok->foto), '.pdf');
+    });
+@endphp
+
+@if($pdfDocs->count() > 0)
+    <div class="mb-3">
+        <div class="flex items-center gap-2 mb-3">
+            <span class="text-xs sm:text-sm font-medium text-gray-700">📄 Hasil Pengawasan (PDF)</span>
+            <span class="px-2 py-1 bg-red-100 text-red-700 text-xs font-semibold rounded-full">
+                {{ $pdfDocs->count() }} Dokumen
+            </span>
+        </div>
+        <div class="space-y-2">
+            @foreach($pdfDocs as $index => $pdf)
+                <div class="flex items-center gap-3 p-3 sm:p-4 bg-gradient-to-r from-red-50 to-pink-50 rounded-lg border-2 border-red-200 hover:border-red-300 hover:shadow-md transition-all">
+                    <!-- Icon PDF -->
+                    <div class="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 bg-red-600 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 sm:w-7 sm:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                    </div>
+                    
+                    <!-- Info File -->
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="px-2 py-0.5 bg-red-600 text-white text-xs font-bold rounded">
+                                PDF {{ $index + 1 }}
+                            </span>
+                            <p class="text-sm sm:text-base font-semibold text-gray-800">
+                                Hasil Pengawasan
+                            </p>
+                        </div>
+                        @if($pdf->keterangan)
+                            <p class="text-xs sm:text-sm text-gray-700 mt-1 line-clamp-2 font-medium">
+                                💬 {{ $pdf->keterangan }}
+                            </p>
+                        @else
+                            <p class="text-xs sm:text-sm text-gray-500 mt-1 italic">
+                                Dokumen hasil pengawasan lapangan
+                            </p>
+                        @endif
+                        <p class="text-xs text-gray-500 mt-1">
+                            📅 Diupload: {{ \Carbon\Carbon::parse($pdf->tanggal_foto)->format('d M Y, H:i') }} WIB
+                        </p>
+                    </div>
+                    
+                    <!-- Tombol Aksi -->
+                    <div class="flex-shrink-0">
+                        <a href="{{ Storage::url($pdf->foto) }}" 
+                           target="_blank"
+                           class="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs sm:text-sm font-semibold rounded-lg transition-colors shadow-md hover:shadow-lg">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                            <span class="hidden sm:inline">Lihat</span>
+                            <span class="sm:hidden">Buka</span>
+                        </a>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    </div>
+@endif
+
                             <!-- Keterangan -->
                             @if($progress->keterangan)
                                 <div class="mb-3 text-xs sm:text-sm p-2 sm:p-3 bg-gray-50 rounded">

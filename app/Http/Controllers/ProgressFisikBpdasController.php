@@ -589,6 +589,7 @@ class ProgressFisikBpdasController extends Controller
         return $this->exportPdfPerUser($request, auth()->id());
     }
 
+    
     /**
      * Dashboard ringkasan untuk BPDAS
      */

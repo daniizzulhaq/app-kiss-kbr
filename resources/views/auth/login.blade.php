@@ -101,7 +101,7 @@
                 <h2 class="text-4xl font-extrabold text-white mb-2 tracking-tight">
                      Mondigi KBR
                 </h2>
-                <p class="text-green-100 text-sm">Monitoring dan Evaluasi Digital Kebun Bibit Rakyat</p>
+                <p class="text-green-100 text-sm">BPDAS PEMALI JRATUN</p>
             </div>
 
             <!-- Session Status -->
@@ -210,7 +210,7 @@
                 <!-- Footer Info -->
                 <div class="pt-4 border-t border-green-200">
                     <p class="text-center text-xs text-gray-600">
-                        🌱 <span class="font-semibold text-green-700">Platform Manajemen Pertanian Modern</span> 🌾
+                         <span class="font-semibold text-green-700">platform data digital kehutanan</span> 
                     </p>
                     
                     <!-- Register Link -->
@@ -230,7 +230,7 @@
 
             <!-- Additional Info -->
             <p class="text-center text-xs text-green-100">
-                © 2024 Sistem Pertanian. Semua hak dilindungi.
+                © 2025 sistem informasi kehutanan. Semua hak dilindungi.
             </p>
         </div>
     </div>
